@@ -1,0 +1,19 @@
+{
+  "appName": "NERAM POS - Restaurant & Cafe Management System",
+  "appId": "com.neram.neram_pos",
+  "version": "1.0.0",
+  "environment": "development",
+  "api": {
+    "baseUrl": "https://api.nerampos.example.com/v1",
+    "connectTimeoutMs": 30000,
+    "receiveTimeoutMs": 30000
+  },
+  "features": {
+    "offlineSync": true,
+    "tableManagement": true,
+    "kitchenDisplaySystem": true,
+    "thermalPrinterIntegration": true,
+    "hapticFeedback": true
+  }
+}
+

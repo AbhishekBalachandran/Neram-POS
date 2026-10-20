@@ -1,0 +1,9 @@
+# Android Keystore Signing Configuration Example
+# Copy this file to key.properties in this folder and replace with actual credentials
+# WARNING: NEVER commit actual key.properties or .jks/.keystore files to Git!
+
+storePassword=your_keystore_password_here
+keyPassword=your_key_password_here
+keyAlias=your_key_alias_here
+storeFile=../keystores/release-key.jks
+

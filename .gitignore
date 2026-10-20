@@ -1,0 +1,71 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Android build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+android/local.properties
+
+# Keystores & Signing credentials
+*.jks
+*.keystore
+key.properties
+key.properties.*
+!key.properties.example
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+ExportOptions.plist
+
+# Google Services / Firebase Configs
+google-services.json
+**/google-services.json
+GoogleService-Info.plist
+**/GoogleService-Info.plist
+
+# Environment variables & Sensitive configs
+.env*
+!.env.example
+config.json
+config.*.json
+!config.example.json
+
+# Symbolication & Obfuscation / Mapping files
+app.*.symbols
+*.symbols
+app.*.map.json
+*.map.json
+mapping.txt
+**/mapping/

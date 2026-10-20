@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:neram_pos/core/theme/app_colors.dart';
+import 'package:neram_pos/core/theme/app_spacing.dart';
+
+/// Reusable decoration patterns, shadows, and card styling.
+abstract final class AppDecorations {
+  // Soft modern shadows (Zepto / Swiggy style subtle depth)
+  static const List<BoxShadow> softShadow = [
+    BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4)),
+  ];
+
+  static const List<BoxShadow> mediumShadow = [
+    BoxShadow(color: Color(0x14000000), blurRadius: 16, offset: Offset(0, 6)),
+  ];
+
+  static const List<BoxShadow> darkElevatedShadow = [
+    BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 4)),
+  ];
+
+  // Amber glow for active/selected items
+  static const List<BoxShadow> primaryGlow = [
+    BoxShadow(color: Color(0x3DF59E0B), blurRadius: 16, offset: Offset(0, 4)),
+  ];
+
+  /// Standard card decoration based on brightness.
+  static BoxDecoration cardBox(
+    BuildContext context, {
+    Color? overrideColor,
+    BorderRadius? borderRadius,
+    bool showBorder = true,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return BoxDecoration(
+      color:
+          overrideColor ??
+          (isDark ? AppColors.darkSurface : AppColors.lightSurface),
+      borderRadius: borderRadius ?? AppSpacing.roundedLg,
+      border: showBorder
+          ? Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              width: 1,
+            )
+          : null,
+      boxShadow: isDark ? darkElevatedShadow : softShadow,
+    );
+  }
+}
