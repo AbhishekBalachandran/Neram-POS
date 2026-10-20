@@ -85,8 +85,8 @@ void main() {
       expect(find.text(AppConstants.appSubtitle), findsOneWidget);
 
       // Verify fields
-      expect(find.text('Username'), findsOneWidget);
-      expect(find.text('Password'), findsOneWidget);
+      expect(find.text('USERNAME'), findsOneWidget);
+      expect(find.text('PASSWORD'), findsOneWidget);
       expect(find.text('Sign In'), findsOneWidget);
 
       // Tap Sign In without filling fields - should trigger validation errors

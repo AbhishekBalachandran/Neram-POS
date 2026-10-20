@@ -14,12 +14,12 @@ abstract final class AppDecorations {
   ];
 
   static const List<BoxShadow> darkElevatedShadow = [
-    BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 4)),
+    BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, 8)),
   ];
 
   // Amber glow for active/selected items
   static const List<BoxShadow> primaryGlow = [
-    BoxShadow(color: Color(0x3DF59E0B), blurRadius: 16, offset: Offset(0, 4)),
+    BoxShadow(color: Color(0x4DFF6B35), blurRadius: 20, offset: Offset(0, 6)),
   ];
 
   /// Standard card decoration based on brightness.
@@ -33,8 +33,8 @@ abstract final class AppDecorations {
     return BoxDecoration(
       color:
           overrideColor ??
-          (isDark ? AppColors.darkSurface : AppColors.lightSurface),
-      borderRadius: borderRadius ?? AppSpacing.roundedLg,
+          (isDark ? AppColors.darkSurfaceContainer : AppColors.lightSurface),
+      borderRadius: borderRadius ?? AppSpacing.roundedXl,
       border: showBorder
           ? Border.all(
               color: isDark ? AppColors.darkBorder : AppColors.lightBorder,

@@ -41,13 +41,13 @@ class AppButton extends StatelessWidget {
     final height = switch (size) {
       AppButtonSize.small => 38.0,
       AppButtonSize.medium => 48.0,
-      AppButtonSize.large => 56.0,
+      AppButtonSize.large => 60.0,
     };
 
     final fontSize = switch (size) {
       AppButtonSize.small => 13.0,
       AppButtonSize.medium => 15.0,
-      AppButtonSize.large => 16.0,
+      AppButtonSize.large => 17.0,
     };
 
     final padding = switch (size) {
@@ -107,6 +107,17 @@ class AppButton extends StatelessWidget {
       gradient = null;
     }
 
+    List<BoxShadow>? shadows;
+    if (_isEnabled && variant == AppButtonVariant.primary) {
+      shadows = const [
+        BoxShadow(
+          color: Color(0x4DFF6B35),
+          blurRadius: 20,
+          offset: Offset(0, 6),
+        ),
+      ];
+    }
+
     final content = AnimatedPressable(
       onTap: _isEnabled
           ? () {
@@ -121,8 +132,9 @@ class AppButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: gradient == null ? backgroundColor : null,
           gradient: gradient,
-          borderRadius: AppSpacing.roundedMd,
+          borderRadius: BorderRadius.circular(12),
           border: border,
+          boxShadow: shadows,
         ),
         child: Row(
           mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,

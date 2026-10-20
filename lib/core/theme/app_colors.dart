@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 /// Comprehensive color tokens for NERAM POS.
-/// Primary brand color is #F59E0B (Amber/Gold), combined with modern food-tech palettes.
+/// Built on the "Amber Hearth POS" Stitch design system with radiant flame amber (#FF6B35),
+/// deep obsidian canvas (#121318), and tiered slate containers.
 abstract final class AppColors {
-  // Brand Primary & Amber Shades
-  static const Color primary = Color(0xFFF59E0B);
-  static const Color primaryLight = Color(0xFFFBBF24);
-  static const Color primaryDark = Color(0xFFD97706);
-  static const Color primaryContainerLight = Color(0xFFFEF3C7);
-  static const Color primaryContainerDark = Color(0xFF78350F);
+  // Brand Primary & Radiant Flame Amber (from Stitch design system)
+  static const Color primary = Color(0xFFFF6B35);
+  static const Color primaryLight = Color(0xFFFFB59D);
+  static const Color primaryDark = Color(0xFFE85D04);
+  static const Color primaryContainer = Color(0xFFFF6B35);
+  static const Color onPrimaryContainer = Color(0xFF5F1900);
+  static const Color primaryContainerLight = Color(0xFFFFE0D6);
+  static const Color primaryContainerDark = Color(0xFF5F1900);
 
+  // Amber Reference Tones
   static const Color amber50 = Color(0xFFFFFBEB);
   static const Color amber100 = Color(0xFFFEF3C7);
   static const Color amber200 = Color(0xFFFDE68A);
@@ -21,64 +25,87 @@ abstract final class AppColors {
   static const Color amber800 = Color(0xFF92400E);
   static const Color amber900 = Color(0xFF78350F);
 
-  // Secondary & Accents
-  static const Color secondary = Color(0xFF0F766E); // Teal accent
-  static const Color secondaryLight = Color(0xFF14B8A6);
-  static const Color accent = Color(0xFFF97316); // Warm orange accent
+  // Secondary & Accents (Ember & Marigold from Stitch)
+  static const Color secondary = Color(0xFFFFB596);
+  static const Color secondaryLight = Color(0xFFFFB596);
+  static const Color secondaryContainer = Color(0xFFF26411);
+  static const Color onSecondary = Color(0xFF581E00);
+  static const Color tertiary = Color(0xFFFFB877);
+  static const Color tertiaryContainer = Color(0xFFE38100);
+  static const Color onTertiary = Color(0xFF4B2700);
+  static const Color accent = Color(0xFFFFB877);
 
   // Functional POS Status Colors
-  static const Color success = Color(0xFF10B981); // Emerald - Ready / Settled
+  static const Color success = Color(0xFF10B981);
   static const Color successLight = Color(0xFFD1FAE5);
-  static const Color warning = Color(0xFFF59E0B); // Amber - Preparing / Pending
+  static const Color warning = Color(0xFFF59E0B);
   static const Color warningLight = Color(0xFFFEF3C7);
-  static const Color error = Color(0xFFEF4444); // Crimson - Void / Cancelled
-  static const Color errorLight = Color(0xFFFEE2E2);
-  static const Color info = Color(0xFF0EA5E9); // Sky - Takeaway / Online
+  static const Color error = Color(0xFFFFB4AB);
+  static const Color errorLight = Color(0xFFFFDAD6);
+  static const Color errorContainer = Color(0xFF93000A);
+  static const Color onError = Color(0xFF690005);
+  static const Color onErrorContainer = Color(0xFFFFDAD6);
+  static const Color info = Color(0xFF0EA5E9);
   static const Color infoLight = Color(0xFFE0F2FE);
-  static const Color purple = Color(0xFF8B5CF6); // KDS / Kitchen station
+  static const Color purple = Color(0xFF8B5CF6);
 
   // Table State Colors
   static const Color tableAvailable = Color(0xFF10B981);
-  static const Color tableOccupied = Color(0xFFF59E0B);
+  static const Color tableOccupied = Color(0xFFFF6B35);
   static const Color tableBilled = Color(0xFF6366F1);
   static const Color tableReserved = Color(0xFF0EA5E9);
 
   // Light Mode Surfaces & Neutrals
   static const Color lightBackground = Color(0xFFF8FAFC);
   static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceContainer = Color(0xFFF1F5F9);
   static const Color lightSurfaceSubtle = Color(0xFFF1F5F9);
   static const Color lightBorder = Color(0xFFE2E8F0);
   static const Color lightTextPrimary = Color(0xFF0F172A);
   static const Color lightTextSecondary = Color(0xFF475569);
   static const Color lightTextMuted = Color(0xFF94A3B8);
 
-  // Dark Mode Surfaces & Neutrals (Deep sleek dark palette for POS screens)
-  static const Color darkBackground = Color(0xFF0B0F17);
-  static const Color darkSurface = Color(0xFF151D2A);
-  static const Color darkSurfaceElevated = Color(0xFF1E293B);
-  static const Color darkSurfaceSubtle = Color(0xFF243248);
-  static const Color darkBorder = Color(0xFF273549);
-  static const Color darkTextPrimary = Color(0xFFF8FAFC);
-  static const Color darkTextSecondary = Color(0xFF94A3B8);
-  static const Color darkTextMuted = Color(0xFF64748B);
+  // Dark Mode Surfaces & Obsidian Tiers (from Stitch "Amber Hearth POS")
+  static const Color darkBackground = Color(0xFF121318);
+  static const Color darkSurface = Color(0xFF121318);
+  static const Color darkSurfaceDim = Color(0xFF121318);
+  static const Color darkSurfaceBright = Color(0xFF38393E);
+  static const Color darkSurfaceContainer = Color(0xFF1E1F24); // Primary Card
+  static const Color darkSurfaceContainerLowest = Color(
+    0xFF0D0E13,
+  ); // Input Field Fill
+  static const Color darkSurfaceContainerLow = Color(
+    0xFF1A1B20,
+  ); // Focused Input
+  static const Color darkSurfaceContainerHigh = Color(0xFF292A2F);
+  static const Color darkSurfaceContainerHighest = Color(0xFF34343A);
+  static const Color darkSurfaceElevated = Color(0xFF292A2F);
+  static const Color darkSurfaceSubtle = Color(0xFF1E1F24);
+  static const Color darkBorder = Color(0xFF373A43);
+  static const Color darkBorderVariant = Color(0xFF594139);
+  static const Color darkTextPrimary = Color(0xFFE3E2E8); // on-surface
+  static const Color darkTextSecondary = Color(
+    0xFFE1BFB5,
+  ); // on-surface-variant
+  static const Color darkTextMuted = Color(0xFF9E9EA7);
 
   // Dynamic Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+    colors: [Color(0xFFFF6B35), Color(0xFFE85D04)],
   );
 
   static const LinearGradient primaryWarmGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+    colors: [Color(0xFFFFB59D), Color(0xFFFF6B35)],
   );
 
   static const LinearGradient darkCardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF1E293B), Color(0xFF151D2A)],
+    colors: [Color(0xFF1E1F24), Color(0xFF1A1B20)],
   );
 
   static const LinearGradient successGradient = LinearGradient(
@@ -90,6 +117,6 @@ abstract final class AppColors {
   static const LinearGradient accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFF97316), Color(0xFFEA580C)],
+    colors: [Color(0xFFFFB877), Color(0xFFE38100)],
   );
 }

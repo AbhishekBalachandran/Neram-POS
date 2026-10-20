@@ -14,7 +14,10 @@ void main() {
 
       expect(lightTheme.brightness, Brightness.light);
       expect(lightTheme.colorScheme.primary, AppColors.primary);
-      expect(lightTheme.colorScheme.primary.toARGB32(), 0xFFF59E0B);
+      expect(
+        lightTheme.colorScheme.primary.toARGB32(),
+        AppColors.primary.toARGB32(),
+      );
       expect(lightTheme.appBarTheme.backgroundColor, AppColors.lightSurface);
       expect(lightTheme.cardTheme.color, AppColors.lightSurface);
       expect(lightTheme.inputDecorationTheme.filled, true);
@@ -25,9 +28,12 @@ void main() {
 
       expect(darkTheme.brightness, Brightness.dark);
       expect(darkTheme.colorScheme.primary, AppColors.primary);
-      expect(darkTheme.colorScheme.primary.toARGB32(), 0xFFF59E0B);
+      expect(
+        darkTheme.colorScheme.primary.toARGB32(),
+        AppColors.primary.toARGB32(),
+      );
       expect(darkTheme.scaffoldBackgroundColor, AppColors.darkBackground);
-      expect(darkTheme.cardTheme.color, AppColors.darkSurface);
+      expect(darkTheme.cardTheme.color, AppColors.darkSurfaceContainer);
       expect(darkTheme.inputDecorationTheme.filled, true);
     });
   });

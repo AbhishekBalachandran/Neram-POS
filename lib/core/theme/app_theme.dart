@@ -459,11 +459,11 @@ abstract final class AppTheme {
 
       // Card Theme
       cardTheme: CardThemeData(
-        color: AppColors.darkSurface,
+        color: AppColors.darkSurfaceContainer,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.roundedLg,
+          borderRadius: AppSpacing.roundedXl,
           side: const BorderSide(color: AppColors.darkBorder, width: 1),
         ),
       ),
@@ -537,7 +537,7 @@ abstract final class AppTheme {
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurfaceElevated,
+        fillColor: AppColors.darkSurfaceContainerLowest,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,
@@ -558,7 +558,7 @@ abstract final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppSpacing.roundedMd,
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppSpacing.roundedMd,
@@ -566,7 +566,7 @@ abstract final class AppTheme {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppSpacing.roundedMd,
-          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
       ),
 

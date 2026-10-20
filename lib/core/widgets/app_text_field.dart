@@ -3,7 +3,9 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 
-/// Styled input field tailored for high-speed POS staff data entry.
+/// Styled input field matching Stitch "Amber Hearth POS" specifications:
+/// Obsidian dark background (#0D0E13), radiant amber icons, clear & visibility actions,
+/// and radiant focus rings.
 class AppTextField extends StatefulWidget {
   const AppTextField({
     required this.controller,
@@ -12,6 +14,7 @@ class AppTextField extends StatefulWidget {
     this.hintText,
     this.prefixIcon,
     this.isPassword = false,
+    this.showClearButton = false,
     this.keyboardType,
     this.textInputAction,
     this.validator,
@@ -26,6 +29,7 @@ class AppTextField extends StatefulWidget {
   final String? hintText;
   final IconData? prefixIcon;
   final bool isPassword;
+  final bool showClearButton;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final String? Function(String?)? validator;
@@ -45,6 +49,21 @@ class _AppTextFieldState extends State<AppTextField> {
   void initState() {
     super.initState();
     _obscureText = widget.isPassword;
+    if (widget.showClearButton) {
+      widget.controller.addListener(_onTextChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.showClearButton) {
+      widget.controller.removeListener(_onTextChanged);
+    }
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    if (mounted) setState(() {});
   }
 
   void _toggleObscure() {
@@ -54,22 +73,34 @@ class _AppTextFieldState extends State<AppTextField> {
     });
   }
 
+  void _clearField() {
+    HapticService.selection();
+    widget.controller.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    final fillColor = isDark
+        ? AppColors.darkSurfaceContainerLowest
+        : AppColors.lightSurfaceSubtle;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          widget.label,
-          style: theme.textTheme.labelMedium?.copyWith(
+          widget.label.toUpperCase(),
+          style: theme.textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w600,
+            letterSpacing: 1.0,
+            fontSize: 11.5,
             color: isDark
-                ? AppColors.darkTextPrimary
-                : AppColors.lightTextPrimary,
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -85,17 +116,25 @@ class _AppTextFieldState extends State<AppTextField> {
           autofillHints: widget.autofillHints,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w500,
+            color: isDark
+                ? AppColors.darkTextPrimary
+                : AppColors.lightTextPrimary,
           ),
           decoration: InputDecoration(
+            filled: true,
+            fillColor: fillColor,
             hintText: widget.hintText,
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: isDark
+                  ? AppColors.darkTextMuted.withAlpha(120)
+                  : AppColors.lightTextMuted,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: 16,
+            ),
             prefixIcon: widget.prefixIcon != null
-                ? Icon(
-                    widget.prefixIcon,
-                    size: 20,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                  )
+                ? Icon(widget.prefixIcon, size: 22, color: AppColors.primary)
                 : null,
             suffixIcon: widget.isPassword
                 ? IconButton(
@@ -110,7 +149,38 @@ class _AppTextFieldState extends State<AppTextField> {
                     ),
                     onPressed: _toggleObscure,
                   )
-                : null,
+                : (widget.showClearButton && widget.controller.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.close_rounded,
+                            size: 18,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                          onPressed: _clearField,
+                        )
+                      : null),
+            border: OutlineInputBorder(
+              borderRadius: AppSpacing.roundedMd,
+              borderSide: BorderSide(color: borderColor, width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: AppSpacing.roundedMd,
+              borderSide: BorderSide(color: borderColor, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: AppSpacing.roundedMd,
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: AppSpacing.roundedMd,
+              borderSide: const BorderSide(color: AppColors.error, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: AppSpacing.roundedMd,
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
+            ),
           ),
         ),
       ],

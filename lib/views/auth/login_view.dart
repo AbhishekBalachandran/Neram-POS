@@ -14,8 +14,9 @@ import 'package:neram_pos/core/widgets/responsive_builder.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-/// Highly elegant staff authentication screen for NERAM POS.
-/// Responsive across mobile phones and restaurant POS tablets.
+/// Staff authentication screen updated to match the Stitch "Amber Hearth POS" design system.
+/// Implements radiant flame amber (#FF6B35), obsidian card surfaces (#1E1F24 / #0D0E13),
+/// Space Grotesk / Plus Jakarta Sans typography, and floating toast notifications.
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -81,14 +82,40 @@ class _LoginViewState extends State<LoginView>
 
     if (!mounted) return;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (success) {
       HapticService.success();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Welcome, ${authViewModel.currentUser?.name ?? "Staff"}!',
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: AppColors.success,
+          backgroundColor: isDark
+              ? AppColors.darkSurfaceContainerHighest
+              : AppColors.lightSurface,
+          content: Row(
+            children: [
+              const Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Welcome, ${authViewModel.currentUser?.name ?? "Staff"}!',
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     } else {
@@ -104,6 +131,9 @@ class _LoginViewState extends State<LoginView>
     return GestureDetector(
       onTap: () => DeviceUtils.hideKeyboard(context),
       child: Scaffold(
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : AppColors.lightBackground,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -119,13 +149,36 @@ class _LoginViewState extends State<LoginView>
           ],
         ),
         body: SafeArea(
-          child: ResponsiveBuilder(
-            builder: (context, info) {
-              if (info.screenWidth >= 860) {
-                return _buildTabletLayout(context, isDark);
-              }
-              return _buildMobileLayout(context, isDark);
-            },
+          child: Stack(
+            children: [
+              // Ambient atmospheric glow backing from Stitch design
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.55),
+                      radius: 0.95,
+                      colors: isDark
+                          ? const [
+                              Color(0x24FF6B35), // Subtle flame amber aura
+                              Colors.transparent,
+                            ]
+                          : const [Color(0x15FF6B35), Colors.transparent],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Responsive Screen Layout
+              ResponsiveBuilder(
+                builder: (context, info) {
+                  if (info.screenWidth >= 860) {
+                    return _buildTabletLayout(context, isDark);
+                  }
+                  return _buildMobileLayout(context, isDark);
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -166,15 +219,15 @@ class _LoginViewState extends State<LoginView>
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      Color(0xFF1E293B),
-                                      Color(0xFF0F172A),
+                                      Color(0xFF1E1F24),
+                                      Color(0xFF121318),
                                     ],
                                   )
                                 : const LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      Color(0xFFFFFBEB),
+                                      Color(0xFFFFFDF8),
                                       Color(0xFFFEF3C7),
                                     ],
                                   ),
@@ -183,7 +236,7 @@ class _LoginViewState extends State<LoginView>
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLogoContainer(size: 80),
+                              _buildLogoContainer(size: 88),
                               const SizedBox(height: AppSpacing.xl),
                               const NeramBrandTitle(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,35 +328,39 @@ class _LoginViewState extends State<LoginView>
             opacity: _fadeAnimation,
             child: SlideTransition(
               position: _slideAnimation,
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
-                decoration: AppDecorations.cardBox(context),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildLogoContainer(size: 72),
-                    const SizedBox(height: AppSpacing.lg),
-                    const NeramBrandTitle(
-                      titleFontSize: 28.0,
-                      subtitleFontSize: 11.0,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Atmospheric Brand Badge Enclosure
+                  _buildLogoContainer(size: 88),
+                  const SizedBox(height: AppSpacing.lg),
 
-                    Text(
-                      'Staff Access',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
+                  // Brand Title & Tagline
+                  const NeramBrandTitle(
+                    titleFontSize: 28.0,
+                    subtitleFontSize: 11.5,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
 
-                    _buildLoginForm(context, isDark),
-                  ],
-                ),
+                  Text(
+                    'Staff Access',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // Primary Interactive Card
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.xxl),
+                    decoration: AppDecorations.cardBox(context),
+                    child: _buildLoginForm(context, isDark),
+                  ),
+                ],
               ),
             ),
           ),
@@ -332,7 +389,7 @@ class _LoginViewState extends State<LoginView>
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF450A0A)
-                        : AppColors.errorLight,
+                        : AppColors.onErrorContainer,
                     borderRadius: AppSpacing.roundedMd,
                     border: Border.all(color: AppColors.error),
                   ),
@@ -362,12 +419,13 @@ class _LoginViewState extends State<LoginView>
                 const SizedBox(height: AppSpacing.lg),
               ],
 
-              // Username Field
+              // Username Field (from Stitch)
               AppTextField(
                 controller: _usernameController,
                 label: 'Username',
-                hintText: 'Enter Username',
-                prefixIcon: Icons.person_outline_rounded,
+                hintText: 'Enter username',
+                prefixIcon: Icons.account_circle,
+                showClearButton: true,
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_passwordFocusNode);
@@ -381,13 +439,13 @@ class _LoginViewState extends State<LoginView>
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Password Field
+              // Password Field (from Stitch)
               AppTextField(
                 controller: _passwordController,
                 focusNode: _passwordFocusNode,
                 label: 'Password',
                 hintText: 'Enter password',
-                prefixIcon: Icons.lock_outline_rounded,
+                prefixIcon: Icons.lock,
                 isPassword: true,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _handleLogin(),
@@ -400,47 +458,20 @@ class _LoginViewState extends State<LoginView>
               ),
               const SizedBox(height: AppSpacing.xxl),
 
-              // Sign In Button
+              // Sign In Button (Stitch 60px primary action)
               AppButton(
                 text: 'Sign In',
                 variant: AppButtonVariant.primary,
                 size: AppButtonSize.large,
                 isFullWidth: true,
                 isLoading: authViewModel.isBusy,
-                leadingIcon: const Icon(
+                trailingIcon: const Icon(
                   Icons.login_rounded,
-                  size: 20,
+                  size: 22,
                   color: Colors.white,
                 ),
                 onPressed: _handleLogin,
               ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Safe credentials tip
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     Icon(
-              //       Icons.security_rounded,
-              //       size: 14,
-              //       color: isDark
-              //           ? AppColors.darkTextMuted
-              //           : AppColors.lightTextMuted,
-              //     ),
-              //     const SizedBox(width: AppSpacing.xs),
-              //     Flexible(
-              //       child: Text(
-              //         'Hardware-encrypted terminal session',
-              //         overflow: TextOverflow.ellipsis,
-              //         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              //           color: isDark
-              //               ? AppColors.darkTextMuted
-              //               : AppColors.lightTextMuted,
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
             ],
           ),
         );
@@ -467,7 +498,7 @@ class _LoginViewState extends State<LoginView>
       ),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.darkSurfaceElevated
+            ? AppColors.darkSurfaceContainerHighest
             : Colors.white.withAlpha(200),
         borderRadius: AppSpacing.roundedMd,
         border: Border.all(
