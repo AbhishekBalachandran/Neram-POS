@@ -4,6 +4,7 @@ import 'package:neram_pos/app.dart';
 import 'package:neram_pos/core/constants/app_constants.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/theme/theme_provider.dart';
+import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
@@ -126,5 +127,17 @@ void main() {
     expect(find.text('Table & Dine-in Management'), findsOneWidget);
     expect(find.text('Realtime Kitchen Display System'), findsOneWidget);
     expect(find.text('Rapid Thermal Billing & Settlement'), findsOneWidget);
+  });
+
+  testWidgets('NeramLogoBadge renders properly in light and dark mode', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        themeMode: ThemeMode.dark,
+        home: Scaffold(body: NeramLogoBadge()),
+      ),
+    );
+    expect(find.byType(NeramLogoBadge), findsOneWidget);
   });
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:neram_pos/core/constants/app_constants.dart';
-import 'package:neram_pos/core/constants/asset_constants.dart';
 import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_decorations.dart';
@@ -10,6 +9,7 @@ import 'package:neram_pos/core/utils/device_utils.dart';
 import 'package:neram_pos/core/widgets/app_button.dart';
 import 'package:neram_pos/core/widgets/app_text_field.dart';
 import 'package:neram_pos/core/widgets/neram_brand_title.dart';
+import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/core/widgets/responsive_builder.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -452,28 +452,7 @@ class _LoginViewState extends State<LoginView>
   // BRAND LOGO CONTAINER
   // ---------------------------------------------------------------------------
   Widget _buildLogoContainer({required double size}) {
-    return Container(
-      width: size,
-      height: size,
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppSpacing.roundedLg,
-        boxShadow: AppDecorations.primaryGlow,
-        border: Border.all(color: AppColors.primaryLight, width: 1.5),
-      ),
-      child: Image.asset(
-        AssetConstants.appLogo,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return const Icon(
-            Icons.restaurant_rounded,
-            color: AppColors.primary,
-            size: 36,
-          );
-        },
-      ),
-    );
+    return NeramLogoBadge(size: size);
   }
 
   Widget _buildFeatureBadge({
