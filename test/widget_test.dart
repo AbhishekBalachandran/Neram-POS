@@ -8,6 +8,8 @@ import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
+import 'package:neram_pos/views/auth/login_view.dart';
+import 'package:neram_pos/views/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -75,6 +77,7 @@ void main() {
       await tester.pumpWidget(
         buildTestApp(prefs: prefs, authRepository: authRepository),
       );
+      await tester.pump(const Duration(milliseconds: 2000));
       await tester.pumpAndSettle();
 
       // Verify brand title and management subtitle match identity
@@ -120,6 +123,7 @@ void main() {
     await tester.pumpWidget(
       buildTestApp(prefs: prefs, authRepository: authRepository),
     );
+    await tester.pump(const Duration(milliseconds: 2000));
     await tester.pumpAndSettle();
 
     expect(find.text(AppConstants.appShortName), findsOneWidget);
@@ -140,4 +144,28 @@ void main() {
     );
     expect(find.byType(NeramLogoBadge), findsOneWidget);
   });
+
+  testWidgets(
+    'SplashScreen displays animated logo and transitions to LoginView via JumpingPageRoute',
+    (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final authRepository = FakeAuthRepository();
+
+      await tester.pumpWidget(
+        buildTestApp(prefs: prefs, authRepository: authRepository),
+      );
+
+      // Initial frame presents the SplashScreen
+      expect(find.byType(SplashScreen), findsOneWidget);
+      expect(find.byType(NeramLogoBadge), findsOneWidget);
+
+      // Advance past splash timer and jumping transition
+      await tester.pump(const Duration(milliseconds: 2000));
+      await tester.pumpAndSettle();
+
+      // Successfully transitioned to LoginView
+      expect(find.byType(SplashScreen), findsNothing);
+      expect(find.byType(LoginView), findsOneWidget);
+    },
+  );
 }
