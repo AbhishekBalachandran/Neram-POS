@@ -701,7 +701,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
             : 'CUSTOMER NAME (REQUIRED FOR TAKEAWAY)';
 
     final hint = isDineIn
-        ? 'Enter guest name (e.g. Alex M.)'
+        ? 'Enter guest name (optional)'
         : isOutdoor
             ? 'Enter outdoor customer name...'
             : 'Enter takeaway pickup name...';

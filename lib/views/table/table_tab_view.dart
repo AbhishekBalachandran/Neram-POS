@@ -1051,34 +1051,36 @@ class TableTabView extends StatelessWidget {
                                 : AppColors.lightTextPrimary,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2.5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.darkSurfaceContainerHigh
-                                : AppColors.lightSurfaceSubtle,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
+                        if (tableViewModel.customerName.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2.5,
+                            ),
+                            decoration: BoxDecoration(
                               color: isDark
-                                  ? AppColors.darkBorder
-                                  : AppColors.lightBorder,
+                                  ? AppColors.darkSurfaceContainerHigh
+                                  : AppColors.lightSurfaceSubtle,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: isDark
+                                    ? AppColors.darkBorder
+                                    : AppColors.lightBorder,
+                              ),
+                            ),
+                            child: Text(
+                              tableViewModel.customerName,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
+                              ),
                             ),
                           ),
-                          child: Text(
-                            tableViewModel.customerName,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.lightTextSecondary,
-                            ),
-                          ),
-                        ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 3),

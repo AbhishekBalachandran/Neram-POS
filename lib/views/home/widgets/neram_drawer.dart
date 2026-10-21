@@ -52,7 +52,7 @@ class NeramDrawer extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
     final authViewModel = context.watch<AuthViewModel>();
     final user = authViewModel.currentUser;
-    final userName = user?.name ?? 'Alex Morgan';
+    final userName = user?.name ?? 'Abhishek';
     final userInitials = _getInitials(userName);
     final userRole = user?.role.name.toUpperCase() ?? 'STAFF';
 

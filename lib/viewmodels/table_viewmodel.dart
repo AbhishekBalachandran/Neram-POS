@@ -39,7 +39,7 @@ class TableViewModel extends ChangeNotifier {
   String _searchQuery = '';
   final Map<String, int> _currentTableCart = {};
   DiningMode _diningMode = DiningMode.dineIn;
-  String _customerName = 'Alex M.';
+  String _customerName = '';
   final Map<String, String> _itemNotes = {
     'dish_1': 'Extra crunchy, less oil',
     'dish_2': 'Medium spice',
@@ -70,9 +70,15 @@ class TableViewModel extends ChangeNotifier {
   };
 
   String get orderIdentifierSubtitle => switch (_diningMode) {
-    DiningMode.dineIn => '${selectedTable.subtitle} • $_customerName',
-    DiningMode.outdoor => 'Customer: $_customerName',
-    DiningMode.takeaway => 'Customer: $_customerName',
+    DiningMode.dineIn => _customerName.isNotEmpty
+        ? '${selectedTable.subtitle} • $_customerName'
+        : selectedTable.subtitle,
+    DiningMode.outdoor => _customerName.isNotEmpty
+        ? 'Customer: $_customerName'
+        : 'Outdoor Order',
+    DiningMode.takeaway => _customerName.isNotEmpty
+        ? 'Customer: $_customerName'
+        : 'Takeaway Order',
   };
 
   int get totalCartItemCount =>
@@ -228,7 +234,6 @@ class TableViewModel extends ChangeNotifier {
         seats: 4,
         status: TableStatus.preparing,
         total: 48.50,
-        customerName: 'Alex M.',
         timeElapsed: '12m ago',
         itemCount: 4,
       ),
@@ -419,7 +424,7 @@ class TableViewModel extends ChangeNotifier {
         id: '#ORD-2849',
         tableId: 'T-01',
         tableName: 'Table T-01',
-        customerName: 'Alex M.',
+        customerName: 'Dine-In',
         items: [
           '2x Crispy Corn Pepper Fry',
           '1x Butter Chicken Handi',
