@@ -489,7 +489,7 @@ class NeramDrawer extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '\$642.50',
+                                '₹642.50',
                                 style: AppTypography.headlineFont(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,

@@ -24,5 +24,5 @@ class OrderModel {
   final String timeElapsed;
   final TableZone zone;
 
-  String get formattedTotal => '\$${total.toStringAsFixed(2)}';
+  String get formattedTotal => '₹${total.toStringAsFixed(2)}';
 }

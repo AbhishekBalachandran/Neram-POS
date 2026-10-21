@@ -20,5 +20,5 @@ class DishModel {
   final FoodType foodType;
   final bool isAvailable;
 
-  String get formattedPrice => '\$${price.toStringAsFixed(2)}';
+  String get formattedPrice => '₹${price.toStringAsFixed(2)}';
 }

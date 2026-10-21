@@ -73,7 +73,7 @@ class TableModel {
   final String timeElapsed;
   final int itemCount;
 
-  String get formattedTotal => '\$${total.toStringAsFixed(2)}';
+  String get formattedTotal => '₹${total.toStringAsFixed(2)}';
   String get subtitle => '$seats Seats • Indoor';
 
   TableModel copyWith({

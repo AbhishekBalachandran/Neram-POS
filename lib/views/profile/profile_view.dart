@@ -5,11 +5,9 @@ import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/utils/jumping_page_route.dart';
-import 'package:neram_pos/core/widgets/neram_app_bar.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
 import 'package:neram_pos/views/auth/widgets/change_password_dialog.dart';
-import 'package:neram_pos/views/home/widgets/neram_drawer.dart';
 import 'package:provider/provider.dart';
 
 /// Staff Profile View matching the Google Stitch "NERAM POS - View Profile" specification
@@ -28,12 +26,42 @@ import 'package:provider/provider.dart';
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
+  /// Allows disabling infinite repeating animations in widget test environments.
+  static bool enableAnimations = true;
+
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class _ProfileViewState extends State<ProfileView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseScale;
+  late Animation<double> _pulseOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    if (ProfileView.enableAnimations) {
+      _pulseController.repeat();
+    }
+    _pulseScale = Tween<double>(begin: 1.0, end: 2.3).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
+    );
+    _pulseOpacity = Tween<double>(begin: 0.75, end: 0.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   void _copyToClipboard(String text, String label) {
     HapticService.selection();
@@ -532,16 +560,9 @@ class _ProfileViewState extends State<ProfileView> {
         : 'AM';
 
     return Scaffold(
-      key: _scaffoldKey,
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: NeramAppBar(
-        onMenuPressed: () {
-          _scaffoldKey.currentState?.openEndDrawer();
-        },
-      ),
-      endDrawer: const NeramDrawer(),
       body: SafeArea(
-        top: false,
+        top: true,
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 680),
@@ -792,20 +813,50 @@ class _ProfileViewState extends State<ProfileView> {
                         Positioned(
                           right: -3,
                           bottom: -3,
-                          child: Container(
+                          child: SizedBox(
                             width: 18,
                             height: 18,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: containerColor,
-                                width: 2.5,
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x4410B981),
-                                  blurRadius: 4,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              clipBehavior: Clip.none,
+                              children: [
+                                // Pulsing Radar Ring (animate-ping)
+                                AnimatedBuilder(
+                                  animation: _pulseController,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: _pulseScale.value,
+                                      child: Container(
+                                        width: 14,
+                                        height: 14,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF10B981).withValues(
+                                            alpha: _pulseOpacity.value,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                // Solid Central Dot
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: containerColor,
+                                      width: 2.5,
+                                    ),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Color(0x5510B981),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

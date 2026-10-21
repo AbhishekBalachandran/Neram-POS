@@ -1026,7 +1026,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                         SizedBox(
                           width: 52,
                           child: Text(
-                            '\$${lineTotal.toStringAsFixed(2)}',
+                            '₹${lineTotal.toStringAsFixed(2)}',
                             textAlign: TextAlign.right,
                             style: AppTypography.headlineFont(
                               fontSize: 13,
@@ -1175,7 +1175,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                 ),
               ),
               Text(
-                '\$${subtotal.toStringAsFixed(2)}',
+                '₹${subtotal.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -1197,7 +1197,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                 ),
               ),
               Text(
-                '\$${tax.toStringAsFixed(2)}',
+                '₹${tax.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -1254,7 +1254,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                 ],
               ),
               Text(
-                '\$${total.toStringAsFixed(2)}',
+                '₹${total.toStringAsFixed(2)}',
                 style: AppTypography.headlineFont(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
@@ -15,8 +16,42 @@ import 'package:provider/provider.dart';
 /// Table Tab UI matching the Google Stitch "NERAM POS - Tables & Active Orders" specification.
 /// Features the top action strip (Active Orders alert & All Tables bottom sheet trigger),
 /// horizontal quick-access table chips, menu category filters, search bar, and dishes catalog.
-class TableTabView extends StatelessWidget {
+/// The top section stays fixed above the dishes list, automatically hiding when the user
+/// scrolls up to maximize screen space for dishes, and revealing when scrolling down.
+class TableTabView extends StatefulWidget {
   const TableTabView({super.key});
+
+  @override
+  State<TableTabView> createState() => _TableTabViewState();
+}
+
+class _TableTabViewState extends State<TableTabView> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isHeaderVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    if (_scrollController.offset <= 10) {
+      if (!_isHeaderVisible) {
+        setState(() {
+          _isHeaderVisible = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,65 +64,81 @@ class TableTabView extends StatelessWidget {
 
     return Column(
       children: [
-        // Responsive scroll view where top sections scroll off naturally,
-        // expanding the dishes list to occupy the full screen height
-        Expanded(
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: [
-              // 1. Top Action Strip & Quick Tables Bar (scrolls away on drag)
-              SliverToBoxAdapter(
-                child: _buildTopActionStrip(context, isDark, tableViewModel),
-              ),
-
-              // 2. Search Bar & Category Filter Pills (scrolls away on drag)
-              SliverToBoxAdapter(
-                child: _buildSearchAndCategories(
-                  context,
-                  isDark,
-                  tableViewModel,
-                ),
-              ),
-
-              // 3. Section Header: POPULAR & RECOMMENDED DISHES
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.xs,
-                  AppSpacing.md,
-                  AppSpacing.xs,
-                ),
-                sliver: SliverToBoxAdapter(
-                  child: _buildSectionHeader(isDark, dishes.length),
-                ),
-              ),
-
-              // 4. Dishes Catalog List (expands to full viewport on scroll)
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.xs,
-                  AppSpacing.md,
-                  bottomPadding,
-                ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final dish = dishes[index];
-                      return _buildDishCard(
+        // FIXED TOP SECTION (Action Strip + Search & Categories)
+        // Fixed at top, but smoothly hides when scrolled up and shows when scrolled down
+        ClipRect(
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.fastOutSlowIn,
+            alignment: Alignment.topCenter,
+            child: _isHeaderVisible
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildTopActionStrip(context, isDark, tableViewModel),
+                      _buildSearchAndCategories(
                         context,
                         isDark,
                         tableViewModel,
-                        dish,
-                      );
-                    },
-                    childCount: dishes.length,
-                  ),
-                ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ),
+
+        // DISHES CATALOG LIST
+        // Scrolls independently beneath the fixed top section
+        Expanded(
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                // User scrolled up (content moving up, browsing down the list)
+                if (_isHeaderVisible &&
+                    _scrollController.hasClients &&
+                    _scrollController.offset > 20) {
+                  setState(() {
+                    _isHeaderVisible = false;
+                  });
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                // User scrolled down (content moving down, returning towards top)
+                if (!_isHeaderVisible) {
+                  setState(() {
+                    _isHeaderVisible = true;
+                  });
+                }
+              }
+              return false;
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-            ],
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.xs + 2,
+                AppSpacing.md,
+                bottomPadding,
+              ),
+              itemCount: dishes.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: _buildSectionHeader(isDark, dishes.length),
+                  );
+                }
+                final dish = dishes[index - 1];
+                return _buildDishCard(
+                  context,
+                  isDark,
+                  tableViewModel,
+                  dish,
+                );
+              },
+            ),
           ),
         ),
 
@@ -1182,7 +1233,7 @@ class TableTabView extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '\$${total.toStringAsFixed(2)}',
+                            '₹${total.toStringAsFixed(2)}',
                             style: AppTypography.headlineFont(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,

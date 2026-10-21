@@ -496,7 +496,7 @@ class TableViewModel extends ChangeNotifier {
       ),
     ];
 
-    // Pre-staged order items matching Stitch "Animated Order Sheet" spec (3 items • $26.98)
+    // Pre-staged order items matching Stitch "Animated Order Sheet" spec (3 items • ₹26.98)
     _currentTableCart['dish_1'] = 1;
     _currentTableCart['dish_2'] = 1;
     _currentTableCart['dish_3'] = 1;

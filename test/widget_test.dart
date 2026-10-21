@@ -64,6 +64,7 @@ class FakeAuthRepository implements AuthRepository {
 void main() {
   setUpAll(() {
     AppTypography.useGoogleFonts = false;
+    ProfileView.enableAnimations = false;
   });
 
   setUp(() {
