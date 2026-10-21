@@ -4,6 +4,25 @@ import 'package:neram_pos/data/models/dish_model.dart';
 import 'package:neram_pos/data/models/order_model.dart';
 import 'package:neram_pos/data/models/table_model.dart';
 
+/// Dining mode selection from Stitch Animated Order Sheet.
+enum DiningMode {
+  dineIn,
+  outdoor,
+  takeaway;
+
+  String get displayName => switch (this) {
+    DiningMode.dineIn => 'Table',
+    DiningMode.outdoor => 'Outdoor',
+    DiningMode.takeaway => 'Takeaway',
+  };
+
+  String get subtitle => switch (this) {
+    DiningMode.dineIn => 'Dine-in',
+    DiningMode.outdoor => 'Unified Area',
+    DiningMode.takeaway => 'Pickup Token',
+  };
+}
+
 /// State management for Table & Menu Workspace.
 class TableViewModel extends ChangeNotifier {
   TableViewModel() {
@@ -19,6 +38,13 @@ class TableViewModel extends ChangeNotifier {
   String _selectedCategory = 'All (48)';
   String _searchQuery = '';
   final Map<String, int> _currentTableCart = {};
+  DiningMode _diningMode = DiningMode.dineIn;
+  String _customerName = 'Alex M.';
+  final Map<String, String> _itemNotes = {
+    'dish_1': 'Extra crunchy, less oil',
+    'dish_2': 'Medium spice',
+    'dish_3': 'Served with hot croutons',
+  };
 
   // Getters
   List<TableModel> get tables => _tables;
@@ -28,6 +54,9 @@ class TableViewModel extends ChangeNotifier {
   String get selectedCategory => _selectedCategory;
   String get searchQuery => _searchQuery;
   Map<String, int> get currentTableCart => _currentTableCart;
+  DiningMode get diningMode => _diningMode;
+  String get customerName => _customerName;
+  Map<String, String> get itemNotes => _itemNotes;
 
   TableModel get selectedTable => _tables.firstWhere(
     (t) => t.id == _selectedTableId,
@@ -37,14 +66,23 @@ class TableViewModel extends ChangeNotifier {
   int get totalCartItemCount =>
       _currentTableCart.values.fold(0, (sum, count) => sum + count);
 
-  double get currentTableCartTotal {
-    double total = selectedTable.total;
+  double get cartSubtotal {
+    double sum = 0.0;
     for (final entry in _currentTableCart.entries) {
-      final dish = _dishes.firstWhere((d) => d.id == entry.key);
-      total += dish.price * entry.value;
+      final dish = _dishes.firstWhere(
+        (d) => d.id == entry.key,
+        orElse: () => _dishes.first,
+      );
+      sum += dish.price * entry.value;
     }
-    return total;
+    return sum;
   }
+
+  double get cartTax => cartSubtotal * 0.05; // 5% GST from Stitch
+  double get cartServiceCharge => 0.0; // FREE
+  double get cartTotalPayable => cartSubtotal + cartTax;
+
+  double get currentTableCartTotal => cartTotalPayable;
 
   static const List<String> categories = [
     'All (48)',
@@ -110,7 +148,51 @@ class TableViewModel extends ChangeNotifier {
     }
   }
 
+  void setDiningMode(DiningMode mode) {
+    if (_diningMode != mode) {
+      HapticService.selection();
+      _diningMode = mode;
+      notifyListeners();
+    }
+  }
+
+  void setCustomerName(String name) {
+    _customerName = name;
+    notifyListeners();
+  }
+
+  void setItemNote(String dishId, String note) {
+    _itemNotes[dishId] = note;
+    notifyListeners();
+  }
+
+  void sendOrderToKitchen() {
+    HapticService.success();
+    // Update active orders and mark table as preparing
+    final newOrder = OrderModel(
+      id: '#ORD-${DateTime.now().millisecondsSinceEpoch % 10000}',
+      tableId: _selectedTableId,
+      tableName: selectedTable.name,
+      customerName: _customerName,
+      items: _currentTableCart.entries.map((e) {
+        final dish = _dishes.firstWhere(
+          (d) => d.id == e.key,
+          orElse: () => _dishes.first,
+        );
+        return '${e.value}x ${dish.name}';
+      }).toList(),
+      total: cartTotalPayable,
+      status: TableStatus.preparing,
+      timeElapsed: 'Just now',
+      zone: selectedTable.zone,
+    );
+    _activeOrders.insert(0, newOrder);
+    _currentTableCart.clear();
+    notifyListeners();
+  }
+
   void clearCart() {
+    HapticService.mediumImpact();
     _currentTableCart.clear();
     notifyListeners();
   }
@@ -481,5 +563,10 @@ class TableViewModel extends ChangeNotifier {
         zone: TableZone.indoor,
       ),
     ];
+
+    // Pre-staged order items matching Stitch "Animated Order Sheet" spec (3 items • $26.98)
+    _currentTableCart['dish_1'] = 1;
+    _currentTableCart['dish_2'] = 1;
+    _currentTableCart['dish_3'] = 1;
   }
 }

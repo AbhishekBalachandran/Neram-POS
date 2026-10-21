@@ -77,6 +77,7 @@ void main() {
           create: (_) => AuthViewModel(authRepository: authRepository),
         ),
         ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
+        ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
       ],
       child: const NeramPosApp(),
     );
@@ -346,6 +347,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Verify Swiggy-style AnimatedSearchBar is present with static prefix and rotating hint
+    expect(find.text('Search for '), findsOneWidget);
+    expect(find.text("'Pizza'"), findsOneWidget);
+
     // Tap All Tables trigger
     await tester.tap(find.text('ALL TABLES (22)'));
     await tester.pumpAndSettle();
@@ -372,13 +377,26 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('REALTIME KITCHEN & TABLE ORDERS'), findsNothing);
 
-    // Add a dish to cart
-    final addButtons = find.text('Add');
-    expect(addButtons, findsWidgets);
-    await tester.tap(addButtons.first);
+    // Verify bottom order tray displays View Order button
+    final viewOrderFinder = find.text('View Order');
+    expect(viewOrderFinder, findsOneWidget);
+
+    // Tap View Order to open Stitch Animated Order Sheet
+    await tester.tap(viewOrderFinder);
     await tester.pumpAndSettle();
 
-    // Verify cart order tray appears with Send to Kitchen button
-    expect(find.text('Send to Kitchen'), findsOneWidget);
+    // Verify Animated Order Sheet components
+    expect(find.text('Current Order'), findsOneWidget);
+    expect(find.text('DINING MODE'), findsOneWidget);
+    expect(find.text('TABLE / STATION'), findsOneWidget);
+    expect(find.text('CUSTOMER / GUEST NAME'), findsOneWidget);
+    expect(find.text('ORDERED DISHES'), findsOneWidget);
+    expect(find.text('Send to Kitchen (KOT)'), findsOneWidget);
+
+    // Confirm & Fire to Kitchen
+    await tester.tap(find.text('Send to Kitchen (KOT)'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Current Order'), findsNothing);
   });
 }

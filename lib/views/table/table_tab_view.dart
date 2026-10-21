@@ -8,6 +8,8 @@ import 'package:neram_pos/data/models/table_model.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/table/widgets/active_orders_dialog.dart';
 import 'package:neram_pos/views/table/widgets/all_tables_bottom_sheet.dart';
+import 'package:neram_pos/views/table/widgets/animated_search_bar.dart';
+import 'package:neram_pos/views/table/widgets/cart_details_modal.dart';
 import 'package:provider/provider.dart';
 
 /// Table Tab UI matching the Google Stitch "NERAM POS - Tables & Active Orders" specification.
@@ -428,71 +430,10 @@ class TableTabView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Search Field
-          Container(
-            height: 42,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkSurfaceContainer
-                  : AppColors.lightSurface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.search_rounded,
-                  size: 20,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    onChanged: tableViewModel.setSearchQuery,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.lightTextPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Search dishes, ingredients...',
-                      hintStyle: TextStyle(
-                        fontSize: 12,
-                        color: isDark
-                            ? AppColors.darkTextMuted
-                            : AppColors.lightTextMuted,
-                      ),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.darkSurfaceContainerHigh
-                        : AppColors.lightSurfaceSubtle,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.tune_rounded,
-                    size: 16,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                  ),
-                ),
-              ],
-            ),
+          // Spacious Uncongested Swiggy-Style Animated Search Bar
+          AnimatedSearchBar(
+            onChanged: tableViewModel.setSearchQuery,
+            onFilterTap: () => AllTablesBottomSheet.show(context),
           ),
           const SizedBox(height: AppSpacing.sm),
 
@@ -801,123 +742,181 @@ class TableTabView extends StatelessWidget {
     bool isDark,
     TableViewModel tableViewModel,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSurfaceContainerHighest
-            : AppColors.lightSurface,
-        border: Border(
-          top: BorderSide(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
+    final count = tableViewModel.totalCartItemCount;
+    final total = tableViewModel.cartTotalPayable;
+    final table = tableViewModel.selectedTable;
+
+    return AnimatedSlide(
+      offset: count > 0 ? Offset.zero : const Offset(0, 1),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + 2,
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x33000000),
-            blurRadius: 10,
-            offset: Offset(0, -2),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkSurfaceContainerLowest.withValues(alpha: 0.95)
+              : AppColors.lightSurface,
+          border: Border(
+            top: BorderSide(
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              width: 1.0,
+            ),
           ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x66000000),
+              blurRadius: 16,
+              offset: Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Left: Table Name, Guest Tag, and Items / Total Summary
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      tableViewModel.selectedTable.name,
-                      style: AppTypography.headlineFont(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.lightTextPrimary,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          table.name,
+                          style: AppTypography.headlineFont(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.lightTextPrimary,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 1.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.darkSurfaceContainerHigh
+                                : AppColors.lightSurfaceSubtle,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.lightBorder,
+                            ),
+                          ),
+                          child: Text(
+                            tableViewModel.customerName,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '•  ${tableViewModel.totalCartItemCount} items added',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary,
-                      ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          '$count Items',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        Text(
+                          '  •  Total ',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                        ),
+                        Text(
+                          '\$${total.toStringAsFixed(2)}',
+                          style: AppTypography.headlineFont(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.lightTextPrimary,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                Text(
-                  '\$${tableViewModel.currentTableCartTotal.toStringAsFixed(2)}',
-                  style: AppTypography.headlineFont(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: tableViewModel.clearCart,
-                  child: Text(
-                    'Clear',
-                    style: TextStyle(
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.lightTextSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    HapticService.success();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          'Order updated for ${tableViewModel.selectedTable.name}!',
-                        ),
-                      ),
-                    );
+              ),
+
+              // Right: View Order Button matching Stitch
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    HapticService.selection();
+                    CartDetailsModal.show(context);
                   },
-                  child: const Row(
-                    children: [
-                      Icon(Icons.check_circle_rounded, size: 16),
-                      SizedBox(width: 6),
-                      Text(
-                        'Send to Kitchen',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ],
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x4DFF6B35),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.receipt_long_rounded,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'View Order',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
