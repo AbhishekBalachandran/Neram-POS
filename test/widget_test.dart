@@ -446,8 +446,9 @@ void main() {
     expect(find.byType(NeramDrawer), findsOneWidget);
     expect(find.text("TODAY'S ORDERS"), findsOneWidget);
     expect(find.text('TERMINAL CASH'), findsOneWidget);
+    expect(find.text('Dark Theme'), findsOneWidget);
+    expect(find.text('View Profile & Badges'), findsOneWidget);
     expect(find.text('Change Password / PIN'), findsOneWidget);
-    expect(find.text('Kitchen Printer'), findsOneWidget);
     expect(find.text('SIGN OUT & LOCK TERMINAL'), findsOneWidget);
 
     // Tap Change Password / PIN

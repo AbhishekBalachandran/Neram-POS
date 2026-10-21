@@ -499,7 +499,7 @@ class NeramDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
 
-                  // 4. PRIMARY ACTION GROUP CARD
+                  // 4. ACTION GROUP CARD (Dark Theme & Change Password / PIN matching Stitch)
                   Container(
                     decoration: BoxDecoration(
                       color: containerColor,
@@ -509,14 +509,23 @@ class NeramDrawer extends StatelessWidget {
                             ? AppColors.darkBorder
                             : AppColors.lightBorder,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.20 : 0.04,
+                          ),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
-                        // Item 1: Dark Theme Switch
+                        // Item 1: Dark Theme Switch matching Stitch HTML
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 14,
-                            vertical: 10,
+                            vertical: 12,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -535,22 +544,24 @@ class NeramDrawer extends StatelessWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
+                                          Text(
                                             'Dark Theme',
                                             style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: 14,
                                               fontWeight: FontWeight.w700,
+                                              color: isDark
+                                                  ? AppColors.darkTextPrimary
+                                                  : AppColors.lightTextPrimary,
                                             ),
                                           ),
                                           const SizedBox(height: 1),
                                           Text(
                                             'Optimized for dimly-lit kitchen & bar',
                                             style: TextStyle(
-                                              fontSize: 10.5,
+                                              fontSize: 11,
                                               color: isDark
                                                   ? AppColors.darkTextSecondary
-                                                  : AppColors
-                                                        .lightTextSecondary,
+                                                  : AppColors.lightTextSecondary,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -561,15 +572,49 @@ class NeramDrawer extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Switch(
-                                value: isDark,
-                                activeThumbColor: AppColors.primary,
-                                activeTrackColor: AppColors.primary.withValues(
-                                  alpha: 0.35,
-                                ),
-                                onChanged: (_) {
+                              const SizedBox(width: 10),
+
+                              // Stitch custom theme toggle switch
+                              GestureDetector(
+                                onTap: () {
+                                  HapticService.selection();
                                   themeProvider.toggleTheme(context);
                                 },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeOutCubic,
+                                  width: 48,
+                                  height: 28,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.primary
+                                        : (isDark
+                                            ? AppColors.darkSurfaceContainerHighest
+                                            : AppColors.lightBorder),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  alignment: isDark
+                                      ? Alignment.centerRight
+                                      : Alignment.centerLeft,
+                                  child: Container(
+                                    width: 22,
+                                    height: 22,
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? const Color(0xFF5F1900)
+                                          : Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color(0x33000000),
+                                          blurRadius: 4,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -588,88 +633,6 @@ class NeramDrawer extends StatelessWidget {
                             HapticService.selection();
                             Navigator.of(context).pop();
                             ChangePasswordDialog.show(context);
-                          },
-                        ),
-                        _buildDivider(isDark),
-
-                        // Item 3: Kitchen Printer
-                        _buildDrawerTile(
-                          icon: Icons.print_rounded,
-                          iconBg: containerHighColor,
-                          iconColor: AppColors.primary,
-                          title: 'Kitchen Printer',
-                          statusBadge: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(width: 6),
-                              Icon(
-                                Icons.circle,
-                                size: 6,
-                                color: Color(0xFF10B981),
-                              ),
-                            ],
-                          ),
-                          subtitle: 'Epson TM-T88VI • Online (Ready)',
-                          isDark: isDark,
-                          onTap: () {
-                            HapticService.selection();
-                          },
-                        ),
-                        _buildDivider(isDark),
-
-                        // Item 4: Station Settings
-                        _buildDrawerTile(
-                          icon: Icons.tune_rounded,
-                          iconBg: containerHighColor,
-                          iconColor: AppColors.primary,
-                          title: 'Station Settings',
-                          subtitle: 'Cash drawer, barcode reader, offline mode',
-                          isDark: isDark,
-                          onTap: () {
-                            HapticService.selection();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // 5. SECONDARY OPERATIONS GROUP CARD
-                  Container(
-                    decoration: BoxDecoration(
-                      color: containerColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildDrawerTile(
-                          icon: Icons.receipt_long_rounded,
-                          iconBg: containerHighColor,
-                          iconColor: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                          title: 'End of Day (Z-Report)',
-                          isDark: isDark,
-                          onTap: () {
-                            HapticService.selection();
-                          },
-                        ),
-                        _buildDivider(isDark),
-                        _buildDrawerTile(
-                          icon: Icons.support_agent_rounded,
-                          iconBg: containerHighColor,
-                          iconColor: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                          title: 'Dispatch & Support Hotline',
-                          isDark: isDark,
-                          onTap: () {
-                            HapticService.selection();
                           },
                         ),
                       ],
