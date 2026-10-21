@@ -18,6 +18,7 @@ import 'package:neram_pos/views/home/home_view.dart';
 import 'package:neram_pos/views/home/widgets/neram_drawer.dart';
 import 'package:neram_pos/views/leaves/leaves_tab_view.dart';
 import 'package:neram_pos/views/leaves/widgets/apply_leave_modal.dart';
+import 'package:neram_pos/views/profile/profile_view.dart';
 import 'package:neram_pos/views/splash/splash_screen.dart';
 import 'package:neram_pos/views/table/table_tab_view.dart';
 import 'package:provider/provider.dart';
@@ -478,6 +479,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ChangePasswordDialog), findsNothing);
+
+    // Re-open drawer to test View Profile & Badges navigation
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+    expect(find.byType(NeramDrawer), findsOneWidget);
+
+    await tester.tap(find.text('View Profile & Badges'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileView), findsOneWidget);
+    expect(find.text('Staff Profile'), findsOneWidget);
+
+    // Pop back to home via back button
+    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileView), findsNothing);
   });
 
   testWidgets('LeavesTabView renders shift punch station, metrics gauge, and applies leave', (
@@ -627,6 +643,81 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
       }
+    },
+  );
+
+  testWidgets(
+    'ProfileView renders Stitch specifications and handles PIN & HR modals',
+    (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final authRepository = FakeAuthRepository();
+
+      tester.view.physicalSize = const Size(768, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(prefs: prefs),
+            ),
+            ChangeNotifierProvider<AuthViewModel>(
+              create: (_) => AuthViewModel(authRepository: authRepository),
+            ),
+            ChangeNotifierProvider<TableViewModel>(
+              create: (_) => TableViewModel(),
+            ),
+            ChangeNotifierProvider<LeavesViewModel>(
+              create: (_) => LeavesViewModel(),
+            ),
+          ],
+          child: const MaterialApp(
+            home: ProfileView(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify key profile headers & metadata from Stitch
+      expect(find.text('Staff Profile'), findsOneWidget);
+      expect(find.text('CREDENTIAL & TERMINAL IDENTITY'), findsOneWidget);
+      expect(find.text('VIEW-ONLY PROFILE'), findsOneWidget);
+      expect(find.text('Account & System Access'), findsOneWidget);
+
+      // Verify Contact Admin / HR modal while at top
+      await tester.tap(find.text('Contact Admin / HR'));
+      await tester.pumpAndSettle();
+      expect(find.text('Contact Store Administration'), findsOneWidget);
+
+      // Close Contact Admin modal
+      await tester.tap(find.text('Close'));
+      await tester.pumpAndSettle();
+      expect(find.text('Contact Store Administration'), findsNothing);
+
+      // Verify Update PIN modal
+      await tester.tap(find.text('Update PIN'));
+      await tester.pumpAndSettle();
+      expect(find.text('Update Quick PIN'), findsOneWidget);
+      expect(find.text('NEW 4-DIGIT SPEED PIN'), findsOneWidget);
+
+      // Cancel Update PIN modal
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.text('Update Quick PIN'), findsNothing);
+
+      // Scroll down and verify remaining sections
+      await tester.scrollUntilVisible(find.text('Personal & Employment Details'), 200);
+      expect(find.text('Personal & Employment Details'), findsOneWidget);
+
+      await tester.scrollUntilVisible(find.text('Bank Account & Payout Details'), 200);
+      expect(find.text('Bank Account & Payout Details'), findsOneWidget);
+
+      await tester.scrollUntilVisible(find.text('Log Out of Terminal'), 200);
+      expect(find.text('Log Out of Terminal'), findsOneWidget);
     },
   );
 }

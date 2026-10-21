@@ -9,6 +9,7 @@ import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
 import 'package:neram_pos/views/auth/widgets/change_password_dialog.dart';
+import 'package:neram_pos/views/profile/profile_view.dart';
 import 'package:provider/provider.dart';
 
 /// App Drawer matching the Stitch "NERAM POS - App Drawer" specification
@@ -345,6 +346,10 @@ class NeramDrawer extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                             onTap: () {
                               HapticService.selection();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).push(
+                                JumpingPageRoute(page: const ProfileView()),
+                              );
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
