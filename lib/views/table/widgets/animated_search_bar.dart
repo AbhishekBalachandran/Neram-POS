@@ -103,17 +103,17 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: 48,
+      height: 46,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor, width: isFocused ? 1.5 : 1.0),
         boxShadow: [
           BoxShadow(
             color: isFocused
                 ? AppColors.primary.withValues(alpha: 0.15)
                 : Colors.black.withValues(alpha: isDark ? 0.20 : 0.04),
-            blurRadius: isFocused ? 12 : 8,
+            blurRadius: isFocused ? 12 : 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -121,7 +121,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           onTap: () {
             if (!_focusNode.hasFocus) {
               HapticService.selection();
@@ -205,7 +205,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                           ),
                         ),
 
-                      // Actual Editable Text Input
+                      // Actual Editable Text Input - No inner border to prevent double-boxing
                       TextField(
                         controller: _controller,
                         focusNode: _focusNode,
@@ -219,6 +219,13 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                         cursorColor: AppColors.primary,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          filled: false,
+                          fillColor: Colors.transparent,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
                         ),

@@ -3,6 +3,7 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
+import 'package:neram_pos/core/widgets/app_bottom_sheet.dart';
 import 'package:neram_pos/data/models/table_model.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -12,11 +13,8 @@ class AllTablesBottomSheet extends StatefulWidget {
   const AllTablesBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) {
-    HapticService.selection();
-    return showModalBottomSheet(
+    return AppBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => const AllTablesBottomSheet(),
     );
   }
