@@ -119,7 +119,11 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: const Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 20),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppColors.primary,
+              size: 20,
+            ),
             SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -178,50 +182,52 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                 vertical: AppSpacing.sm,
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.calendar_month_rounded,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Apply for Leave',
-                            style: AppTypography.headlineFont(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: isDark
-                                  ? AppColors.darkTextPrimary
-                                  : AppColors.lightTextPrimary,
-                            ),
-                          ),
-                          Text(
-                            'Submit duty absence for manager authorization',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.lightTextSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.calendar_month_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Apply for Leave',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.headlineFont(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.lightTextPrimary,
+                          ),
+                        ),
+                        Text(
+                          'Submit duty absence for manager authorization',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   IconButton(
                     icon: const Icon(Icons.close_rounded),
                     color: isDark
@@ -317,16 +323,21 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    type.displayName,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.lightTextPrimary,
+                                  Flexible(
+                                    child: Text(
+                                      type.displayName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? AppColors.darkTextPrimary
+                                            : AppColors.lightTextPrimary,
+                                      ),
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   Text(
                                     type.balanceText,
                                     style: const TextStyle(
@@ -357,43 +368,54 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Container(
-                      decoration: BoxDecoration(
+                    TextField(
+                      controller: _reasonController,
+                      maxLines: 3,
+                      style: TextStyle(
+                        fontSize: 13,
                         color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: isDark
                             ? AppColors.darkSurfaceContainer
                             : AppColors.lightSurfaceSubtle,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
+                        hintText:
+                            'State operational reason and designated shift cover colleague...',
+                        hintStyle: TextStyle(
+                          fontSize: 12,
                           color: isDark
-                              ? AppColors.darkBorder
-                              : AppColors.lightBorder,
+                              ? AppColors.darkTextMuted
+                              : AppColors.lightTextMuted,
                         ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      child: TextField(
-                        controller: _reasonController,
-                        maxLines: 3,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.lightTextPrimary,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
                         ),
-                        decoration: InputDecoration(
-                          hintText:
-                              'State operational reason and designated shift cover colleague...',
-                          hintStyle: TextStyle(
-                            fontSize: 12,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
                             color: isDark
-                                ? AppColors.darkTextMuted
-                                : AppColors.lightTextMuted,
+                                ? AppColors.darkBorder
+                                : AppColors.lightBorder,
                           ),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.lightBorder,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -456,13 +478,16 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                               ),
                             ),
                             onPressed: () => Navigator.of(context).pop(),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.lightTextSecondary,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary,
+                                ),
                               ),
                             ),
                           ),
@@ -487,24 +512,33 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: _handleSubmit,
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.send_rounded,
-                                      size: 17,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Submit Request',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
+                                child: const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.send_rounded,
+                                            size: 17,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            'Submit Request',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),

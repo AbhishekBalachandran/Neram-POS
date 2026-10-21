@@ -614,6 +614,17 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
+
+        // Test ApplyLeaveModal on the same screen size
+        await tester.tap(find.text('Apply Leave'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.byType(ApplyLeaveModal), findsOneWidget);
+
+        // Close modal
+        await tester.tap(find.byIcon(Icons.close_rounded));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
       }
     },
   );
