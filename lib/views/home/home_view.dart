@@ -10,6 +10,7 @@ import 'package:neram_pos/core/widgets/neram_bottom_nav_bar.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
+import 'package:neram_pos/views/table/table_tab_view.dart';
 import 'package:provider/provider.dart';
 
 /// Main Dashboard view matching the Google Stitch "NERAM POS - Main Dashboard" specification.
@@ -64,14 +65,8 @@ class _HomeViewState extends State<HomeView> {
         child: IndexedStack(
           index: _currentTabIndex,
           children: [
-            // Tab 0: Floor Workspace (from Stitch)
-            _buildWorkspacePlaceholder(
-              isDark: isDark,
-              icon: Icons.table_restaurant_rounded,
-              title: 'Floor Workspace',
-              description:
-                  'Floor grid is clean and ready. Tap into floor management or select a table to begin.',
-            ),
+            // Tab 0: Table & Active Orders Workspace (from Stitch)
+            const TableTabView(),
 
             // Tab 1: Stock Workspace
             _buildWorkspacePlaceholder(

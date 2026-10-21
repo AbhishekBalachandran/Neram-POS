@@ -10,9 +10,11 @@ import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
+import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
 import 'package:neram_pos/views/home/home_view.dart';
 import 'package:neram_pos/views/splash/splash_screen.dart';
+import 'package:neram_pos/views/table/table_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -74,6 +76,7 @@ void main() {
         ChangeNotifierProvider<AuthViewModel>(
           create: (_) => AuthViewModel(authRepository: authRepository),
         ),
+        ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
       ],
       child: const NeramPosApp(),
     );
@@ -275,7 +278,7 @@ void main() {
   });
 
   testWidgets(
-    'HomeView renders Stitch Top App Bar, Bottom Nav Bar, and Floor Workspace',
+    'HomeView renders Stitch Top App Bar, Bottom Nav Bar, and TableTabView',
     (WidgetTester tester) async {
       final prefs = await SharedPreferences.getInstance();
       final authRepository = FakeAuthRepository();
@@ -289,6 +292,9 @@ void main() {
             ChangeNotifierProvider<AuthViewModel>(
               create: (_) => AuthViewModel(authRepository: authRepository),
             ),
+            ChangeNotifierProvider<TableViewModel>(
+              create: (_) => TableViewModel(),
+            ),
           ],
           child: const MaterialApp(home: HomeView()),
         ),
@@ -300,12 +306,12 @@ void main() {
       expect(find.text('NERAM'), findsOneWidget);
       expect(find.text('POS'), findsOneWidget);
 
-      // Floor Workspace Placeholder
-      expect(find.text('Floor Workspace'), findsOneWidget);
-      expect(
-        find.textContaining('Floor grid is clean and ready'),
-        findsOneWidget,
-      );
+      // TableTabView in Tab 0
+      expect(find.byType(TableTabView), findsOneWidget);
+      expect(find.text('ACTIVE ORDERS'), findsOneWidget);
+      expect(find.text('ALL TABLES (22)'), findsOneWidget);
+      expect(find.text('POPULAR & RECOMMENDED DISHES'), findsOneWidget);
+      expect(find.text('Crispy Corn Pepper Fry'), findsOneWidget);
 
       // Bottom Navigation Bar
       expect(find.byType(NeramBottomNavBar), findsOneWidget);
@@ -317,6 +323,62 @@ void main() {
       await tester.tap(find.text('STOCK'));
       await tester.pumpAndSettle();
       expect(find.text('Stock & Inventory'), findsOneWidget);
+
+      // Switch back to Table tab
+      await tester.tap(find.text('TABLE'));
+      await tester.pumpAndSettle();
+      expect(find.byType(TableTabView), findsOneWidget);
     },
   );
+
+  testWidgets('TableTabView opens All Tables sheet and Active Orders dialog', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TableViewModel>(
+            create: (_) => TableViewModel(),
+          ),
+        ],
+        child: const MaterialApp(home: Scaffold(body: TableTabView())),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap All Tables trigger
+    await tester.tap(find.text('ALL TABLES (22)'));
+    await tester.pumpAndSettle();
+
+    // Verify bottom sheet appears
+    expect(find.text('All Tables & Zones'), findsOneWidget);
+    expect(find.text('INDOOR DINING (T-01 TO T-12)'), findsOneWidget);
+
+    // Close bottom sheet
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('All Tables & Zones'), findsNothing);
+
+    // Tap Active Orders button
+    await tester.tap(find.text('ACTIVE ORDERS'));
+    await tester.pumpAndSettle();
+
+    // Verify dialog appears
+    expect(find.text('Active Orders'), findsOneWidget);
+    expect(find.text('REALTIME KITCHEN & TABLE ORDERS'), findsOneWidget);
+
+    // Close dialog
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('REALTIME KITCHEN & TABLE ORDERS'), findsNothing);
+
+    // Add a dish to cart
+    final addButtons = find.text('Add');
+    expect(addButtons, findsWidgets);
+    await tester.tap(addButtons.first);
+    await tester.pumpAndSettle();
+
+    // Verify cart order tray appears with Send to Kitchen button
+    expect(find.text('Send to Kitchen'), findsOneWidget);
+  });
 }
