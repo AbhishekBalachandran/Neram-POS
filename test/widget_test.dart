@@ -12,7 +12,9 @@ import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
+import 'package:neram_pos/views/auth/widgets/change_password_dialog.dart';
 import 'package:neram_pos/views/home/home_view.dart';
+import 'package:neram_pos/views/home/widgets/neram_drawer.dart';
 import 'package:neram_pos/views/splash/splash_screen.dart';
 import 'package:neram_pos/views/table/table_tab_view.dart';
 import 'package:provider/provider.dart';
@@ -398,5 +400,70 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Current Order'), findsNothing);
+  });
+
+  testWidgets('HomeView opens Stitch App Drawer and Change Password Dialog', (
+    WidgetTester tester,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final authRepo = FakeAuthRepository();
+    final authViewModel = AuthViewModel(authRepository: authRepo);
+    await authViewModel.login(username: 'abhishek', password: '123456');
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ThemeProvider>(
+            create: (_) => ThemeProvider(prefs: prefs),
+          ),
+          ChangeNotifierProvider<AuthViewModel>.value(value: authViewModel),
+          ChangeNotifierProvider<TableViewModel>(
+            create: (_) => TableViewModel(),
+          ),
+        ],
+        child: const MaterialApp(home: HomeView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap drawer menu button in Top App Bar
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+
+    // Verify Stitch App Drawer components
+    expect(find.byType(NeramDrawer), findsOneWidget);
+    expect(find.text("TODAY'S ORDERS"), findsOneWidget);
+    expect(find.text('TERMINAL CASH'), findsOneWidget);
+    expect(find.text('Change Password / PIN'), findsOneWidget);
+    expect(find.text('Kitchen Printer'), findsOneWidget);
+    expect(find.text('SIGN OUT & LOCK TERMINAL'), findsOneWidget);
+
+    // Tap Change Password / PIN
+    await tester.tap(find.text('Change Password / PIN'));
+    await tester.pumpAndSettle();
+
+    // Verify ChangePasswordDialog appears
+    expect(find.byType(ChangePasswordDialog), findsOneWidget);
+    expect(find.text('Change Password'), findsOneWidget);
+    expect(find.text('PASSWORD SECURITY REQUIREMENTS'), findsOneWidget);
+    expect(find.text('0 / 5 MET'), findsOneWidget);
+
+    // Enter a strong password into New Password field
+    final newPasswordField = find.widgetWithText(
+      TextField,
+      'Create strong terminal password',
+    );
+    await tester.enterText(newPasswordField, 'NeramPass@2026');
+    await tester.pump();
+
+    // Verify requirements are updated
+    expect(find.text('5 / 5 MET'), findsOneWidget);
+    expect(find.text('Excellent'), findsOneWidget);
+
+    // Close dialog via Cancel button
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChangePasswordDialog), findsNothing);
   });
 }

@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
-import 'package:neram_pos/core/theme/theme_provider.dart';
-import 'package:neram_pos/core/utils/jumping_page_route.dart';
 import 'package:neram_pos/core/widgets/neram_app_bar.dart';
 import 'package:neram_pos/core/widgets/neram_bottom_nav_bar.dart';
-import 'package:neram_pos/data/models/user_model.dart';
-import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
-import 'package:neram_pos/views/auth/login_view.dart';
+import 'package:neram_pos/views/home/widgets/neram_drawer.dart';
 import 'package:neram_pos/views/table/table_tab_view.dart';
-import 'package:provider/provider.dart';
 
-/// Main Dashboard view matching the Google Stitch "NERAM POS - Main Dashboard" specification.
+/// Main Dashboard view matching the Google Stitch "NERAM POS - Main Dashboard" specification
+/// and "NERAM POS - App Drawer" specification.
 /// Features the frosted glass top app bar, bottom navigation bar (Table, Stock, Leaves),
-/// and responsive workspace views.
+/// comprehensive staff drawer, and responsive workspace views.
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -24,6 +19,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentTabIndex = 0;
 
   void _onTabChanged(int index) {
@@ -32,33 +28,21 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<void> _handleLogout() async {
-    HapticService.selection();
-    final authViewModel = context.read<AuthViewModel>();
-    await authViewModel.logout();
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      JumpingPageRoute(page: const LoginView()),
-      (route) => false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final authViewModel = context.watch<AuthViewModel>();
-    final user = authViewModel.currentUser;
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: isDark
           ? AppColors.darkBackground
           : AppColors.lightBackground,
       appBar: NeramAppBar(
         onMenuPressed: () {
-          Scaffold.of(context).openEndDrawer();
+          _scaffoldKey.currentState?.openEndDrawer();
         },
       ),
-      endDrawer: _buildStaffDrawer(context, isDark, user),
+      endDrawer: NeramDrawer(onTabSelected: _onTabChanged),
       body: SafeArea(
         top: false,
         bottom: false,
@@ -123,50 +107,46 @@ class _HomeViewState extends State<HomeView> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
+                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 64x64 rounded icon container
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.darkSurfaceContainerHigh
-                        : AppColors.lightSurfaceSubtle,
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.30),
+                      width: 1.5,
+                    ),
                   ),
-                  child: Icon(icon, size: 32, color: AppColors.primary),
+                  child: Icon(icon, size: 36, color: AppColors.primary),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // Workspace title
+                const SizedBox(height: AppSpacing.xl),
                 Text(
                   title,
-                  textAlign: TextAlign.center,
                   style: AppTypography.headlineFont(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
                     color: isDark
                         ? AppColors.darkTextPrimary
                         : AppColors.lightTextPrimary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-
-                // Description
                 Text(
                   description,
                   textAlign: TextAlign.center,
-                  style: AppTypography.bodyFont(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                  style: TextStyle(
+                    fontSize: 13,
                     color: isDark
                         ? AppColors.darkTextSecondary
                         : AppColors.lightTextSecondary,
@@ -176,133 +156,6 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  /// Staff side drawer for quick actions (Profile, Theme Toggle, Sign Out)
-  Widget _buildStaffDrawer(BuildContext context, bool isDark, UserModel? user) {
-    final themeProvider = context.watch<ThemeProvider>();
-
-    return Drawer(
-      backgroundColor: isDark
-          ? AppColors.darkSurfaceContainer
-          : AppColors.lightSurface,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Drawer Header
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                    child: Text(
-                      user?.name.substring(0, 1).toUpperCase() ?? 'S',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user?.name ?? 'Staff Member',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.lightTextPrimary,
-                          ),
-                        ),
-                        Text(
-                          user != null ? user.role.name.toUpperCase() : 'STAFF',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
-
-            // Navigation Options
-            ListTile(
-              leading: const Icon(Icons.table_restaurant_rounded),
-              title: const Text('Table Management'),
-              selected: _currentTabIndex == 0,
-              onTap: () {
-                Navigator.of(context).pop();
-                _onTabChanged(0);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.inventory_2_rounded),
-              title: const Text('Stock & Inventory'),
-              selected: _currentTabIndex == 1,
-              onTap: () {
-                Navigator.of(context).pop();
-                _onTabChanged(1);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.event_available_rounded),
-              title: const Text('Leaves & Shifts'),
-              selected: _currentTabIndex == 2,
-              onTap: () {
-                Navigator.of(context).pop();
-                _onTabChanged(2);
-              },
-            ),
-
-            const Divider(height: 1),
-
-            // Theme Toggle
-            SwitchListTile(
-              secondary: Icon(
-                isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                color: AppColors.primary,
-              ),
-              title: const Text('Dark Mode'),
-              value: isDark,
-              onChanged: (_) {
-                themeProvider.toggleTheme(context);
-              },
-            ),
-
-            const Spacer(),
-            const Divider(height: 1),
-
-            // Logout
-            ListTile(
-              leading: const Icon(Icons.logout_rounded, color: AppColors.error),
-              title: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              onTap: _handleLogout,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
         ),
       ),
     );
