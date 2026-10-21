@@ -56,9 +56,9 @@ class TableTabView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.sm,
         AppSpacing.md,
-        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.md,
       ),
       decoration: BoxDecoration(
         color: isDark
@@ -86,8 +86,8 @@ class TableTabView extends StatelessWidget {
                   onTap: () => ActiveOrdersDialog.show(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 14,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.15),
@@ -108,27 +108,27 @@ class TableTabView extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         const Icon(
                           Icons.bolt_rounded,
-                          size: 16,
+                          size: 18,
                           color: AppColors.primary,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 5),
                         Text(
                           'ACTIVE ORDERS',
                           style: AppTypography.headlineFont(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.5,
                             color: AppColors.primary,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
+                            horizontal: 7,
+                            vertical: 3,
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary,
@@ -137,7 +137,7 @@ class TableTabView extends StatelessWidget {
                           child: Text(
                             '$activeOrdersCount',
                             style: const TextStyle(
-                              fontSize: 10,
+                              fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
                               height: 1.0,
@@ -158,8 +158,8 @@ class TableTabView extends StatelessWidget {
                   onTap: () => AllTablesBottomSheet.show(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 14,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: isDark
@@ -177,16 +177,16 @@ class TableTabView extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.grid_view_rounded,
-                          size: 15,
+                          size: 16,
                           color: isDark
                               ? AppColors.darkTextSecondary
                               : AppColors.lightTextSecondary,
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 6),
                         Text(
                           'ALL TABLES ($totalTablesCount)',
                           style: AppTypography.headlineFont(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.4,
                             color: isDark
@@ -194,10 +194,10 @@ class TableTabView extends StatelessWidget {
                                 : AppColors.lightTextSecondary,
                           ),
                         ),
-                        const SizedBox(width: 2),
+                        const SizedBox(width: 4),
                         Icon(
                           Icons.expand_more_rounded,
-                          size: 16,
+                          size: 18,
                           color: isDark
                               ? AppColors.darkTextSecondary
                               : AppColors.lightTextSecondary,
@@ -209,15 +209,15 @@ class TableTabView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
 
           // Row 2: Horizontal Quick-Access Table Chips
           SizedBox(
-            height: 48,
+            height: 52,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: tableViewModel.tables.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 final table = tableViewModel.tables[index];
                 final isSelected = table.id == tableViewModel.selectedTableId;
@@ -247,13 +247,13 @@ class TableTabView extends StatelessWidget {
       return Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x40FF6B35),
@@ -272,7 +272,7 @@ class TableTabView extends StatelessWidget {
                     Text(
                       table.id,
                       style: AppTypography.headlineFont(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
@@ -280,7 +280,7 @@ class TableTabView extends StatelessWidget {
                     Text(
                       table.subtitle,
                       style: const TextStyle(
-                        fontSize: 9,
+                        fontSize: 10,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         letterSpacing: 0.3,
@@ -288,15 +288,15 @@ class TableTabView extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                    horizontal: 7,
+                    vertical: 3,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -309,11 +309,11 @@ class TableTabView extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 3),
+                      const SizedBox(width: 4),
                       Text(
                         table.status.displayName,
                         style: const TextStyle(
-                          fontSize: 9,
+                          fontSize: 10,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFFFEF3C7),
                         ),
@@ -332,15 +332,15 @@ class TableTabView extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
           decoration: BoxDecoration(
             color: isDark
                 ? AppColors.darkSurfaceContainer
                 : AppColors.lightSurface,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
             ),
@@ -355,7 +355,7 @@ class TableTabView extends StatelessWidget {
                   Text(
                     table.id,
                     style: AppTypography.headlineFont(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: isDark
                           ? AppColors.darkTextPrimary
@@ -365,7 +365,7 @@ class TableTabView extends StatelessWidget {
                   Text(
                     table.subtitle,
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 10,
                       fontWeight: FontWeight.w500,
                       color: isDark
                           ? AppColors.darkTextMuted
@@ -375,12 +375,12 @@ class TableTabView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: table.status.backgroundColor,
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: table.status.borderColor),
                 ),
                 child: Row(
@@ -394,11 +394,11 @@ class TableTabView extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 3),
+                    const SizedBox(width: 4),
                     Text(
                       table.status.displayName,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: table.status.color,
                       ),
@@ -424,9 +424,9 @@ class TableTabView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.sm,
         AppSpacing.md,
-        AppSpacing.xs,
+        AppSpacing.md,
+        AppSpacing.sm,
       ),
       child: Column(
         children: [
@@ -435,15 +435,15 @@ class TableTabView extends StatelessWidget {
             onChanged: tableViewModel.setSearchQuery,
             onFilterTap: () => AllTablesBottomSheet.show(context),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
 
           // Categories Horizontal Scroll
           SizedBox(
-            height: 36,
+            height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: TableViewModel.categories.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 6),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final category = TableViewModel.categories[index];
                 final isSelected = category == tableViewModel.selectedCategory;
@@ -453,8 +453,8 @@ class TableTabView extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -475,7 +475,7 @@ class TableTabView extends StatelessWidget {
                     child: Text(
                       category,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w500,
@@ -549,13 +549,13 @@ class TableTabView extends StatelessWidget {
           final countInCart = tableViewModel.currentTableCart[dish.id] ?? 0;
 
           return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(AppSpacing.md),
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: isDark
                   ? AppColors.darkSurfaceContainerLow
                   : AppColors.lightSurface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
               ),
@@ -571,7 +571,7 @@ class TableTabView extends StatelessWidget {
               children: [
                 // Veg / Egg / NonVeg Badge
                 _buildFoodTypeBadge(dish.foodType),
-                const SizedBox(width: AppSpacing.sm + 2),
+                const SizedBox(width: AppSpacing.md),
 
                 // Dish Details
                 Expanded(
@@ -581,29 +581,29 @@ class TableTabView extends StatelessWidget {
                       Text(
                         dish.name,
                         style: AppTypography.headlineFont(
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: isDark
                               ? AppColors.darkTextPrimary
                               : AppColors.lightTextPrimary,
                         ),
                       ),
-                      const SizedBox(height: 1),
+                      const SizedBox(height: 2),
                       Text(
                         dish.subtitle,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: FontWeight.w500,
                           color: isDark
                               ? AppColors.darkTextSecondary
                               : AppColors.lightTextSecondary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 5),
                       Text(
                         dish.formattedPrice,
                         style: AppTypography.headlineFont(
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
                         ),
@@ -617,16 +617,16 @@ class TableTabView extends StatelessWidget {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       onTap: () => tableViewModel.addDish(dish),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 7,
+                          horizontal: 16,
+                          vertical: 8.5,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: const [
                             BoxShadow(
                               color: Color(0x33FF6B35),
@@ -643,11 +643,11 @@ class TableTabView extends StatelessWidget {
                               size: 16,
                               color: Colors.white,
                             ),
-                            SizedBox(width: 3),
+                            SizedBox(width: 4),
                             Text(
                               'Add',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
@@ -661,7 +661,7 @@ class TableTabView extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -669,8 +669,8 @@ class TableTabView extends StatelessWidget {
                         IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                            minWidth: 32,
+                            minHeight: 32,
                           ),
                           icon: const Icon(
                             Icons.remove_rounded,
@@ -682,7 +682,7 @@ class TableTabView extends StatelessWidget {
                         Text(
                           '$countInCart',
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
@@ -690,8 +690,8 @@ class TableTabView extends StatelessWidget {
                         IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                            minWidth: 32,
+                            minHeight: 32,
                           ),
                           icon: const Icon(
                             Icons.add_rounded,
@@ -719,16 +719,16 @@ class TableTabView extends StatelessWidget {
     };
 
     return Container(
-      width: 16,
-      height: 16,
+      width: 18,
+      height: 18,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(5),
         border: Border.all(color: color, width: 1.5),
       ),
       alignment: Alignment.center,
       child: Container(
-        width: 7,
-        height: 7,
+        width: 8,
+        height: 8,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       ),
     );
@@ -752,8 +752,8 @@ class TableTabView extends StatelessWidget {
       curve: Curves.easeOutCubic,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm + 2,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
           color: isDark
@@ -789,24 +789,24 @@ class TableTabView extends StatelessWidget {
                         Text(
                           table.name,
                           style: AppTypography.headlineFont(
-                            fontSize: 13,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: isDark
                                 ? AppColors.darkTextPrimary
                                 : AppColors.lightTextPrimary,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 1.5,
+                            horizontal: 8,
+                            vertical: 2.5,
                           ),
                           decoration: BoxDecoration(
                             color: isDark
                                 ? AppColors.darkSurfaceContainerHigh
                                 : AppColors.lightSurfaceSubtle,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: isDark
                                   ? AppColors.darkBorder
@@ -816,7 +816,7 @@ class TableTabView extends StatelessWidget {
                           child: Text(
                             tableViewModel.customerName,
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: isDark
                                   ? AppColors.darkTextSecondary
@@ -826,13 +826,13 @@ class TableTabView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Row(
                       children: [
                         Text(
                           '$count Items',
                           style: const TextStyle(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
@@ -840,7 +840,7 @@ class TableTabView extends StatelessWidget {
                         Text(
                           '  •  Total ',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 12,
                             color: isDark
                                 ? AppColors.darkTextSecondary
                                 : AppColors.lightTextSecondary,
@@ -849,7 +849,7 @@ class TableTabView extends StatelessWidget {
                         Text(
                           '\$${total.toStringAsFixed(2)}',
                           style: AppTypography.headlineFont(
-                            fontSize: 12,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: isDark
                                 ? AppColors.darkTextPrimary
@@ -866,19 +866,19 @@ class TableTabView extends StatelessWidget {
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   onTap: () {
                     HapticService.selection();
                     CartDetailsModal.show(context);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 9,
+                      horizontal: 16,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x4DFF6B35),
@@ -892,14 +892,14 @@ class TableTabView extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.receipt_long_rounded,
-                          size: 16,
+                          size: 18,
                           color: Colors.white,
                         ),
                         SizedBox(width: 6),
                         Text(
                           'View Order',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),

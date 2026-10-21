@@ -103,17 +103,17 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: 46,
+      height: 52,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: borderColor, width: isFocused ? 1.5 : 1.0),
         boxShadow: [
           BoxShadow(
             color: isFocused
                 ? AppColors.primary.withValues(alpha: 0.15)
                 : Colors.black.withValues(alpha: isDark ? 0.20 : 0.04),
-            blurRadius: isFocused ? 12 : 6,
+            blurRadius: isFocused ? 14 : 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -121,7 +121,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           onTap: () {
             if (!_focusNode.hasFocus) {
               HapticService.selection();
@@ -129,20 +129,20 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
             }
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md + 2),
             child: Row(
               children: [
                 // Leading Search Icon with amber pulse on focus
                 Icon(
                   Icons.search_rounded,
-                  size: 20,
+                  size: 22,
                   color: isFocused
                       ? AppColors.primary
                       : isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.lightTextSecondary,
                 ),
-                const SizedBox(width: AppSpacing.sm + 2),
+                const SizedBox(width: AppSpacing.sm + 4),
 
                 // Search Input with Animated Swiggy-Style Rotating Carousel
                 Expanded(
@@ -157,7 +157,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                               Text(
                                 'Search for ',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: isDark
                                       ? AppColors.darkTextMuted
@@ -201,7 +201,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                                       widget.hintItems[_currentHintIndex],
                                       key: ValueKey<int>(_currentHintIndex),
                                       style: TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: isDark
                                             ? AppColors.darkTextSecondary
@@ -220,7 +220,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                         controller: _controller,
                         focusNode: _focusNode,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: isDark
                               ? AppColors.darkTextPrimary
@@ -247,11 +247,11 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                 // Trailing Clear or Filter Button
                 if (_hasText)
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 18),
+                    icon: const Icon(Icons.close_rounded, size: 20),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(
-                      minWidth: 28,
-                      minHeight: 28,
+                      minWidth: 32,
+                      minHeight: 32,
                     ),
                     color: isDark
                         ? AppColors.darkTextSecondary
