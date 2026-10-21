@@ -22,17 +22,74 @@ class TableTabView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final tableViewModel = context.watch<TableViewModel>();
+    final dishes = tableViewModel.filteredDishes;
+    final bottomPadding = tableViewModel.totalCartItemCount > 0
+        ? 90.0
+        : AppSpacing.xxl;
 
     return Column(
       children: [
-        // Top Action Strip & Quick Tables Bar
-        _buildTopActionStrip(context, isDark, tableViewModel),
+        // Responsive scroll view where top sections scroll off naturally,
+        // expanding the dishes list to occupy the full screen height
+        Expanded(
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              // 1. Top Action Strip & Quick Tables Bar (scrolls away on drag)
+              SliverToBoxAdapter(
+                child: _buildTopActionStrip(context, isDark, tableViewModel),
+              ),
 
-        // Search Bar & Category Filter Pills
-        _buildSearchAndCategories(context, isDark, tableViewModel),
+              // 2. Search Bar & Category Filter Pills (scrolls away on drag)
+              SliverToBoxAdapter(
+                child: _buildSearchAndCategories(
+                  context,
+                  isDark,
+                  tableViewModel,
+                ),
+              ),
 
-        // Dishes List
-        Expanded(child: _buildDishesList(context, isDark, tableViewModel)),
+              // 3. Section Header: POPULAR & RECOMMENDED DISHES
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child: _buildSectionHeader(isDark, dishes.length),
+                ),
+              ),
+
+              // 4. Dishes Catalog List (expands to full viewport on scroll)
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                  AppSpacing.md,
+                  bottomPadding,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final dish = dishes[index];
+                      return _buildDishCard(
+                        context,
+                        isDark,
+                        tableViewModel,
+                        dish,
+                      );
+                    },
+                    childCount: dishes.length,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
 
         // Bottom Table Summary Tray (Floating bottom cart summary if items selected)
         if (tableViewModel.totalCartItemCount > 0)
@@ -56,9 +113,9 @@ class TableTabView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
+        AppSpacing.sm,
         AppSpacing.md,
-        AppSpacing.md,
-        AppSpacing.md,
+        AppSpacing.sm,
       ),
       decoration: BoxDecoration(
         color: isDark
@@ -698,9 +755,9 @@ class TableTabView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
+        AppSpacing.xs + 2,
         AppSpacing.md,
-        AppSpacing.md,
-        AppSpacing.sm,
+        AppSpacing.xs + 2,
       ),
       child: Column(
         children: [
@@ -771,222 +828,208 @@ class TableTabView extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // DISHES CATALOG LIST
+  // SECTION HEADER & DISH CARD (FOR SLIVER LIST)
   // ---------------------------------------------------------------------------
-  Widget _buildDishesList(
+  Widget _buildSectionHeader(bool isDark, int count) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              'POPULAR & RECOMMENDED DISHES',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.headlineFont(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.8,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$count Items Available',
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDishCard(
     BuildContext context,
     bool isDark,
     TableViewModel tableViewModel,
+    DishModel dish,
   ) {
-    final dishes = tableViewModel.filteredDishes;
+    final countInCart = tableViewModel.currentTableCart[dish.id] ?? 0;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.md,
-        AppSpacing.xxl,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSurfaceContainerLow
+            : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      children: [
-        // Section Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  'POPULAR & RECOMMENDED DISHES',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+      child: Row(
+        children: [
+          // Veg / Egg / NonVeg Badge
+          _buildFoodTypeBadge(dish.foodType),
+          const SizedBox(width: AppSpacing.md),
+
+          // Dish Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dish.name,
                   style: AppTypography.headlineFont(
-                    fontSize: 11,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  dish.subtitle,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                     color: isDark
                         ? AppColors.darkTextSecondary
                         : AppColors.lightTextSecondary,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${dishes.length} Items Available',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 6),
-
-        // Dishes Cards
-        ...dishes.map((dish) {
-          final countInCart = tableViewModel.currentTableCart[dish.id] ?? 0;
-
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkSurfaceContainerLow
-                  : AppColors.lightSurface,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                const SizedBox(height: 5),
+                Text(
+                  dish.formattedPrice,
+                  style: AppTypography.headlineFont(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                // Veg / Egg / NonVeg Badge
-                _buildFoodTypeBadge(dish.foodType),
-                const SizedBox(width: AppSpacing.md),
+          ),
 
-                // Dish Details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          // Add or Quantity Counter Button
+          if (countInCart == 0)
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => tableViewModel.addDish(dish),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33FF6B35),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        dish.name,
-                        style: AppTypography.headlineFont(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.lightTextPrimary,
-                        ),
+                      Icon(
+                        Icons.add_rounded,
+                        size: 16,
+                        color: Colors.white,
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(width: 4),
                       Text(
-                        dish.subtitle,
+                        'Add',
                         style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        dish.formattedPrice,
-                        style: AppTypography.headlineFont(
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: Colors.white,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Add or Quantity Counter Button
-                if (countInCart == 0)
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () => tableViewModel.addDish(dish),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x33FF6B35),
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.add_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Add',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+              ),
+            )
+          else
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
                     ),
-                  )
-                else
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                    icon: const Icon(
+                      Icons.remove_rounded,
+                      size: 16,
+                      color: Colors.white,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
-                          ),
-                          icon: const Icon(
-                            Icons.remove_rounded,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          onPressed: () => tableViewModel.removeDish(dish),
-                        ),
-                        Text(
-                          '$countInCart',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
-                          ),
-                          icon: const Icon(
-                            Icons.add_rounded,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          onPressed: () => tableViewModel.addDish(dish),
-                        ),
-                      ],
+                    onPressed: () => tableViewModel.removeDish(dish),
+                  ),
+                  Text(
+                    '$countInCart',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
                     ),
                   ),
-              ],
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    icon: const Icon(
+                      Icons.add_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => tableViewModel.addDish(dish),
+                  ),
+                ],
+              ),
             ),
-          );
-        }),
-      ],
+        ],
+      ),
     );
   }
 
