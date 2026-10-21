@@ -21,6 +21,14 @@ class FakeAuthRepository implements AuthRepository {
     required String username,
     required String password,
   }) async {
+    if (username.trim().toLowerCase() == 'abhishek' && password == '123456') {
+      return UserModel(
+        id: 'usr_abhishek_001',
+        name: 'Abhishek',
+        email: 'abhishek@nerampos.com',
+        role: StaffRole.manager,
+      );
+    }
     if (shouldSucceed) {
       return UserModel(
         id: 'staff_1',
@@ -107,6 +115,37 @@ void main() {
 
       // Verify success snackbar appears
       expect(find.text('Welcome, Alex Cashier!'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'LoginView sample credentials quick fill and login succeeds for Abhishek',
+    (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final authRepository = FakeAuthRepository();
+
+      await tester.pumpWidget(
+        buildTestApp(prefs: prefs, authRepository: authRepository),
+      );
+      await tester.pump(const Duration(milliseconds: 2000));
+      await tester.pumpAndSettle();
+
+      // Tap demo quick fill chip
+      final demoFinder = find.textContaining('Demo: abhishek / 123456');
+      expect(demoFinder, findsOneWidget);
+      await tester.tap(demoFinder);
+      await tester.pumpAndSettle();
+
+      // Verify fields filled
+      expect(find.text('abhishek'), findsOneWidget);
+      expect(find.text('123456'), findsOneWidget);
+
+      // Tap Sign In
+      await tester.tap(find.text('Sign In'));
+      await tester.pumpAndSettle();
+
+      // Verify welcome snackbar for Abhishek
+      expect(find.text('Welcome, Abhishek!'), findsOneWidget);
     },
   );
 

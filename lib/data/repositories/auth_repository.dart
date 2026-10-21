@@ -1,4 +1,5 @@
 import 'package:neram_pos/core/constants/api_endpoints.dart';
+import 'package:neram_pos/core/errors/app_exception.dart';
 import 'package:neram_pos/core/network/api_client.dart';
 import 'package:neram_pos/core/security/token_manager.dart';
 import 'package:neram_pos/data/models/auth_token_model.dart';
@@ -19,12 +20,38 @@ class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
 
   final ApiClient apiClient;
   final TokenManager tokenManager;
+  UserModel? _cachedUser;
 
   @override
   Future<UserModel> login({
     required String username,
     required String password,
   }) async {
+    final cleanUsername = username.trim().toLowerCase();
+
+    // Sample / Demo staff credentials for internal development & testing
+    if (cleanUsername == 'abhishek') {
+      if (password == '123456') {
+        final sampleUser = UserModel(
+          id: 'usr_abhishek_001',
+          name: 'Abhishek',
+          email: 'abhishek@nerampos.com',
+          role: StaffRole.manager,
+          outletId: 'outlet_001',
+        );
+        _cachedUser = sampleUser;
+        await tokenManager.saveTokens(
+          accessToken: 'sample_token_abhishek_valid',
+          refreshToken: 'sample_refresh_token_abhishek',
+        );
+        return sampleUser;
+      } else {
+        throw const UnauthorizedException(
+          message: 'Invalid password. Please check your credentials.',
+        );
+      }
+    }
+
     return safeCall(() async {
       final response = await apiClient.post<Map<String, dynamic>>(
         ApiEndpoints.login,
@@ -44,15 +71,21 @@ class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
       );
 
       final userData = data['user'] as Map<String, dynamic>? ?? data;
-      return UserModel.fromJson(userData);
+      final user = UserModel.fromJson(userData);
+      _cachedUser = user;
+      return user;
     });
   }
 
   @override
   Future<void> logout() async {
+    _cachedUser = null;
     return safeCall(() async {
       try {
-        await apiClient.post<dynamic>(ApiEndpoints.logout);
+        final token = await tokenManager.getAccessToken();
+        if (token == null || !token.contains('sample_token_abhishek')) {
+          await apiClient.post<dynamic>(ApiEndpoints.logout);
+        }
       } catch (_) {
         // Ignore remote logout network errors to ensure local tokens are always cleared
       } finally {
@@ -66,6 +99,18 @@ class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
     return safeCall(() async {
       final isAuth = await isAuthenticated();
       if (!isAuth) return null;
+
+      final token = await tokenManager.getAccessToken();
+      if (token != null && token.contains('sample_token_abhishek')) {
+        return _cachedUser ??
+            UserModel(
+              id: 'usr_abhishek_001',
+              name: 'Abhishek',
+              email: 'abhishek@nerampos.com',
+              role: StaffRole.manager,
+              outletId: 'outlet_001',
+            );
+      }
 
       final response = await apiClient.get<Map<String, dynamic>>(
         ApiEndpoints.staffProfile,

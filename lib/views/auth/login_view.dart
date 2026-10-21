@@ -4,7 +4,6 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_decorations.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
-import 'package:neram_pos/core/theme/theme_provider.dart';
 import 'package:neram_pos/core/utils/device_utils.dart';
 import 'package:neram_pos/core/widgets/app_button.dart';
 import 'package:neram_pos/core/widgets/app_text_field.dart';
@@ -126,7 +125,6 @@ class _LoginViewState extends State<LoginView>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final themeProvider = context.watch<ThemeProvider>();
 
     return GestureDetector(
       onTap: () => DeviceUtils.hideKeyboard(context),
@@ -134,21 +132,8 @@ class _LoginViewState extends State<LoginView>
         backgroundColor: isDark
             ? AppColors.darkBackground
             : AppColors.lightBackground,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          actions: [
-            IconButton(
-              tooltip: 'Toggle Theme',
-              icon: Icon(
-                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-              ),
-              onPressed: () => themeProvider.toggleTheme(context),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-          ],
-        ),
         body: SafeArea(
+          top: false,
           child: Stack(
             children: [
               // Ambient atmospheric glow backing from Stitch design
@@ -471,6 +456,61 @@ class _LoginViewState extends State<LoginView>
                   color: Colors.white,
                 ),
                 onPressed: _handleLogin,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // Sample Demo Login Quick Fill Helper
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: AppSpacing.roundedMd,
+                  onTap: () {
+                    HapticService.selection();
+                    _usernameController.text = 'abhishek';
+                    _passwordController.text = '123456';
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.darkSurfaceContainerHighest
+                          : AppColors.lightSurfaceSubtle,
+                      borderRadius: AppSpacing.roundedMd,
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.key_rounded,
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Flexible(
+                          child: Text(
+                            'Demo: abhishek / 123456 (Tap to fill)',
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
