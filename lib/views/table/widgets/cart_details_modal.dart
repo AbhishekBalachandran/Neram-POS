@@ -1367,9 +1367,11 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                             size: 18,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            'Order sent to Kitchen for ${tableViewModel.selectedTable.name}!',
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          Expanded(
+                            child: Text(
+                              'Order sent to Kitchen for ${tableViewModel.orderDestinationTitle}!',
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ],
                       ),

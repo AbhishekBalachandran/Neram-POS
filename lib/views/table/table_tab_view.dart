@@ -74,135 +74,148 @@ class TableTabView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Row 1: Active Orders Alert Pill & All Tables Trigger
+          // Row 1: Active Orders Alert Pill & All Tables Trigger (Fully Responsive)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Active Orders Pill
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: () => ActiveOrdersDialog.show(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.40),
+              Flexible(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(999),
+                    onTap: () => ActiveOrdersDialog.show(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Animated Beacon
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.40),
                         ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.bolt_rounded,
-                          size: 18,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'ACTIVE ORDERS',
-                          style: AppTypography.headlineFont(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            '$activeOrdersCount',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              height: 1.0,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Animated Beacon
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.bolt_rounded,
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'ACTIVE ORDERS',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.headlineFont(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.4,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              '$activeOrdersCount',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                height: 1.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
 
               // All Tables Trigger Button
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: () => AllTablesBottomSheet.show(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.darkSurfaceContainerHigh
-                          : AppColors.lightSurface,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
+              Flexible(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(999),
+                    onTap: () => AllTablesBottomSheet.show(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.grid_view_rounded,
-                          size: 16,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkSurfaceContainerHigh
+                            : AppColors.lightSurface,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
                           color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
+                              ? AppColors.darkBorder
+                              : AppColors.lightBorder,
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'ALL TABLES ($totalTablesCount)',
-                          style: AppTypography.headlineFont(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.4,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.grid_view_rounded,
+                            size: 15,
                             color: isDark
                                 ? AppColors.darkTextSecondary
                                 : AppColors.lightTextSecondary,
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.expand_more_rounded,
-                          size: 18,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                        ),
-                      ],
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'ALL TABLES ($totalTablesCount)',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.headlineFont(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.3,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          Icon(
+                            Icons.expand_more_rounded,
+                            size: 16,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -313,16 +326,21 @@ class TableTabView extends StatelessWidget {
                       : AppColors.lightTextSecondary,
                 ),
                 const SizedBox(width: 5),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                    color: isSelected
-                        ? Colors.white
-                        : isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.lightTextPrimary,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        color: isSelected
+                            ? Colors.white
+                            : isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -776,17 +794,22 @@ class TableTabView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'POPULAR & RECOMMENDED DISHES',
-                style: AppTypography.headlineFont(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
+              Flexible(
+                child: Text(
+                  'POPULAR & RECOMMENDED DISHES',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.headlineFont(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Text(
                 '${dishes.length} Items Available',
                 style: const TextStyle(
@@ -1007,8 +1030,8 @@ class TableTabView extends StatelessWidget {
       curve: Curves.easeOutCubic,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + 4,
         ),
         decoration: BoxDecoration(
           color: isDark
@@ -1041,83 +1064,97 @@ class TableTabView extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          tableViewModel.orderDestinationTitle,
-                          style: AppTypography.headlineFont(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.lightTextPrimary,
+                        Flexible(
+                          child: Text(
+                            tableViewModel.orderDestinationTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.headlineFont(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.lightTextPrimary,
+                            ),
                           ),
                         ),
                         if (tableViewModel.customerName.isNotEmpty) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? AppColors.darkSurfaceContainerHigh
-                                  : AppColors.lightSurfaceSubtle,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: isDark
-                                    ? AppColors.darkBorder
-                                    : AppColors.lightBorder,
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
                               ),
-                            ),
-                            child: Text(
-                              tableViewModel.customerName,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                              decoration: BoxDecoration(
                                 color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.lightTextSecondary,
+                                    ? AppColors.darkSurfaceContainerHigh
+                                    : AppColors.lightSurfaceSubtle,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.lightBorder,
+                                ),
+                              ),
+                              child: Text(
+                                tableViewModel.customerName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary,
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ],
                     ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Text(
-                          '$count Items',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '$count Items',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '  •  Total ',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.lightTextSecondary,
+                          Text(
+                            ' • Total ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.lightTextSecondary,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '\$${total.toStringAsFixed(2)}',
-                          style: AppTypography.headlineFont(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.lightTextPrimary,
+                          Text(
+                            '\$${total.toStringAsFixed(2)}',
+                            style: AppTypography.headlineFont(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.lightTextPrimary,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
 
               // Right: View Order Button matching Stitch
               Material(
@@ -1130,8 +1167,8 @@ class TableTabView extends StatelessWidget {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
+                      horizontal: 12,
+                      vertical: 9,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
@@ -1149,22 +1186,22 @@ class TableTabView extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.receipt_long_rounded,
-                          size: 18,
+                          size: 16,
                           color: Colors.white,
                         ),
-                        SizedBox(width: 6),
+                        SizedBox(width: 5),
                         Text(
                           'View Order',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(width: 4),
+                        SizedBox(width: 3),
                         Icon(
                           Icons.arrow_forward_rounded,
-                          size: 14,
+                          size: 13,
                           color: Colors.white,
                         ),
                       ],

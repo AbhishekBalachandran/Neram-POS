@@ -5,6 +5,7 @@ import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/widgets/neram_app_bar.dart';
 import 'package:neram_pos/core/widgets/neram_bottom_nav_bar.dart';
 import 'package:neram_pos/views/home/widgets/neram_drawer.dart';
+import 'package:neram_pos/views/leaves/leaves_tab_view.dart';
 import 'package:neram_pos/views/table/table_tab_view.dart';
 
 /// Main Dashboard view matching the Google Stitch "NERAM POS - Main Dashboard" specification
@@ -61,14 +62,8 @@ class _HomeViewState extends State<HomeView> {
                   'Realtime stock status, ingredient consumption, and warehouse replenishment.',
             ),
 
-            // Tab 2: Leaves & Attendance
-            _buildWorkspacePlaceholder(
-              isDark: isDark,
-              icon: Icons.event_available_rounded,
-              title: 'Leaves & Roster',
-              description:
-                  'Staff attendance, shift schedules, and leave approval management.',
-            ),
+            // Tab 2: Leaves & Attendance (from Stitch)
+            const LeavesTabView(),
           ],
         ),
       ),

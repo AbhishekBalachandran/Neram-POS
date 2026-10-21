@@ -10,6 +10,7 @@ import 'package:neram_pos/core/theme/theme_provider.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/app_viewmodel.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
+import 'package:neram_pos/viewmodels/leaves_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,6 +58,7 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<AppViewModel>(create: (_) => AppViewModel()),
         ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
+        ChangeNotifierProvider<LeavesViewModel>(create: (_) => LeavesViewModel()),
       ],
       child: const NeramPosApp(),
     ),

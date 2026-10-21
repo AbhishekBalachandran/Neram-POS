@@ -305,7 +305,8 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
+                                  Expanded(
+                                    child: Row(
                                     children: [
                                       if (order.zone == TableZone.outdoor) ...[
                                         Container(
@@ -330,14 +331,18 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(
-                                          order.customerName,
-                                          style: AppTypography.headlineFont(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: isDark
-                                                ? AppColors.darkTextPrimary
-                                                : AppColors.lightTextPrimary,
+                                        Expanded(
+                                          child: Text(
+                                            order.customerName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTypography.headlineFont(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: isDark
+                                                  ? AppColors.darkTextPrimary
+                                                  : AppColors.lightTextPrimary,
+                                            ),
                                           ),
                                         ),
                                       ] else if (order.zone == TableZone.takeaway) ...[
@@ -363,14 +368,18 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(
-                                          order.customerName,
-                                          style: AppTypography.headlineFont(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: isDark
-                                                ? AppColors.darkTextPrimary
-                                                : AppColors.lightTextPrimary,
+                                        Expanded(
+                                          child: Text(
+                                            order.customerName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTypography.headlineFont(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: isDark
+                                                  ? AppColors.darkTextPrimary
+                                                  : AppColors.lightTextPrimary,
+                                            ),
                                           ),
                                         ),
                                       ] else ...[
@@ -385,18 +394,23 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                           ),
                                         ),
                                         const SizedBox(width: 6),
-                                        Text(
-                                          '•  ${order.customerName}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: isDark
-                                                ? AppColors.darkTextSecondary
-                                                : AppColors.lightTextSecondary,
+                                        Expanded(
+                                          child: Text(
+                                            '•  ${order.customerName}',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: isDark
+                                                  ? AppColors.darkTextSecondary
+                                                  : AppColors.lightTextSecondary,
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ],
-                                  ),
+                                  )),
+                                  const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,

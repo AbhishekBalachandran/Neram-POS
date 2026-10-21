@@ -10,11 +10,14 @@ import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
+import 'package:neram_pos/viewmodels/leaves_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
 import 'package:neram_pos/views/auth/widgets/change_password_dialog.dart';
 import 'package:neram_pos/views/home/home_view.dart';
 import 'package:neram_pos/views/home/widgets/neram_drawer.dart';
+import 'package:neram_pos/views/leaves/leaves_tab_view.dart';
+import 'package:neram_pos/views/leaves/widgets/apply_leave_modal.dart';
 import 'package:neram_pos/views/splash/splash_screen.dart';
 import 'package:neram_pos/views/table/table_tab_view.dart';
 import 'package:provider/provider.dart';
@@ -79,7 +82,7 @@ void main() {
           create: (_) => AuthViewModel(authRepository: authRepository),
         ),
         ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
-        ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
+        ChangeNotifierProvider<LeavesViewModel>(create: (_) => LeavesViewModel()),
       ],
       child: const NeramPosApp(),
     );
@@ -298,6 +301,9 @@ void main() {
             ChangeNotifierProvider<TableViewModel>(
               create: (_) => TableViewModel(),
             ),
+            ChangeNotifierProvider<LeavesViewModel>(
+              create: (_) => LeavesViewModel(),
+            ),
           ],
           child: const MaterialApp(home: HomeView()),
         ),
@@ -342,6 +348,9 @@ void main() {
         providers: [
           ChangeNotifierProvider<TableViewModel>(
             create: (_) => TableViewModel(),
+          ),
+          ChangeNotifierProvider<LeavesViewModel>(
+            create: (_) => LeavesViewModel(),
           ),
         ],
         child: const MaterialApp(home: Scaffold(body: TableTabView())),
@@ -420,6 +429,9 @@ void main() {
           ChangeNotifierProvider<TableViewModel>(
             create: (_) => TableViewModel(),
           ),
+          ChangeNotifierProvider<LeavesViewModel>(
+            create: (_) => LeavesViewModel(),
+          ),
         ],
         child: const MaterialApp(home: HomeView()),
       ),
@@ -466,4 +478,143 @@ void main() {
 
     expect(find.byType(ChangePasswordDialog), findsNothing);
   });
+
+  testWidgets('LeavesTabView renders shift punch station, metrics gauge, and applies leave', (
+    WidgetTester tester,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final authRepo = FakeAuthRepository();
+    final authViewModel = AuthViewModel(authRepository: authRepo);
+    await authViewModel.login(username: 'abhishek', password: '123456');
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ThemeProvider>(
+            create: (_) => ThemeProvider(prefs: prefs),
+          ),
+          ChangeNotifierProvider<AuthViewModel>.value(value: authViewModel),
+          ChangeNotifierProvider<TableViewModel>(
+            create: (_) => TableViewModel(),
+          ),
+          ChangeNotifierProvider<LeavesViewModel>(
+            create: (_) => LeavesViewModel(),
+          ),
+        ],
+        child: const MaterialApp(home: HomeView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap Leaves tab in Bottom Navigation Bar (Tab 2)
+    await tester.tap(find.text('LEAVES'));
+    await tester.pumpAndSettle();
+
+    // Verify LeavesTabView is active
+    expect(find.byType(LeavesTabView), findsOneWidget);
+    expect(find.text('SHIFT TIMER'), findsOneWidget);
+    expect(find.text('Shift & Duty Roster'), findsOneWidget);
+    expect(find.text('MONTHLY ATTENDANCE RATE'), findsOneWidget);
+    expect(find.text('ELIGIBLE WORK DAYS'), findsOneWidget);
+    expect(find.text('LEAVES TAKEN'), findsOneWidget);
+    expect(find.text('Leave Audit & Team Log'), findsOneWidget);
+
+    // Verify Check In / Check Out action button
+    expect(find.text('Check In'), findsOneWidget);
+    await tester.tap(find.text('Check In'));
+    await tester.pumpAndSettle();
+
+    // Tap Apply Leave button
+    await tester.tap(find.text('Apply Leave'));
+    await tester.pumpAndSettle();
+
+    // Verify ApplyLeaveModal opens
+    expect(find.byType(ApplyLeaveModal), findsOneWidget);
+    expect(find.text('Apply for Leave'), findsOneWidget);
+    expect(find.text('Submit Request'), findsOneWidget);
+
+    // Enter absence reason
+    final reasonField = find.byType(TextField);
+    await tester.enterText(reasonField, 'Family vacation planned');
+    await tester.pump();
+
+    // Submit Request
+    await tester.tap(find.text('Submit Request'));
+    await tester.pumpAndSettle();
+
+    // Modal should close and the new leave application should appear
+    expect(find.byType(ApplyLeaveModal), findsNothing);
+    expect(find.text('Family vacation planned'), findsOneWidget);
+  });
+
+  testWidgets(
+    'TableTabView and LeavesTabView render with zero overflow on narrow mobile and tablet screens',
+    (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final screenSizes = [
+        const Size(320, 568),  // Smallest compact phone (iPhone SE 1st gen)
+        const Size(360, 640),  // Standard small budget Android
+        const Size(393, 852),  // Modern phone (iPhone 16)
+        const Size(768, 1024), // Portrait Tablet (iPad)
+        const Size(1024, 768), // Landscape Tablet
+      ];
+
+      for (final size in screenSizes) {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        // Test TableTabView
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider<ThemeProvider>(
+                create: (_) => ThemeProvider(prefs: prefs),
+              ),
+              ChangeNotifierProvider<TableViewModel>(
+                create: (_) => TableViewModel(),
+              ),
+              ChangeNotifierProvider<LeavesViewModel>(
+                create: (_) => LeavesViewModel(),
+              ),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: TableTabView(),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+
+        // Test LeavesTabView
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider<ThemeProvider>(
+                create: (_) => ThemeProvider(prefs: prefs),
+              ),
+              ChangeNotifierProvider<TableViewModel>(
+                create: (_) => TableViewModel(),
+              ),
+              ChangeNotifierProvider<LeavesViewModel>(
+                create: (_) => LeavesViewModel(),
+              ),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: LeavesTabView(),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
 }
