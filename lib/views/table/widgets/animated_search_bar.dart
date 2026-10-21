@@ -168,6 +168,16 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                                 child: ClipRect(
                                   child: AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 400),
+                                    layoutBuilder:
+                                        (currentChild, previousChildren) {
+                                          return Stack(
+                                            alignment: Alignment.centerLeft,
+                                            children: [
+                                              ...previousChildren,
+                                              ?currentChild,
+                                            ],
+                                          );
+                                        },
                                     transitionBuilder: (child, animation) {
                                       final inAnimation =
                                           Tween<Offset>(
