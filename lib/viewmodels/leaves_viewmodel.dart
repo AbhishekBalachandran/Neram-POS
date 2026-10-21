@@ -16,7 +16,7 @@ class LeavesViewModel extends ChangeNotifier {
   DateTime? _checkInTime = DateTime.now().subtract(
     const Duration(hours: 4, minutes: 22, seconds: 14),
   );
-  String _stationName = 'Active On Floor (Barista 01)';
+  String _stationName = 'Active';
 
   int _selectedYear = 2024;
   String _selectedMonth = 'October';
@@ -65,7 +65,7 @@ class LeavesViewModel extends ChangeNotifier {
     HapticService.success();
     _isCheckedIn = true;
     _checkInTime = DateTime.now();
-    _stationName = 'Active On Floor (Barista 01)';
+    _stationName = 'Active';
     notifyListeners();
   }
 
@@ -73,7 +73,7 @@ class LeavesViewModel extends ChangeNotifier {
     HapticService.mediumImpact();
     _isCheckedIn = false;
     _checkInTime = null;
-    _stationName = 'Logged Off';
+    _stationName = 'Inactive';
     notifyListeners();
   }
 

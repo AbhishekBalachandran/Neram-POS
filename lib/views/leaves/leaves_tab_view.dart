@@ -287,10 +287,14 @@ class LeavesTabView extends StatelessWidget {
                             ),
                             children: [
                               TextSpan(
-                                text: leavesViewModel.stationName,
-                                style: const TextStyle(
+                                text: leavesViewModel.isCheckedIn
+                                    ? 'Active'
+                                    : 'Inactive',
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
+                                  color: leavesViewModel.isCheckedIn
+                                      ? const Color(0xFF10B981)
+                                      : AppColors.error,
                                 ),
                               ),
                             ],

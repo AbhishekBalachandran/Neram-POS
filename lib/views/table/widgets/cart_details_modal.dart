@@ -120,23 +120,23 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(
+                              'Current Order',
+                              style: AppTypography.headlineFont(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.lightTextPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
                             Row(
                               children: [
-                                Text(
-                                  'Current Order',
-                                  style: AppTypography.headlineFont(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: isDark
-                                        ? AppColors.darkTextPrimary
-                                        : AppColors.lightTextPrimary,
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
+                                    horizontal: 7,
+                                    vertical: 1.5,
                                   ),
                                   decoration: BoxDecoration(
                                     color: AppColors.primary.withValues(
@@ -153,8 +153,8 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Container(
-                                        width: 6,
-                                        height: 6,
+                                        width: 5,
+                                        height: 5,
                                         decoration: const BoxDecoration(
                                           color: AppColors.primary,
                                           shape: BoxShape.circle,
@@ -164,7 +164,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                                       Text(
                                         '${tableViewModel.totalCartItemCount} Items',
                                         style: const TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 9.5,
                                           fontWeight: FontWeight.w700,
                                           color: AppColors.primary,
                                         ),
@@ -172,19 +172,21 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                                     ],
                                   ),
                                 ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    'Review & dispatch to kitchen',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      color: isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.lightTextSecondary,
+                                    ),
+                                  ),
+                                ),
                               ],
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Review items, station & dispatch to kitchen',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.lightTextSecondary,
-                              ),
                             ),
                           ],
                         ),
@@ -199,15 +201,15 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                     TextButton.icon(
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 4,
+                          vertical: 2,
                         ),
                         foregroundColor: AppColors.error,
                       ),
-                      icon: const Icon(Icons.delete_sweep_rounded, size: 16),
+                      icon: const Icon(Icons.delete_sweep_rounded, size: 15),
                       label: const Text(
                         'Clear',
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(fontSize: 11.5),
                       ),
                       onPressed: () {
                         tableViewModel.clearCart();
@@ -215,7 +217,9 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      icon: const Icon(Icons.close_rounded, size: 20),
                       color: isDark
                           ? AppColors.darkTextSecondary
                           : AppColors.lightTextSecondary,

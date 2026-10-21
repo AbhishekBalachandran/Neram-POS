@@ -226,14 +226,15 @@ class _TableTabViewState extends State<TableTabView> {
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              'ACTIVE ORDERS',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              'ACTIVE\nORDERS',
+                              maxLines: 2,
+                              softWrap: true,
                               style: AppTypography.headlineFont(
-                                fontSize: 11,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                letterSpacing: 0.4,
+                                letterSpacing: 0.3,
                                 color: AppColors.primary,
+                                height: 1.15,
                               ),
                             ),
                           ),
