@@ -239,9 +239,14 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   _buildDiningModeSwitcher(isDark, tableViewModel),
                   const SizedBox(height: AppSpacing.sm + 4),
 
-                  // 2. Table / Station Picker
-                  _buildTablePicker(context, isDark, tableViewModel),
-                  const SizedBox(height: AppSpacing.sm + 4),
+                  // 2. Table / Station Picker (Only for Dine-In Tables)
+                  if (tableViewModel.diningMode == DiningMode.dineIn) ...[
+                    _buildTablePicker(context, isDark, tableViewModel),
+                    const SizedBox(height: AppSpacing.sm + 4),
+                  ] else ...[
+                    _buildCustomerNameOnlyBanner(isDark, tableViewModel),
+                    const SizedBox(height: AppSpacing.sm + 4),
+                  ],
 
                   // 3. Customer / Guest Name
                   _buildCustomerNameInput(isDark, tableViewModel),
@@ -343,7 +348,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   mode: DiningMode.dineIn,
                   icon: Icons.table_restaurant_rounded,
                   label: 'Table',
-                  sub: 'Dine-in',
+                  sub: 'Indoor Table',
                   isSelected: tableViewModel.diningMode == DiningMode.dineIn,
                   onTap: () => tableViewModel.setDiningMode(DiningMode.dineIn),
                 ),
@@ -354,7 +359,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   mode: DiningMode.outdoor,
                   icon: Icons.deck_rounded,
                   label: 'Outdoor',
-                  sub: 'Unified Area',
+                  sub: 'By Name',
                   isSelected: tableViewModel.diningMode == DiningMode.outdoor,
                   onTap: () => tableViewModel.setDiningMode(DiningMode.outdoor),
                 ),
@@ -365,13 +370,77 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   mode: DiningMode.takeaway,
                   icon: Icons.shopping_bag_rounded,
                   label: 'Takeaway',
-                  sub: 'Pickup Token',
+                  sub: 'By Name',
                   isSelected: tableViewModel.diningMode == DiningMode.takeaway,
                   onTap: () =>
                       tableViewModel.setDiningMode(DiningMode.takeaway),
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Banner displayed when Outdoor or Takeaway mode is selected (orders are tracked by customer name, not table).
+  Widget _buildCustomerNameOnlyBanner(
+    bool isDark,
+    TableViewModel tableViewModel,
+  ) {
+    final isOutdoor = tableViewModel.diningMode == DiningMode.outdoor;
+    final accentColor = isOutdoor ? AppColors.secondary : AppColors.primary;
+    final icon = isOutdoor ? Icons.deck_rounded : Icons.shopping_bag_rounded;
+    final title = isOutdoor ? 'Outdoor Order' : 'Takeaway Order';
+    final desc = isOutdoor
+        ? 'No outdoor tables. This order is identified & served by Customer Name.'
+        : 'Takeaway order. Packed & announced by Customer Name.';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: accentColor.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.20),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 20, color: accentColor),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: accentColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  desc,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -454,7 +523,8 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
     bool isDark,
     TableViewModel tableViewModel,
   ) {
-    final quickTables = ['T-01', 'T-02', 'T-03', 'T-04', 'OD-01', 'TK-14'];
+    // Only Indoor tables (T-01 to T-12)
+    final quickTables = tableViewModel.tables.map((t) => t.id).toList();
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -482,7 +552,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'TABLE / STATION',
+                    'INDOOR TABLE',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -620,6 +690,34 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
   // 3. CUSTOMER / GUEST NAME INPUT
   // ---------------------------------------------------------------------------
   Widget _buildCustomerNameInput(bool isDark, TableViewModel tableViewModel) {
+    final mode = tableViewModel.diningMode;
+    final isDineIn = mode == DiningMode.dineIn;
+    final isOutdoor = mode == DiningMode.outdoor;
+
+    final title = isDineIn
+        ? 'CUSTOMER / GUEST NAME (OPTIONAL)'
+        : isOutdoor
+            ? 'CUSTOMER NAME (REQUIRED FOR OUTDOOR)'
+            : 'CUSTOMER NAME (REQUIRED FOR TAKEAWAY)';
+
+    final hint = isDineIn
+        ? 'Enter guest name (e.g. Alex M.)'
+        : isOutdoor
+            ? 'Enter outdoor customer name...'
+            : 'Enter takeaway pickup name...';
+
+    final headerIcon = isDineIn
+        ? Icons.person_rounded
+        : isOutdoor
+            ? Icons.deck_rounded
+            : Icons.shopping_bag_rounded;
+
+    final headerColor = isDineIn
+        ? AppColors.secondary
+        : isOutdoor
+            ? AppColors.secondary
+            : AppColors.primary;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -636,14 +734,14 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.person_rounded,
+              Icon(
+                headerIcon,
                 size: 15,
-                color: AppColors.secondary,
+                color: headerColor,
               ),
               const SizedBox(width: 6),
               Text(
-                'CUSTOMER / GUEST NAME',
+                title,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -689,8 +787,8 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                           ? AppColors.darkTextPrimary
                           : AppColors.lightTextPrimary,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: 'Enter guest name (e.g. Alex M.)',
+                    decoration: InputDecoration(
+                      hintText: hint,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,

@@ -211,28 +211,284 @@ class TableTabView extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Row 2: Horizontal Quick-Access Table Chips
-          SizedBox(
-            height: 52,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: tableViewModel.tables.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 10),
-              itemBuilder: (context, index) {
-                final table = tableViewModel.tables[index];
-                final isSelected = table.id == tableViewModel.selectedTableId;
+          // Row 2: Service / Dining Mode Switcher
+          Row(
+            children: [
+              _buildServiceModePill(
+                icon: Icons.table_restaurant_rounded,
+                label: 'Dine-In',
+                isSelected: tableViewModel.diningMode == DiningMode.dineIn,
+                isDark: isDark,
+                onTap: () => tableViewModel.setDiningMode(DiningMode.dineIn),
+              ),
+              const SizedBox(width: 8),
+              _buildServiceModePill(
+                icon: Icons.deck_rounded,
+                label: 'Outdoor',
+                isSelected: tableViewModel.diningMode == DiningMode.outdoor,
+                isDark: isDark,
+                onTap: () => tableViewModel.setDiningMode(DiningMode.outdoor),
+              ),
+              const SizedBox(width: 8),
+              _buildServiceModePill(
+                icon: Icons.shopping_bag_rounded,
+                label: 'Takeaway',
+                isSelected: tableViewModel.diningMode == DiningMode.takeaway,
+                isDark: isDark,
+                onTap: () => tableViewModel.setDiningMode(DiningMode.takeaway),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
 
-                return _buildQuickTableChip(
-                  table: table,
-                  isSelected: isSelected,
-                  isDark: isDark,
-                  onTap: () => tableViewModel.selectTable(table.id),
-                );
-              },
+          // Row 3: Contextual View - Indoor Tables List OR Customer Name Order Bar
+          if (tableViewModel.diningMode == DiningMode.dineIn)
+            SizedBox(
+              height: 52,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: tableViewModel.tables.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
+                itemBuilder: (context, index) {
+                  final table = tableViewModel.tables[index];
+                  final isSelected = table.id == tableViewModel.selectedTableId;
+
+                  return _buildQuickTableChip(
+                    table: table,
+                    isSelected: isSelected,
+                    isDark: isDark,
+                    onTap: () => tableViewModel.selectTable(table.id),
+                  );
+                },
+              ),
+            )
+          else
+            _buildCustomerOrderBar(context, isDark, tableViewModel),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceModePill({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 8),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primary
+                  : isDark
+                  ? AppColors.darkSurfaceContainerHigh
+                  : AppColors.lightSurface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.primary
+                    : isDark
+                    ? AppColors.darkBorder
+                    : AppColors.lightBorder,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 14,
+                  color: isSelected
+                      ? Colors.white
+                      : isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: isSelected
+                        ? Colors.white
+                        : isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomerOrderBar(
+    BuildContext context,
+    bool isDark,
+    TableViewModel tableViewModel,
+  ) {
+    final isOutdoor = tableViewModel.diningMode == DiningMode.outdoor;
+    final accentColor = isOutdoor ? AppColors.secondary : AppColors.primary;
+    final icon = isOutdoor ? Icons.deck_rounded : Icons.shopping_bag_rounded;
+    final modeLabel = isOutdoor ? 'Outdoor Order' : 'Takeaway Order';
+    final helpText = isOutdoor
+        ? 'No outdoor tables • Served by Customer Name'
+        : 'Takeaway pickup • Called by Customer Name';
+
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: accentColor.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: accentColor),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  modeLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: accentColor,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  helpText,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () => _promptChangeCustomerName(context, tableViewModel),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurfaceContainerHigh
+                      : AppColors.lightSurface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: accentColor.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person_outline_rounded, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      tableViewModel.customerName.isEmpty
+                          ? 'Set Name'
+                          : tableViewModel.customerName,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.edit_rounded, size: 12),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _promptChangeCustomerName(
+    BuildContext context,
+    TableViewModel tableViewModel,
+  ) {
+    final controller = TextEditingController(text: tableViewModel.customerName);
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark
+              ? AppColors.darkSurfaceContainerLowest
+              : AppColors.lightSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            tableViewModel.diningMode == DiningMode.outdoor
+                ? 'Outdoor Customer Name'
+                : 'Takeaway Customer Name',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'Enter customer name...',
+              filled: true,
+              fillColor: isDark
+                  ? AppColors.darkSurfaceContainer
+                  : AppColors.lightSurfaceSubtle,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  tableViewModel.setCustomerName(controller.text.trim());
+                }
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -744,7 +1000,6 @@ class TableTabView extends StatelessWidget {
   ) {
     final count = tableViewModel.totalCartItemCount;
     final total = tableViewModel.cartTotalPayable;
-    final table = tableViewModel.selectedTable;
 
     return AnimatedSlide(
       offset: count > 0 ? Offset.zero : const Offset(0, 1),
@@ -787,7 +1042,7 @@ class TableTabView extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          table.name,
+                          tableViewModel.orderDestinationTitle,
                           style: AppTypography.headlineFont(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

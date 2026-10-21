@@ -74,9 +74,7 @@ class TableModel {
   final int itemCount;
 
   String get formattedTotal => '\$${total.toStringAsFixed(2)}';
-  String get subtitle => zone == TableZone.takeaway
-      ? 'Express Pickup'
-      : '${zone.displayName} • ${seats}P';
+  String get subtitle => '$seats Seats • Indoor';
 
   TableModel copyWith({
     String? id,

@@ -4,22 +4,22 @@ import 'package:neram_pos/data/models/dish_model.dart';
 import 'package:neram_pos/data/models/order_model.dart';
 import 'package:neram_pos/data/models/table_model.dart';
 
-/// Dining mode selection from Stitch Animated Order Sheet.
+/// Dining mode selection: Indoor Tables, Outdoor (by customer name), Takeaway (by customer name).
 enum DiningMode {
   dineIn,
   outdoor,
   takeaway;
 
   String get displayName => switch (this) {
-    DiningMode.dineIn => 'Table',
+    DiningMode.dineIn => 'Dine-In',
     DiningMode.outdoor => 'Outdoor',
     DiningMode.takeaway => 'Takeaway',
   };
 
   String get subtitle => switch (this) {
-    DiningMode.dineIn => 'Dine-in',
-    DiningMode.outdoor => 'Unified Area',
-    DiningMode.takeaway => 'Pickup Token',
+    DiningMode.dineIn => 'Indoor Table',
+    DiningMode.outdoor => 'By Customer Name',
+    DiningMode.takeaway => 'By Customer Name',
   };
 }
 
@@ -62,6 +62,18 @@ class TableViewModel extends ChangeNotifier {
     (t) => t.id == _selectedTableId,
     orElse: () => _tables.first,
   );
+
+  String get orderDestinationTitle => switch (_diningMode) {
+    DiningMode.dineIn => selectedTable.name,
+    DiningMode.outdoor => 'Outdoor Order',
+    DiningMode.takeaway => 'Takeaway Order',
+  };
+
+  String get orderIdentifierSubtitle => switch (_diningMode) {
+    DiningMode.dineIn => '${selectedTable.subtitle} • $_customerName',
+    DiningMode.outdoor => 'Customer: $_customerName',
+    DiningMode.takeaway => 'Customer: $_customerName',
+  };
 
   int get totalCartItemCount =>
       _currentTableCart.values.fold(0, (sum, count) => sum + count);
@@ -171,8 +183,12 @@ class TableViewModel extends ChangeNotifier {
     // Update active orders and mark table as preparing
     final newOrder = OrderModel(
       id: '#ORD-${DateTime.now().millisecondsSinceEpoch % 10000}',
-      tableId: _selectedTableId,
-      tableName: selectedTable.name,
+      tableId: _diningMode == DiningMode.dineIn ? _selectedTableId : '',
+      tableName: switch (_diningMode) {
+        DiningMode.dineIn => selectedTable.name,
+        DiningMode.outdoor => 'Outdoor',
+        DiningMode.takeaway => 'Takeaway',
+      },
       customerName: _customerName,
       items: _currentTableCart.entries.map((e) {
         final dish = _dishes.firstWhere(
@@ -184,7 +200,11 @@ class TableViewModel extends ChangeNotifier {
       total: cartTotalPayable,
       status: TableStatus.preparing,
       timeElapsed: 'Just now',
-      zone: selectedTable.zone,
+      zone: switch (_diningMode) {
+        DiningMode.dineIn => TableZone.indoor,
+        DiningMode.outdoor => TableZone.outdoor,
+        DiningMode.takeaway => TableZone.takeaway,
+      },
     );
     _activeOrders.insert(0, newOrder);
     _currentTableCart.clear();
@@ -198,7 +218,7 @@ class TableViewModel extends ChangeNotifier {
   }
 
   void _initializeData() {
-    // 22 Tables across Indoor, Outdoor, and Takeaway zones
+    // 12 Indoor Dining Tables (Outdoor & Takeaway orders are taken by customer name)
     _tables = [
       // Indoor
       const TableModel(
@@ -312,99 +332,6 @@ class TableViewModel extends ChangeNotifier {
         name: 'Table T-12',
         zone: TableZone.indoor,
         seats: 4,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-
-      // Outdoor
-      const TableModel(
-        id: 'OD-01',
-        name: 'Outdoor OD-01',
-        zone: TableZone.outdoor,
-        seats: 4,
-        status: TableStatus.preparing,
-        total: 35.50,
-        customerName: 'Sarah K.',
-        timeElapsed: '8m ago',
-        itemCount: 3,
-      ),
-      const TableModel(
-        id: 'OD-02',
-        name: 'Outdoor OD-02',
-        zone: TableZone.outdoor,
-        seats: 2,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-      const TableModel(
-        id: 'OD-03',
-        name: 'Outdoor OD-03',
-        zone: TableZone.outdoor,
-        seats: 4,
-        status: TableStatus.occupied,
-        total: 44.00,
-        customerName: 'Liam W.',
-        timeElapsed: '28m ago',
-        itemCount: 3,
-      ),
-      const TableModel(
-        id: 'OD-04',
-        name: 'Outdoor OD-04',
-        zone: TableZone.outdoor,
-        seats: 6,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-      const TableModel(
-        id: 'OD-05',
-        name: 'Outdoor OD-05',
-        zone: TableZone.outdoor,
-        seats: 4,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-      const TableModel(
-        id: 'OD-06',
-        name: 'Outdoor OD-06',
-        zone: TableZone.outdoor,
-        seats: 2,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-
-      // Takeaway Tokens
-      const TableModel(
-        id: 'TK-14',
-        name: 'Token #14',
-        zone: TableZone.takeaway,
-        seats: 0,
-        status: TableStatus.preparing,
-        total: 19.00,
-        customerName: 'David L.',
-        timeElapsed: '5m ago',
-        itemCount: 2,
-      ),
-      const TableModel(
-        id: 'TK-15',
-        name: 'Token #15',
-        zone: TableZone.takeaway,
-        seats: 0,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-      const TableModel(
-        id: 'TK-16',
-        name: 'Token #16',
-        zone: TableZone.takeaway,
-        seats: 0,
-        status: TableStatus.vacant,
-        total: 0.00,
-      ),
-      const TableModel(
-        id: 'TK-17',
-        name: 'Token #17',
-        zone: TableZone.takeaway,
-        seats: 0,
         status: TableStatus.vacant,
         total: 0.00,
       ),
@@ -531,8 +458,8 @@ class TableViewModel extends ChangeNotifier {
       ),
       const OrderModel(
         id: '#ORD-2851',
-        tableId: 'OD-01',
-        tableName: 'Outdoor OD-01',
+        tableId: '',
+        tableName: 'Outdoor',
         customerName: 'Sarah K.',
         items: ['1x Crispy Corn Pepper Fry', '1x Mango Kulfi Falooda'],
         total: 35.50,
@@ -542,8 +469,8 @@ class TableViewModel extends ChangeNotifier {
       ),
       const OrderModel(
         id: '#ORD-2854',
-        tableId: 'TK-14',
-        tableName: 'Token #14',
+        tableId: '',
+        tableName: 'Takeaway',
         customerName: 'David L.',
         items: ['1x Butter Chicken Handi', '2x Garlic Butter Naan'],
         total: 19.00,

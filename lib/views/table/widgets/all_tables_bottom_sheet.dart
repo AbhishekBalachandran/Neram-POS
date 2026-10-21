@@ -8,7 +8,7 @@ import 'package:neram_pos/data/models/table_model.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-/// Modal bottom sheet presenting all 22 tables across Indoor, Outdoor, and Takeaway zones.
+/// Modal bottom sheet presenting all 12 indoor dining tables.
 class AllTablesBottomSheet extends StatefulWidget {
   const AllTablesBottomSheet({super.key});
 
@@ -24,7 +24,7 @@ class AllTablesBottomSheet extends StatefulWidget {
 }
 
 class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
-  String _selectedZoneFilter = 'all';
+  String _selectedStatusFilter = 'all';
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +33,10 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
     final tables = tableViewModel.tables;
     final selectedId = tableViewModel.selectedTableId;
 
-    final indoorTables = tables
-        .where((t) => t.zone == TableZone.indoor)
-        .toList();
-    final outdoorTables = tables
-        .where((t) => t.zone == TableZone.outdoor)
-        .toList();
-    final takeawayTables = tables
-        .where((t) => t.zone == TableZone.takeaway)
-        .toList();
+    final filteredTables = tables.where((t) {
+      if (_selectedStatusFilter == 'all') return true;
+      return t.status.name == _selectedStatusFilter;
+    }).toList();
 
     return Container(
       constraints: BoxConstraints(
@@ -83,57 +78,59 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'All Tables & Zones',
-                          style: AppTypography.headlineFont(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.lightTextPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.darkSurfaceContainerHigh
-                                : AppColors.lightSurfaceSubtle,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            '22 Tables',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Indoor Dining Tables',
+                            style: AppTypography.headlineFont(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                               color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.lightTextSecondary,
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.lightTextPrimary,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Tap any table card to select or assign orders',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary,
+                          const SizedBox(width: AppSpacing.sm),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.darkSurfaceContainerHigh
+                                  : AppColors.lightSurfaceSubtle,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              '${tables.length} Tables',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        'Outdoor & Takeaway orders by Customer Name',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded),
@@ -147,7 +144,7 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
           ),
           const Divider(height: 1),
 
-          // Zone Filter Tabs & Status Legend Strip
+          // Status Filter Tabs & Status Legend Strip
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.lg,
@@ -159,18 +156,36 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Zone Chips
+                // Status Chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildZoneChip('all', 'All (22)', isDark),
+                      _buildFilterChip('all', 'All (${tables.length})', isDark),
                       const SizedBox(width: AppSpacing.xs),
-                      _buildZoneChip('indoor', 'Indoor (12)', isDark),
+                      _buildFilterChip(
+                        'vacant',
+                        'Vacant (${tables.where((t) => t.status == TableStatus.vacant).length})',
+                        isDark,
+                      ),
                       const SizedBox(width: AppSpacing.xs),
-                      _buildZoneChip('outdoor', 'Outdoor (6)', isDark),
+                      _buildFilterChip(
+                        'preparing',
+                        'Preparing (${tables.where((t) => t.status == TableStatus.preparing).length})',
+                        isDark,
+                      ),
                       const SizedBox(width: AppSpacing.xs),
-                      _buildZoneChip('takeaway', 'Takeaway (4)', isDark),
+                      _buildFilterChip(
+                        'occupied',
+                        'Occupied (${tables.where((t) => t.status == TableStatus.occupied).length})',
+                        isDark,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      _buildFilterChip(
+                        'billed',
+                        'Billed (${tables.where((t) => t.status == TableStatus.billed).length})',
+                        isDark,
+                      ),
                     ],
                   ),
                 ),
@@ -202,57 +217,19 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_selectedZoneFilter == 'all' ||
-                      _selectedZoneFilter == 'indoor') ...[
-                    _buildZoneHeader(
-                      icon: Icons.chair_rounded,
-                      title: 'Indoor Dining (T-01 to T-12)',
-                      count: '12 Tables',
-                      isDark: isDark,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _buildTablesGrid(
-                      indoorTables,
-                      selectedId,
-                      isDark,
-                      tableViewModel,
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                  ],
-                  if (_selectedZoneFilter == 'all' ||
-                      _selectedZoneFilter == 'outdoor') ...[
-                    _buildZoneHeader(
-                      icon: Icons.deck_rounded,
-                      title: 'Outdoor Patio (OD-01 to OD-06)',
-                      count: '6 Tables',
-                      isDark: isDark,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _buildTablesGrid(
-                      outdoorTables,
-                      selectedId,
-                      isDark,
-                      tableViewModel,
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                  ],
-                  if (_selectedZoneFilter == 'all' ||
-                      _selectedZoneFilter == 'takeaway') ...[
-                    _buildZoneHeader(
-                      icon: Icons.shopping_bag_rounded,
-                      title: 'Express Takeaway Tokens',
-                      count: '4 Tokens',
-                      isDark: isDark,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _buildTablesGrid(
-                      takeawayTables,
-                      selectedId,
-                      isDark,
-                      tableViewModel,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
+                  _buildZoneHeader(
+                    icon: Icons.chair_rounded,
+                    title: 'Indoor Dining (T-01 to T-12)',
+                    count: '${filteredTables.length} Tables',
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildTablesGrid(
+                    filteredTables,
+                    selectedId,
+                    isDark,
+                    tableViewModel,
+                  ),
                 ],
               ),
             ),
@@ -262,46 +239,51 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
     );
   }
 
-  Widget _buildZoneChip(String zoneKey, String label, bool isDark) {
-    final isSelected = _selectedZoneFilter == zoneKey;
-    return GestureDetector(
-      onTap: () {
-        HapticService.selection();
-        setState(() => _selectedZoneFilter = zoneKey);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary
-              : isDark
-              ? AppColors.darkSurfaceContainer
-              : AppColors.lightSurface,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
+  Widget _buildFilterChip(String value, String label, bool isDark) {
+    final isSelected = _selectedStatusFilter == value;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: () {
+          HapticService.selection();
+          setState(() => _selectedStatusFilter = value);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          decoration: BoxDecoration(
             color: isSelected
                 ? AppColors.primary
                 : isDark
-                ? AppColors.darkBorder
-                : AppColors.lightBorder,
+                ? AppColors.darkSurfaceContainerHigh
+                : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: isSelected
+                  ? AppColors.primary
+                  : isDark
+                  ? AppColors.darkBorder
+                  : AppColors.lightBorder,
+            ),
           ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected
-                ? Colors.white
-                : isDark
-                ? AppColors.darkTextSecondary
-                : AppColors.lightTextSecondary,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected
+                  ? Colors.white
+                  : isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.lightTextSecondary,
+            ),
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildLegendDot(Color color, String label) {
     return Row(
@@ -439,7 +421,7 @@ class _AllTablesBottomSheetState extends State<AllTablesBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        table.seats > 0 ? '${table.seats} Seats' : 'Takeaway',
+                        '${table.seats} Seats',
                         style: TextStyle(
                           fontSize: 10,
                           color: isDark

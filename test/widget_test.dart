@@ -312,7 +312,7 @@ void main() {
       // TableTabView in Tab 0
       expect(find.byType(TableTabView), findsOneWidget);
       expect(find.text('ACTIVE ORDERS'), findsOneWidget);
-      expect(find.text('ALL TABLES (22)'), findsOneWidget);
+      expect(find.text('ALL TABLES (12)'), findsOneWidget);
       expect(find.text('POPULAR & RECOMMENDED DISHES'), findsOneWidget);
       expect(find.text('Crispy Corn Pepper Fry'), findsOneWidget);
 
@@ -354,17 +354,17 @@ void main() {
     expect(find.text("'Pizza'"), findsOneWidget);
 
     // Tap All Tables trigger
-    await tester.tap(find.text('ALL TABLES (22)'));
+    await tester.tap(find.text('ALL TABLES (12)'));
     await tester.pumpAndSettle();
 
     // Verify bottom sheet appears
-    expect(find.text('All Tables & Zones'), findsOneWidget);
+    expect(find.text('Indoor Dining Tables'), findsOneWidget);
     expect(find.text('INDOOR DINING (T-01 TO T-12)'), findsOneWidget);
 
     // Close bottom sheet
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
-    expect(find.text('All Tables & Zones'), findsNothing);
+    expect(find.text('Indoor Dining Tables'), findsNothing);
 
     // Tap Active Orders button
     await tester.tap(find.text('ACTIVE ORDERS'));
@@ -390,8 +390,8 @@ void main() {
     // Verify Animated Order Sheet components
     expect(find.text('Current Order'), findsOneWidget);
     expect(find.text('DINING MODE'), findsOneWidget);
-    expect(find.text('TABLE / STATION'), findsOneWidget);
-    expect(find.text('CUSTOMER / GUEST NAME'), findsOneWidget);
+    expect(find.text('INDOOR TABLE'), findsOneWidget);
+    expect(find.text('CUSTOMER / GUEST NAME (OPTIONAL)'), findsOneWidget);
     expect(find.text('ORDERED DISHES'), findsOneWidget);
     expect(find.text('Send to Kitchen (KOT)'), findsOneWidget);
 
