@@ -4,11 +4,14 @@ import 'package:neram_pos/app.dart';
 import 'package:neram_pos/core/constants/app_constants.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/theme/theme_provider.dart';
+import 'package:neram_pos/core/widgets/neram_app_bar.dart';
+import 'package:neram_pos/core/widgets/neram_bottom_nav_bar.dart';
 import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
+import 'package:neram_pos/views/home/home_view.dart';
 import 'package:neram_pos/views/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -205,6 +208,115 @@ void main() {
       // Successfully transitioned to LoginView
       expect(find.byType(SplashScreen), findsNothing);
       expect(find.byType(LoginView), findsOneWidget);
+    },
+  );
+
+  testWidgets('NeramAppBar renders brand titles, subtitle, and menu action', (
+    WidgetTester tester,
+  ) async {
+    bool menuTapped = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          appBar: NeramAppBar(onMenuPressed: () => menuTapped = true),
+          body: const SizedBox.shrink(),
+        ),
+      ),
+    );
+
+    expect(find.text('NERAM'), findsOneWidget);
+    expect(find.text('POS'), findsOneWidget);
+    expect(find.text(AppConstants.appSubtitle), findsOneWidget);
+    expect(find.byType(NeramLogoBadge), findsOneWidget);
+
+    final menuButton = find.byIcon(Icons.menu_rounded);
+    expect(menuButton, findsOneWidget);
+    await tester.tap(menuButton);
+    expect(menuTapped, isTrue);
+  });
+
+  testWidgets('NeramBottomNavBar switches between Table, Stock, and Leaves', (
+    WidgetTester tester,
+  ) async {
+    int selectedIndex = 0;
+
+    await tester.pumpWidget(
+      StatefulBuilder(
+        builder: (context, setState) {
+          return MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: NeramBottomNavBar(
+                currentIndex: selectedIndex,
+                onTap: (index) {
+                  setState(() => selectedIndex = index);
+                },
+              ),
+              body: const SizedBox.shrink(),
+            ),
+          );
+        },
+      ),
+    );
+
+    expect(find.text('TABLE'), findsOneWidget);
+    expect(find.text('STOCK'), findsOneWidget);
+    expect(find.text('LEAVES'), findsOneWidget);
+
+    // Tap Stock
+    await tester.tap(find.text('STOCK'));
+    await tester.pumpAndSettle();
+    expect(selectedIndex, 1);
+
+    // Tap Leaves
+    await tester.tap(find.text('LEAVES'));
+    await tester.pumpAndSettle();
+    expect(selectedIndex, 2);
+  });
+
+  testWidgets(
+    'HomeView renders Stitch Top App Bar, Bottom Nav Bar, and Floor Workspace',
+    (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final authRepository = FakeAuthRepository();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(prefs: prefs),
+            ),
+            ChangeNotifierProvider<AuthViewModel>(
+              create: (_) => AuthViewModel(authRepository: authRepository),
+            ),
+          ],
+          child: const MaterialApp(home: HomeView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Top App Bar
+      expect(find.byType(NeramAppBar), findsOneWidget);
+      expect(find.text('NERAM'), findsOneWidget);
+      expect(find.text('POS'), findsOneWidget);
+
+      // Floor Workspace Placeholder
+      expect(find.text('Floor Workspace'), findsOneWidget);
+      expect(
+        find.textContaining('Floor grid is clean and ready'),
+        findsOneWidget,
+      );
+
+      // Bottom Navigation Bar
+      expect(find.byType(NeramBottomNavBar), findsOneWidget);
+      expect(find.text('TABLE'), findsOneWidget);
+      expect(find.text('STOCK'), findsOneWidget);
+      expect(find.text('LEAVES'), findsOneWidget);
+
+      // Switch to Stock tab
+      await tester.tap(find.text('STOCK'));
+      await tester.pumpAndSettle();
+      expect(find.text('Stock & Inventory'), findsOneWidget);
     },
   );
 }

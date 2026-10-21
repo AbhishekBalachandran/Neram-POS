@@ -7,6 +7,7 @@ import 'package:neram_pos/core/widgets/neram_brand_title.dart';
 import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
+import 'package:neram_pos/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
 /// Fantastic animated splash screen showcasing brand identity with a spring
@@ -129,9 +130,10 @@ class _SplashScreenState extends State<SplashScreen>
     // Jumping transition haptic
     HapticService.lightImpact();
 
-    // When dedicated Home dashboard is built, destination can branch here:
-    // final destination = authViewModel.isAuthenticated ? const HomeView() : const LoginView();
-    const Widget destination = LoginView();
+    // When staff is already authenticated, jump straight to Home dashboard
+    final destination = authViewModel.isAuthenticated
+        ? const HomeView()
+        : const LoginView();
 
     Navigator.of(
       context,

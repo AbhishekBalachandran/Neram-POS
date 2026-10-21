@@ -5,12 +5,14 @@ import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_decorations.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/utils/device_utils.dart';
+import 'package:neram_pos/core/utils/jumping_page_route.dart';
 import 'package:neram_pos/core/widgets/app_button.dart';
 import 'package:neram_pos/core/widgets/app_text_field.dart';
 import 'package:neram_pos/core/widgets/neram_brand_title.dart';
 import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/core/widgets/responsive_builder.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
+import 'package:neram_pos/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
 /// Staff authentication screen updated to match the Stitch "Amber Hearth POS" design system.
@@ -117,6 +119,11 @@ class _LoginViewState extends State<LoginView>
           ),
         ),
       );
+
+      if (!mounted) return;
+      Navigator.of(
+        context,
+      ).pushReplacement(JumpingPageRoute(page: const HomeView()));
     } else {
       HapticService.error();
     }
