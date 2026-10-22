@@ -65,6 +65,7 @@ void main() {
   setUpAll(() {
     AppTypography.useGoogleFonts = false;
     ProfileView.enableAnimations = false;
+    SplashScreen.enableAnimations = false;
   });
 
   setUp(() {
