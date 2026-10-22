@@ -11,12 +11,12 @@ import 'package:neram_pos/views/auth/login_view.dart';
 import 'package:neram_pos/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
-/// Fantastic animated splash screen showcasing brand identity with an elegant
-/// entrance, continuous breathing ambient glow, and dynamic POS loading indicator.
+/// Fantastic animated splash screen showcasing brand identity with the beloved
+/// spring bounce entrance, zoom in & out pulse animation, and jumping transition.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
-  /// Allows automated widget tests to disable looping animations.
+  /// Allows automated widget tests to shorten wait times.
   static bool enableAnimations = true;
 
   @override
@@ -24,17 +24,13 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late final AnimationController _entranceController;
-  late final AnimationController _pulseController;
-
-  late final Animation<double> _logoOpacityAnimation;
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
   late final Animation<double> _logoScaleAnimation;
+  late final Animation<double> _logoRotationAnimation;
+  late final Animation<double> _pulseAnimation;
   late final Animation<double> _titleFadeAnimation;
   late final Animation<Offset> _titleSlideAnimation;
-  late final Animation<double> _loaderFadeAnimation;
-  late final Animation<double> _pulseAnimation;
-  late final Animation<double> _glowAnimation;
 
   bool _hasPrecached = false;
 
@@ -42,75 +38,64 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    _entranceController = AnimationController(
+    _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1800),
     );
 
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1600),
-    );
-
-    // Smooth entrance: opacity fade and gentle scale-in (0.80 -> 1.0)
-    // Starting at 0.80 prevents the logo from disappearing to 0 after Android system splash
-    _logoOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    // Initial energetic elastic spring entrance (0% -> 55%)
+    _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-        parent: _entranceController,
-        curve: const Interval(0.0, 0.45, curve: Curves.easeIn),
+        parent: _animController,
+        curve: const Interval(0.0, 0.55, curve: Curves.elasticOut),
       ),
     );
 
-    _logoScaleAnimation = Tween<double>(begin: 0.80, end: 1.0).animate(
+    // Subtle rotational flourish on entry
+    _logoRotationAnimation = Tween<double>(begin: -0.12, end: 0.0).animate(
       CurvedAnimation(
-        parent: _entranceController,
-        curve: const Interval(0.0, 0.70, curve: Curves.easeOutBack),
+        parent: _animController,
+        curve: const Interval(0.0, 0.45, curve: Curves.easeOutBack),
+      ),
+    );
+
+    // Beloved zoom in and zoom out breathing pulse sequence (55% -> 100%)
+    _pulseAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.12)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.12, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+    ]).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: const Interval(0.55, 1.0),
       ),
     );
 
     // Staggered brand title reveal
     _titleFadeAnimation = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.35, 0.80, curve: Curves.easeIn),
+      parent: _animController,
+      curve: const Interval(0.45, 0.85, curve: Curves.easeIn),
     );
 
     _titleSlideAnimation =
-        Tween<Offset>(begin: const Offset(0.0, 0.25), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0.0, 0.35), end: Offset.zero).animate(
           CurvedAnimation(
-            parent: _entranceController,
-            curve: const Interval(0.35, 0.85, curve: Curves.easeOutCubic),
+            parent: _animController,
+            curve: const Interval(0.45, 0.90, curve: Curves.easeOutCubic),
           ),
         );
 
-    // Status indicator fade-in
-    _loaderFadeAnimation = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.55, 1.0, curve: Curves.easeIn),
-    );
-
-    // Continuous breathing pulse (never looks frozen or stuck)
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.035).animate(
-      CurvedAnimation(
-        parent: _pulseController,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-
-    _glowAnimation = Tween<double>(begin: 0.85, end: 1.25).animate(
-      CurvedAnimation(
-        parent: _pulseController,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-
-    _entranceController.forward();
-
-    if (SplashScreen.enableAnimations) {
-      _pulseController.repeat(reverse: true);
-    }
+    _animController.forward();
 
     // Tactile sensation timed with the initial elastic landing
-    Future<void>.delayed(const Duration(milliseconds: 320), () {
+    Future<void>.delayed(const Duration(milliseconds: 280), () {
       if (mounted) {
         HapticService.mediumImpact();
       }
@@ -132,8 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _entranceController.dispose();
-    _pulseController.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
@@ -144,10 +128,10 @@ class _SplashScreenState extends State<SplashScreen>
     final authViewModel = context.read<AuthViewModel>();
     await authViewModel.checkAuthStatus();
 
-    // Ensure animation is clearly appreciated before transition
+    // Ensure full animation (elastic entrance + zoom in/out pulse) is clearly appreciated
     final elapsed = DateTime.now().difference(startTime);
     final minSplashDuration = SplashScreen.enableAnimations
-        ? const Duration(milliseconds: 2200)
+        ? const Duration(milliseconds: 2400)
         : const Duration(milliseconds: 1500);
 
     final remaining = minSplashDuration - elapsed;
@@ -156,9 +140,6 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (!mounted) return;
-
-    // Stop repeating controller before transition
-    _pulseController.stop();
 
     // Jumping transition haptic
     HapticService.lightImpact();
@@ -184,34 +165,20 @@ class _SplashScreenState extends State<SplashScreen>
       body: Stack(
         alignment: Alignment.center,
         children: [
-          // Dynamic ambient warm background glow (breathing smoothly)
+          // Ambient warm background glow that expands with zoom in & out
           AnimatedBuilder(
-            animation: _glowAnimation,
+            animation: _animController,
             builder: (context, child) {
-              final glowMultiplier = _glowAnimation.value;
+              final scale = _logoScaleAnimation.value * _pulseAnimation.value;
               return Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
-                      center: const Alignment(0.0, -0.1),
-                      radius: 0.95 * glowMultiplier,
+                      center: const Alignment(0.0, -0.05),
+                      radius: 0.9 + (0.3 * (scale > 0 ? (scale - 1.0) : 0)),
                       colors: isDark
-                          ? [
-                              Color.lerp(
-                                const Color(0x30E26E1B),
-                                const Color(0x45E26E1B),
-                                (_pulseController.value),
-                              )!,
-                              Colors.transparent,
-                            ]
-                          : [
-                              Color.lerp(
-                                const Color(0x20F59E0B),
-                                const Color(0x35F59E0B),
-                                (_pulseController.value),
-                              )!,
-                              Colors.transparent,
-                            ],
+                          ? const [Color(0x28F59E0B), Colors.transparent]
+                          : const [Color(0x20F59E0B), Colors.transparent],
                     ),
                   ),
                 ),
@@ -224,26 +191,21 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Smooth fade & gentle scale logo badge with continuous breathing
+                // Elastic bounce & zoom in and out pulse logo badge
                 AnimatedBuilder(
-                  animation: Listenable.merge([
-                    _logoScaleAnimation,
-                    _logoOpacityAnimation,
-                    _pulseAnimation,
-                  ]),
+                  animation: _animController,
                   builder: (context, child) {
                     final scale =
                         _logoScaleAnimation.value * _pulseAnimation.value;
-                    final opacity = _logoOpacityAnimation.value.clamp(0.0, 1.0);
-                    return Opacity(
-                      opacity: opacity,
-                      child: Transform.scale(
-                        scale: scale,
+                    return Transform.scale(
+                      scale: scale,
+                      child: Transform.rotate(
+                        angle: _logoRotationAnimation.value,
                         child: child,
                       ),
                     );
                   },
-                  child: const NeramLogoBadge(size: 104),
+                  child: const NeramLogoBadge(size: 100),
                 ),
                 const SizedBox(height: AppSpacing.xxl),
 
@@ -259,57 +221,6 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ],
-            ),
-          ),
-
-          // Bottom Active Status Indicator (proves system is alive and loading)
-          Positioned(
-            bottom: 48,
-            child: FadeTransition(
-              opacity: _loaderFadeAnimation,
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  final t = _pulseController.value;
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 3 pulsing amber micro-dots
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(3, (index) {
-                          final offset = (t + (index * 0.25)) % 1.0;
-                          final dotOpacity = 0.35 + (0.65 * offset);
-                          final dotScale = 0.85 + (0.35 * offset);
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 3.5),
-                            width: 6 * dotScale,
-                            height: 6 * dotScale,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.primary.withValues(
-                                alpha: dotOpacity,
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'INITIALIZING POS TERMINAL',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 2.2,
-                          color: isDark
-                              ? AppColors.darkTextSecondary.withValues(alpha: 0.8)
-                              : AppColors.lightTextSecondary.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
             ),
           ),
         ],
