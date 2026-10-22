@@ -7,10 +7,12 @@ import 'package:neram_pos/core/theme/theme_provider.dart';
 import 'package:neram_pos/core/widgets/neram_app_bar.dart';
 import 'package:neram_pos/core/widgets/neram_bottom_nav_bar.dart';
 import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
+import 'package:neram_pos/data/models/stock_item_model.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/viewmodels/leaves_viewmodel.dart';
+import 'package:neram_pos/viewmodels/stock_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/auth/login_view.dart';
 import 'package:neram_pos/views/auth/widgets/change_password_dialog.dart';
@@ -20,6 +22,7 @@ import 'package:neram_pos/views/leaves/leaves_tab_view.dart';
 import 'package:neram_pos/views/leaves/widgets/apply_leave_modal.dart';
 import 'package:neram_pos/views/profile/profile_view.dart';
 import 'package:neram_pos/views/splash/splash_screen.dart';
+import 'package:neram_pos/views/stock/stock_tab_view.dart';
 import 'package:neram_pos/views/table/table_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,6 +89,7 @@ void main() {
         ),
         ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
         ChangeNotifierProvider<LeavesViewModel>(create: (_) => LeavesViewModel()),
+        ChangeNotifierProvider<StockViewModel>(create: (_) => StockViewModel()),
       ],
       child: const NeramPosApp(),
     );
@@ -307,6 +311,9 @@ void main() {
             ChangeNotifierProvider<LeavesViewModel>(
               create: (_) => LeavesViewModel(),
             ),
+            ChangeNotifierProvider<StockViewModel>(
+              create: (_) => StockViewModel(),
+            ),
           ],
           child: const MaterialApp(home: HomeView()),
         ),
@@ -354,6 +361,9 @@ void main() {
           ),
           ChangeNotifierProvider<LeavesViewModel>(
             create: (_) => LeavesViewModel(),
+          ),
+          ChangeNotifierProvider<StockViewModel>(
+            create: (_) => StockViewModel(),
           ),
         ],
         child: const MaterialApp(home: Scaffold(body: TableTabView())),
@@ -434,6 +444,9 @@ void main() {
           ),
           ChangeNotifierProvider<LeavesViewModel>(
             create: (_) => LeavesViewModel(),
+          ),
+          ChangeNotifierProvider<StockViewModel>(
+            create: (_) => StockViewModel(),
           ),
         ],
         child: const MaterialApp(home: HomeView()),
@@ -518,6 +531,9 @@ void main() {
           ),
           ChangeNotifierProvider<LeavesViewModel>(
             create: (_) => LeavesViewModel(),
+          ),
+          ChangeNotifierProvider<StockViewModel>(
+            create: (_) => StockViewModel(),
           ),
         ],
         child: const MaterialApp(home: HomeView()),
@@ -676,6 +692,9 @@ void main() {
             ChangeNotifierProvider<LeavesViewModel>(
               create: (_) => LeavesViewModel(),
             ),
+            ChangeNotifierProvider<StockViewModel>(
+              create: (_) => StockViewModel(),
+            ),
           ],
           child: const MaterialApp(
             home: ProfileView(),
@@ -720,6 +739,179 @@ void main() {
 
       await tester.scrollUntilVisible(find.text('Log Out of Terminal'), 200);
       expect(find.text('Log Out of Terminal'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'StockViewModel manages catalog, filters, inward restock, usage, and audit',
+    (WidgetTester tester) async {
+      final stockVM = StockViewModel();
+
+      // Verify initial seed catalog
+      expect(stockVM.totalItemsCount, greaterThanOrEqualTo(18));
+      expect(stockVM.lowAlertCount, equals(3));
+      expect(stockVM.outOfStockCount, equals(0));
+      expect(stockVM.totalStockValue, greaterThan(100000));
+
+      // Category Filter
+      stockVM.setCategory('food');
+      expect(
+        stockVM.filteredItems.every(
+          (item) => item.category == StockCategory.foodRaw,
+        ),
+        isTrue,
+      );
+
+      // Low stock filter
+      stockVM.setCategory('all');
+      stockVM.setLowStockFilter(true);
+      expect(stockVM.filteredItems.length, equals(3));
+
+      // Search query
+      stockVM.setLowStockFilter(false);
+      stockVM.setSearchQuery('Arabica');
+      expect(stockVM.filteredItems.length, equals(1));
+      expect(stockVM.filteredItems.first.name, contains('Arabica'));
+      stockVM.setSearchQuery('');
+
+      // Restock Item
+      final arabica = stockVM.allItems.firstWhere((i) => i.id == 'stk_01');
+      final initialStock = arabica.currentStock;
+      await stockVM.restockItem(
+        itemId: 'stk_01',
+        addedQuantity: 10.0,
+        invoiceNumber: 'INV-TEST-001',
+      );
+      final updatedArabica = stockVM.allItems.firstWhere(
+        (i) => i.id == 'stk_01',
+      );
+      expect(updatedArabica.currentStock, equals(initialStock + 10.0));
+      expect(updatedArabica.logs.first.notes, contains('INV-TEST-001'));
+
+      // Record Usage
+      await stockVM.recordUsage(
+        itemId: 'stk_01',
+        usedQuantity: 2.0,
+        reason: 'Evening rush',
+      );
+      final postUsageArabica = stockVM.allItems.firstWhere(
+        (i) => i.id == 'stk_01',
+      );
+      expect(
+        postUsageArabica.currentStock,
+        equals(updatedArabica.currentStock - 2.0),
+      );
+
+      // Add New Item
+      await stockVM.addNewItem(
+        name: 'Caramel Hazelnut Crunch',
+        category: StockCategory.foodRaw,
+        unit: 'kg',
+        initialStock: 5.0,
+        minLevel: 2.0,
+        costPerUnit: 450.0,
+        supplier: 'Sweet Delights India',
+      );
+      expect(
+        stockVM.allItems.any((i) => i.name == 'Caramel Hazelnut Crunch'),
+        isTrue,
+      );
+
+      // Complete Audit
+      await stockVM.completeAudit(staffName: 'Abhishek (Manager)');
+      expect(stockVM.lastAuditedBy, equals('Abhishek (Manager)'));
+    },
+  );
+
+  testWidgets(
+    'StockTabView renders inventory metrics, search, cards, and opens modals',
+    (WidgetTester tester) async {
+      final stockVM = StockViewModel();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<StockViewModel>.value(value: stockVM),
+          ],
+          child: const MaterialApp(home: Scaffold(body: StockTabView())),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify Title & Metrics
+      expect(find.text('Inventory Management'), findsOneWidget);
+      expect(find.text('Stock & Inventory'), findsOneWidget);
+      expect(find.text('TOTAL ITEMS'), findsOneWidget);
+      expect(find.text('LOW ALERT'), findsOneWidget);
+      expect(find.text('OUT OF STOCK'), findsOneWidget);
+      expect(find.text('TOTAL VALUE'), findsOneWidget);
+
+      // Verify Alert Banner
+      expect(find.text('3 Items Low on Stock'), findsOneWidget);
+
+      // Verify Search and Category Pills
+      expect(
+        find.text('Search items, category, supplier or unit...'),
+        findsOneWidget,
+      );
+      expect(find.text('Consumables'), findsOneWidget);
+      expect(find.text('Small Equipment'), findsOneWidget);
+
+      // Verify Stock Card Presence
+      expect(find.text('Arabica Coffee Beans (Dark Roast)'), findsOneWidget);
+      expect(find.text('Full Cream Cow Milk'), findsOneWidget);
+
+      // Tap + Restock on first item
+      await tester.tap(find.text('+ Restock').first);
+      await tester.pumpAndSettle();
+      expect(find.text('Restock Item'), findsOneWidget);
+      expect(find.text('CONFIRM INWARD RESTOCK'), findsOneWidget);
+
+      // Close Restock Modal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('CONFIRM INWARD RESTOCK'), findsNothing);
+
+      // Tap Usage on first item
+      await tester.tap(find.text('Usage').first);
+      await tester.pumpAndSettle();
+      expect(find.text('Record Stock Usage'), findsOneWidget);
+      expect(find.text('DEDUCT & RECORD USAGE'), findsOneWidget);
+
+      // Close Usage Modal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('DEDUCT & RECORD USAGE'), findsNothing);
+
+      // Tap New Item button
+      await tester.tap(find.text('New Item'));
+      await tester.pumpAndSettle();
+      expect(find.text('Add New Stock Item'), findsOneWidget);
+      expect(find.text('ADD TO INVENTORY CATALOG'), findsOneWidget);
+
+      // Close New Item Modal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('Add New Stock Item'), findsNothing);
+
+      // Scroll down until Weekly Kitchen Stocktake and Start Audit are visible
+      await tester.scrollUntilVisible(
+        find.text('Start Audit'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Weekly Kitchen Stocktake'), findsOneWidget);
+      expect(find.text('Start Audit'), findsOneWidget);
+
+      // Tap Start Audit
+      await tester.tap(find.text('Start Audit'));
+      await tester.pumpAndSettle();
+      expect(find.text('SIGN OFF & COMPLETE AUDIT'), findsOneWidget);
+
+      // Close Audit Modal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('SIGN OFF & COMPLETE AUDIT'), findsNothing);
     },
   );
 }
