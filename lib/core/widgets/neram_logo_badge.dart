@@ -93,7 +93,6 @@ class NeramLogoBadge extends StatelessWidget {
           AssetConstants.appLogo,
           fit: BoxFit.contain,
           cacheWidth: (size * 3).toInt(),
-          cacheHeight: (size * 3).toInt(),
           errorBuilder: (context, error, stackTrace) {
             return const Icon(
               Icons.restaurant_rounded,

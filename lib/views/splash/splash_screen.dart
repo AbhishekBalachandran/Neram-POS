@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:neram_pos/core/constants/asset_constants.dart';
 import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
@@ -31,8 +30,6 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _pulseAnimation;
   late final Animation<double> _titleFadeAnimation;
   late final Animation<Offset> _titleSlideAnimation;
-
-  bool _hasPrecached = false;
 
   @override
   void initState() {
@@ -107,15 +104,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_hasPrecached) {
-      _hasPrecached = true;
-      precacheImage(const AssetImage(AssetConstants.appLogo), context);
-    }
-  }
-
-  @override
   void dispose() {
     _animController.dispose();
     super.dispose();
@@ -124,14 +112,21 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _initializeAppAndNavigate() async {
     final startTime = DateTime.now();
 
-    // Verify token & authentication status
-    final authViewModel = context.read<AuthViewModel>();
-    await authViewModel.checkAuthStatus();
+    // Verify token & authentication status with safety timeout and fallback
+    try {
+      final authViewModel = context.read<AuthViewModel>();
+      await authViewModel.checkAuthStatus().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {},
+      );
+    } catch (_) {
+      // Continue to login gracefully if local auth check throws
+    }
 
     // Ensure full animation (elastic entrance + zoom in/out pulse) is clearly appreciated
     final elapsed = DateTime.now().difference(startTime);
     final minSplashDuration = SplashScreen.enableAnimations
-        ? const Duration(milliseconds: 2400)
+        ? const Duration(milliseconds: 2000)
         : const Duration(milliseconds: 1500);
 
     final remaining = minSplashDuration - elapsed;
@@ -141,17 +136,25 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    // Jumping transition haptic
-    HapticService.lightImpact();
+    try {
+      HapticService.lightImpact();
+    } catch (_) {}
 
-    // When staff is already authenticated, jump straight to Home dashboard
-    final destination = authViewModel.isAuthenticated
-        ? const HomeView()
-        : const LoginView();
+    Widget destination = const LoginView();
+    try {
+      final authViewModel = context.read<AuthViewModel>();
+      if (authViewModel.isAuthenticated) {
+        destination = const HomeView();
+      }
+    } catch (_) {
+      destination = const LoginView();
+    }
 
-    Navigator.of(
-      context,
-    ).pushReplacement(JumpingPageRoute<void>(page: destination));
+    if (mounted) {
+      Navigator.of(
+        context,
+      ).pushReplacement(JumpingPageRoute<void>(page: destination));
+    }
   }
 
   @override
