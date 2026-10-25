@@ -8,6 +8,7 @@ import 'package:neram_pos/data/models/dish_model.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/table/widgets/all_tables_bottom_sheet.dart';
+import 'package:neram_pos/views/table/widgets/table_transfer_dialog.dart';
 import 'package:provider/provider.dart';
 
 /// Animated Order Sheet matching the Google Stitch "NERAM POS - Animated Order Sheet" specification.
@@ -701,7 +702,50 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
+              // Transfer Table Button
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
+                    TableTransferDialog.show(
+                      context,
+                      fromTableId: tableViewModel.selectedTableId,
+                    );
+                  },
+                  child: Container(
+                    height: 42,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.swap_horiz_rounded,
+                          size: 15,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Transfer',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
               // Open Full Grid Button
               Material(
                 color: Colors.transparent,

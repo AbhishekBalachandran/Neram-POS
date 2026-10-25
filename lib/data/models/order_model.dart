@@ -25,4 +25,28 @@ class OrderModel {
   final TableZone zone;
 
   String get formattedTotal => '₹${total.toStringAsFixed(2)}';
+
+  OrderModel copyWith({
+    String? id,
+    String? tableId,
+    String? tableName,
+    String? customerName,
+    List<String>? items,
+    double? total,
+    TableStatus? status,
+    String? timeElapsed,
+    TableZone? zone,
+  }) {
+    return OrderModel(
+      id: id ?? this.id,
+      tableId: tableId ?? this.tableId,
+      tableName: tableName ?? this.tableName,
+      customerName: customerName ?? this.customerName,
+      items: items ?? this.items,
+      total: total ?? this.total,
+      status: status ?? this.status,
+      timeElapsed: timeElapsed ?? this.timeElapsed,
+      zone: zone ?? this.zone,
+    );
+  }
 }

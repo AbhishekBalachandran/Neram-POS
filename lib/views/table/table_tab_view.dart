@@ -11,6 +11,7 @@ import 'package:neram_pos/views/table/widgets/active_orders_dialog.dart';
 import 'package:neram_pos/views/table/widgets/all_tables_bottom_sheet.dart';
 import 'package:neram_pos/views/table/widgets/animated_search_bar.dart';
 import 'package:neram_pos/views/table/widgets/cart_details_modal.dart';
+import 'package:neram_pos/views/table/widgets/table_transfer_dialog.dart';
 import 'package:provider/provider.dart';
 
 /// Table Tab UI matching the Google Stitch "NERAM POS - Tables & Active Orders" specification.
@@ -76,6 +77,7 @@ class _TableTabViewState extends State<TableTabView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildTopActionStrip(context, isDark, tableViewModel),
+                      SizedBox(height: 16),
                       _buildSearchAndCategories(
                         context,
                         isDark,
@@ -148,8 +150,9 @@ class _TableTabViewState extends State<TableTabView> {
                 bottomPadding,
               ),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount:
-                    MediaQuery.of(context).size.width >= 600 ? 3 : 2,
+                crossAxisCount: MediaQuery.of(context).size.width >= 600
+                    ? 3
+                    : 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 childAspectRatio: 1.48,
@@ -157,12 +160,7 @@ class _TableTabViewState extends State<TableTabView> {
               itemCount: dishes.length,
               itemBuilder: (context, index) {
                 final dish = dishes[index];
-                return _buildDishCard(
-                  context,
-                  isDark,
-                  tableViewModel,
-                  dish,
-                );
+                return _buildDishCard(context, isDark, tableViewModel, dish);
               },
             ),
           ),
@@ -456,7 +454,9 @@ class _TableTabViewState extends State<TableTabView> {
                       label,
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w600,
                         color: isSelected
                             ? Colors.white
                             : isDark
@@ -491,9 +491,7 @@ class _TableTabViewState extends State<TableTabView> {
       decoration: BoxDecoration(
         color: accentColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: accentColor.withValues(alpha: 0.35),
-        ),
+        border: Border.all(color: accentColor.withValues(alpha: 0.35)),
       ),
       child: Row(
         children: [
@@ -542,9 +540,7 @@ class _TableTabViewState extends State<TableTabView> {
                       ? AppColors.darkSurfaceContainerHigh
                       : AppColors.lightSurface,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: accentColor.withValues(alpha: 0.5),
-                  ),
+                  border: Border.all(color: accentColor.withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -644,6 +640,8 @@ class _TableTabViewState extends State<TableTabView> {
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
           onTap: onTap,
+          onLongPress: () =>
+              TableTransferDialog.show(context, fromTableId: table.id),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
@@ -729,6 +727,8 @@ class _TableTabViewState extends State<TableTabView> {
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
+        onLongPress: () =>
+            TableTransferDialog.show(context, fromTableId: table.id),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
@@ -817,12 +817,7 @@ class _TableTabViewState extends State<TableTabView> {
     TableViewModel tableViewModel,
   ) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        2,
-        AppSpacing.md,
-        4,
-      ),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.md, 2, AppSpacing.md, 4),
       child: Column(
         children: [
           // Spacious Uncongested Swiggy-Style Animated Search Bar

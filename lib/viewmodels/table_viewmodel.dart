@@ -237,6 +237,58 @@ class TableViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void transferTable({
+    required String fromTableId,
+    required String toTableId,
+    String reason = '',
+  }) {
+    HapticService.selection();
+
+    final sourceIndex = _tables.indexWhere((t) => t.id == fromTableId);
+    final targetIndex = _tables.indexWhere((t) => t.id == toTableId);
+
+    if (sourceIndex == -1 || targetIndex == -1) return;
+
+    final sourceTable = _tables[sourceIndex];
+    final targetTable = _tables[targetIndex];
+
+    // Transfer all matching active orders from source to target
+    _activeOrders = _activeOrders.map((order) {
+      if (order.tableId == fromTableId) {
+        return order.copyWith(
+          tableId: toTableId,
+          tableName: targetTable.name,
+        );
+      }
+      return order;
+    }).toList();
+
+    // Update target and source table models
+    _tables[targetIndex] = targetTable.copyWith(
+      status: sourceTable.status != TableStatus.vacant
+          ? sourceTable.status
+          : TableStatus.occupied,
+      total: sourceTable.total,
+      customerName: sourceTable.customerName,
+      timeElapsed: sourceTable.timeElapsed,
+      itemCount: sourceTable.itemCount,
+    );
+
+    _tables[sourceIndex] = sourceTable.copyWith(
+      status: TableStatus.vacant,
+      total: 0.0,
+      customerName: null,
+      timeElapsed: 'Ready',
+      itemCount: 0,
+    );
+
+    if (_selectedTableId == fromTableId) {
+      _selectedTableId = toTableId;
+    }
+
+    notifyListeners();
+  }
+
   void _initializeData() {
     // 12 Indoor Dining Tables (Outdoor & Takeaway orders are taken by customer name)
     _tables = [

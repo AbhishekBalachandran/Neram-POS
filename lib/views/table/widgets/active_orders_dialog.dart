@@ -5,6 +5,7 @@ import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/data/models/table_model.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
+import 'package:neram_pos/views/table/widgets/table_transfer_dialog.dart';
 import 'package:provider/provider.dart';
 
 /// Modal dialog displaying active live kitchen & table orders from Stitch.
@@ -58,7 +59,7 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
           ? AppColors.darkSurfaceContainerLowest
           : AppColors.lightSurface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(maxWidth: 480, maxHeight: 680),
@@ -213,7 +214,8 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                   : AppColors.lightTextPrimary,
                             ),
                             decoration: InputDecoration(
-                              hintText: 'Search customer, token, table...',
+                              hintText:
+                                  'Search customer, token, bill no, table...',
                               hintStyle: TextStyle(
                                 fontSize: 12,
                                 color: isDark
@@ -249,11 +251,11 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                           isDark,
                         ),
                         const SizedBox(width: AppSpacing.xs),
-                        _buildTypeTab('indoor', 'Dine-In Tables', isDark),
+                        _buildTypeTab('indoor', 'Tables', isDark),
                         const SizedBox(width: AppSpacing.xs),
-                        _buildTypeTab('outdoor', 'Outdoor (By Name)', isDark),
+                        _buildTypeTab('outdoor', 'Outdoor', isDark),
                         const SizedBox(width: AppSpacing.xs),
-                        _buildTypeTab('takeaway', 'Takeaway (By Name)', isDark),
+                        _buildTypeTab('takeaway', 'Takeaway', isDark),
                       ],
                     ),
                   ),
@@ -307,35 +309,94 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                 children: [
                                   Expanded(
                                     child: Row(
-                                    children: [
-                                      if (order.zone == TableZone.outdoor) ...[
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 7,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.secondary.withValues(alpha: 0.15),
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(
-                                              color: AppColors.secondary.withValues(alpha: 0.4),
+                                      children: [
+                                        if (order.zone ==
+                                            TableZone.outdoor) ...[
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 7,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.secondary
+                                                  .withValues(alpha: 0.15),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                              border: Border.all(
+                                                color: AppColors.secondary
+                                                    .withValues(alpha: 0.4),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'OUTDOOR',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.secondary,
+                                              ),
                                             ),
                                           ),
-                                          child: const Text(
-                                            'OUTDOOR',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.secondary,
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              order.customerName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppTypography.headlineFont(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: isDark
+                                                    ? AppColors.darkTextPrimary
+                                                    : AppColors
+                                                          .lightTextPrimary,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            order.customerName,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                        ] else if (order.zone ==
+                                            TableZone.takeaway) ...[
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 7,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.15),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                              border: Border.all(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.4),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'TAKEAWAY',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              order.customerName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppTypography.headlineFont(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: isDark
+                                                    ? AppColors.darkTextPrimary
+                                                    : AppColors
+                                                          .lightTextPrimary,
+                                              ),
+                                            ),
+                                          ),
+                                        ] else ...[
+                                          Text(
+                                            order.tableName,
                                             style: AppTypography.headlineFont(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w700,
@@ -344,72 +405,26 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                                   : AppColors.lightTextPrimary,
                                             ),
                                           ),
-                                        ),
-                                      ] else if (order.zone == TableZone.takeaway) ...[
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 7,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primary.withValues(alpha: 0.15),
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(
-                                              color: AppColors.primary.withValues(alpha: 0.4),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              '•  ${order.customerName}',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: isDark
+                                                    ? AppColors
+                                                          .darkTextSecondary
+                                                    : AppColors
+                                                          .lightTextSecondary,
+                                              ),
                                             ),
                                           ),
-                                          child: const Text(
-                                            'TAKEAWAY',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.primary,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            order.customerName,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: AppTypography.headlineFont(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w700,
-                                              color: isDark
-                                                  ? AppColors.darkTextPrimary
-                                                  : AppColors.lightTextPrimary,
-                                            ),
-                                          ),
-                                        ),
-                                      ] else ...[
-                                        Text(
-                                          order.tableName,
-                                          style: AppTypography.headlineFont(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: isDark
-                                                ? AppColors.darkTextPrimary
-                                                : AppColors.lightTextPrimary,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Expanded(
-                                          child: Text(
-                                            '•  ${order.customerName}',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: isDark
-                                                  ? AppColors.darkTextSecondary
-                                                  : AppColors.lightTextSecondary,
-                                            ),
-                                          ),
-                                        ),
+                                        ],
                                       ],
-                                    ],
-                                  )),
+                                    ),
+                                  ),
                                   const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -477,7 +492,7 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                               ),
                               const SizedBox(height: AppSpacing.sm),
 
-                              // Bottom Row: Total and Select Table Action
+                              // Bottom Row: Total and Action Buttons
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -490,51 +505,112 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                       color: AppColors.primary,
                                     ),
                                   ),
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      HapticService.selection();
-                                      tableViewModel.selectTable(order.tableId);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? AppColors.darkSurfaceContainerHigh
-                                            : AppColors.lightSurfaceSubtle,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: isDark
-                                              ? AppColors.darkBorder
-                                              : AppColors.lightBorder,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Open Table',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: isDark
-                                                  ? AppColors.darkTextPrimary
-                                                  : AppColors.lightTextPrimary,
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Table Transfer Button (Only for Dine-In Tables with tableId)
+                                      if (order.zone == TableZone.indoor &&
+                                          order.tableId.isNotEmpty) ...[
+                                        InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          onTap: () {
+                                            TableTransferDialog.show(
+                                              context,
+                                              fromTableId: order.tableId,
+                                              order: order,
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.35),
+                                              ),
+                                            ),
+                                            child: const Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.swap_horiz_rounded,
+                                                  size: 13,
+                                                  color: AppColors.primary,
+                                                ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  'Transfer',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.primary,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          const SizedBox(width: 4),
-                                          const Icon(
-                                            Icons.arrow_forward_rounded,
-                                            size: 13,
-                                            color: AppColors.primary,
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      InkWell(
+                                        borderRadius: BorderRadius.circular(8),
+                                        onTap: () {
+                                          HapticService.selection();
+                                          tableViewModel
+                                              .selectTable(order.tableId);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
                                           ),
-                                        ],
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? AppColors
+                                                    .darkSurfaceContainerHigh
+                                                : AppColors.lightSurfaceSubtle,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: isDark
+                                                  ? AppColors.darkBorder
+                                                  : AppColors.lightBorder,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Open Table',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isDark
+                                                      ? AppColors
+                                                          .darkTextPrimary
+                                                      : AppColors
+                                                          .lightTextPrimary,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              const Icon(
+                                                Icons.arrow_forward_rounded,
+                                                size: 13,
+                                                color: AppColors.primary,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),

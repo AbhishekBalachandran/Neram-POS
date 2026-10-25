@@ -8,6 +8,7 @@ import 'package:neram_pos/core/widgets/neram_app_bar.dart';
 import 'package:neram_pos/core/widgets/neram_bottom_nav_bar.dart';
 import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
 import 'package:neram_pos/data/models/stock_item_model.dart';
+import 'package:neram_pos/data/models/table_model.dart';
 import 'package:neram_pos/data/models/user_model.dart';
 import 'package:neram_pos/data/repositories/auth_repository.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
@@ -413,6 +414,7 @@ void main() {
     expect(find.text('Abhishek'), findsWidgets);
     expect(find.text('DINING MODE'), findsOneWidget);
     expect(find.text('TABLE'), findsOneWidget);
+    expect(find.text('Transfer'), findsWidgets);
     expect(find.text('INDOOR TABLE'), findsNothing);
     expect(find.text('CUSTOMER / GUEST NAME (OPTIONAL)'), findsOneWidget);
     expect(find.text('ORDER NOTE (OPTIONAL)'), findsOneWidget);
@@ -420,6 +422,29 @@ void main() {
     expect(find.byIcon(Icons.delete_outline_rounded), findsWidgets);
     expect(find.text('Add note (e.g. less spicy, no onion)...'), findsWidgets);
     expect(find.text('Send to Kitchen (KOT)'), findsOneWidget);
+
+    // Tap Transfer button to open Table Transfer Dialog
+    await tester.tap(find.text('Transfer').first);
+    await tester.pumpAndSettle();
+
+    // Verify TableTransferDialog components
+    expect(find.text('Transfer Table'), findsOneWidget);
+    expect(find.text('SELECT DESTINATION TABLE'), findsOneWidget);
+    expect(find.text('TRANSFER REASON'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Transfer'), findsOneWidget);
+
+    // Enter transfer reason
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Enter reason for table transfer...'),
+      'Customer requested larger table',
+    );
+    await tester.pumpAndSettle();
+
+    // Close transfer dialog via Cancel button
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Transfer Table'), findsNothing);
 
     // Enter order note
     await tester.enterText(
@@ -958,4 +983,33 @@ void main() {
       expect(find.text('SIGN OFF & COMPLETE AUDIT'), findsNothing);
     },
   );
+
+  test('TableViewModel transferTable successfully shifts active order and updates table statuses', () {
+    final vm = TableViewModel();
+    // T-01 is occupied/preparing with active order #ORD-101
+    final table1Before = vm.tables.firstWhere((t) => t.id == 'T-01');
+    final table3Before = vm.tables.firstWhere((t) => t.id == 'T-03');
+    expect(table1Before.status, isNot(TableStatus.vacant));
+    expect(table3Before.status, TableStatus.vacant);
+
+    // Transfer from T-01 to T-03
+    vm.transferTable(
+      fromTableId: 'T-01',
+      toTableId: 'T-03',
+      reason: 'Guest requested window seat',
+    );
+
+    final table1After = vm.tables.firstWhere((t) => t.id == 'T-01');
+    final table3After = vm.tables.firstWhere((t) => t.id == 'T-03');
+
+    expect(table1After.status, TableStatus.vacant);
+    expect(table1After.total, 0.0);
+    expect(table3After.status, table1Before.status);
+    expect(table3After.total, table1Before.total);
+
+    // Order #ORD-2849 should now be attached to T-03
+    final order = vm.activeOrders.firstWhere((o) => o.id == '#ORD-2849');
+    expect(order.tableId, 'T-03');
+    expect(order.tableName, table3After.name);
+  });
 }
