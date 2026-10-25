@@ -144,7 +144,7 @@ class _TableTabViewState extends State<TableTabView> {
                     MediaQuery.of(context).size.width >= 600 ? 3 : 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 1.55,
+                childAspectRatio: 1.48,
               ),
               itemCount: dishes.length,
               itemBuilder: (context, index) {
@@ -916,7 +916,7 @@ class _TableTabViewState extends State<TableTabView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Top: Food Type Badge + Dish Name (Subtitle removed for clean layout)
+          // Top: Food Type Badge + Dish Name & Category
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -926,18 +926,38 @@ class _TableTabViewState extends State<TableTabView> {
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(
-                  dish.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.headlineFont(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.lightTextPrimary,
-                    height: 1.2,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      dish.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.headlineFont(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
+                        height: 1.15,
+                      ),
+                    ),
+                    const SizedBox(height: 1.5),
+                    Text(
+                      dish.category,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
