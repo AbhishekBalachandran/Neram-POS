@@ -44,7 +44,7 @@ class _TableTabViewState extends State<TableTabView> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    if (_scrollController.offset <= 5) {
+    if (_scrollController.offset <= 20) {
       if (!_isHeaderVisible) {
         setState(() {
           _isHeaderVisible = true;
@@ -95,7 +95,9 @@ class _TableTabViewState extends State<TableTabView> {
               if (notification is UserScrollNotification) {
                 if (notification.direction == ScrollDirection.reverse) {
                   // User scrolled up (browsing downwards) -> hide top part instantly
-                  if (_isHeaderVisible) {
+                  if (_isHeaderVisible &&
+                      _scrollController.hasClients &&
+                      _scrollController.offset > 15) {
                     setState(() {
                       _isHeaderVisible = false;
                     });
@@ -110,14 +112,20 @@ class _TableTabViewState extends State<TableTabView> {
                 }
               } else if (notification is ScrollUpdateNotification) {
                 final delta = notification.scrollDelta ?? 0.0;
-                if (delta > 1.0 && _isHeaderVisible) {
-                  setState(() {
-                    _isHeaderVisible = false;
-                  });
-                } else if (delta < -1.0 && !_isHeaderVisible) {
-                  setState(() {
-                    _isHeaderVisible = true;
-                  });
+                // Only respond to active user dragging, not physics bounce-backs
+                if (notification.dragDetails != null) {
+                  if (delta > 1.0 &&
+                      _isHeaderVisible &&
+                      _scrollController.hasClients &&
+                      _scrollController.offset > 15) {
+                    setState(() {
+                      _isHeaderVisible = false;
+                    });
+                  } else if (delta < -1.0 && !_isHeaderVisible) {
+                    setState(() {
+                      _isHeaderVisible = true;
+                    });
+                  }
                 }
               } else if (notification is OverscrollNotification &&
                   notification.overscroll < 0 &&

@@ -423,6 +423,39 @@ void main() {
     expect(find.text('Current Order'), findsNothing);
   });
 
+  testWidgets('TableTabView hides top section on drag up and shows on drag down', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TableViewModel>(
+            create: (_) => TableViewModel(),
+          ),
+          ChangeNotifierProvider<LeavesViewModel>(
+            create: (_) => LeavesViewModel(),
+          ),
+          ChangeNotifierProvider<StockViewModel>(
+            create: (_) => StockViewModel(),
+          ),
+        ],
+        child: const MaterialApp(home: Scaffold(body: TableTabView())),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('ALL TABLES (12)'), findsOneWidget);
+
+    // Drag UP (scroll down into dishes) -> top section should hide
+    await tester.drag(find.byType(GridView), const Offset(0, -150));
+    await tester.pumpAndSettle();
+    expect(find.text('ALL TABLES (12)'), findsNothing);
+
+    // Drag DOWN (scroll up towards top) -> top section should show
+    await tester.drag(find.byType(GridView), const Offset(0, 150));
+    await tester.pumpAndSettle();
+    expect(find.text('ALL TABLES (12)'), findsOneWidget);
+  });
+
   testWidgets('HomeView opens Stitch App Drawer and Change Password Dialog', (
     WidgetTester tester,
   ) async {
