@@ -6,10 +6,7 @@ import 'package:neram_pos/core/utils/currency_formatter.dart';
 import 'package:neram_pos/data/models/stock_item_model.dart';
 import 'package:neram_pos/viewmodels/stock_viewmodel.dart';
 import 'package:neram_pos/views/stock/widgets/new_stock_item_modal.dart';
-import 'package:neram_pos/views/stock/widgets/restock_modal.dart';
 import 'package:neram_pos/views/stock/widgets/stock_audit_modal.dart';
-import 'package:neram_pos/views/stock/widgets/stock_history_dialog.dart';
-import 'package:neram_pos/views/stock/widgets/usage_modal.dart';
 import 'package:provider/provider.dart';
 
 /// Complete Stock & Inventory Management view converted from the Google Stitch
@@ -51,14 +48,18 @@ class _StockTabViewState extends State<StockTabView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                   child: Text(
                     'SORT INVENTORY BY',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                 ),
@@ -68,18 +69,26 @@ class _StockTabViewState extends State<StockTabView> {
                   return ListTile(
                     dense: true,
                     leading: Icon(
-                      isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                      color: isSelected ? AppColors.primary : AppColors.darkTextSecondary,
+                      isSelected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.darkTextSecondary,
                       size: 20,
                     ),
                     title: Text(
                       option.displayName,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
                         color: isSelected
                             ? AppColors.primary
-                            : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+                            : (isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.lightTextPrimary),
                       ),
                     ),
                     onTap: () {
@@ -169,51 +178,52 @@ class _StockTabViewState extends State<StockTabView> {
     );
   }
 
-  /// Top Screen Header with Brand Category Title & Primary "+ New Item" CTA
-  Widget _buildHeader(BuildContext context, bool isDark, StockViewModel stockVM) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
+  /// Top Screen Header with Brand Category Title & Primary "Add New Item" CTA on a dedicated new line
+  Widget _buildHeader(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Stock & Inventory',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.4,
-                    color: isDark ? AppColors.primary : AppColors.primaryDark,
-                  ),
-                ),
-              ],
+            Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(width: 8),
             Text(
-              'Inventory Management',
+              'Stock & Inventory',
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.5,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.4,
+                color: isDark ? AppColors.primary : AppColors.primaryDark,
               ),
             ),
           ],
         ),
+        const SizedBox(height: 2),
+        Text(
+          'Inventory Management',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.5,
+            color: isDark
+                ? AppColors.darkTextPrimary
+                : AppColors.lightTextPrimary,
+          ),
+        ),
+        const SizedBox(height: 12),
 
-        // "+ New Item" CTA Button
+        // "Add New Item" CTA Button moved to new line to prevent congestion/overflow
         FilledButton.icon(
           onPressed: () {
             HapticService.selection();
@@ -222,15 +232,17 @@ class _StockTabViewState extends State<StockTabView> {
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.black,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            elevation: 2,
             shadowColor: AppColors.primary.withValues(alpha: 0.35),
           ),
-          icon: const Icon(Icons.add_box_rounded, size: 18),
+          icon: const Icon(Icons.add_box_rounded, size: 20),
           label: const Text(
-            'New Item',
-            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+            'Add New Item',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
         ),
       ],
@@ -238,7 +250,11 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// High Priority Restock Alert Banner matching the Stitch specification
-  Widget _buildAlertBanner(BuildContext context, bool isDark, StockViewModel stockVM) {
+  Widget _buildAlertBanner(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
     final isFilteringLow = stockVM.isLowStockOnly;
 
     return Material(
@@ -255,7 +271,9 @@ class _StockTabViewState extends State<StockTabView> {
             color: const Color(0xFF2E1911),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isFilteringLow ? AppColors.primary : const Color(0xFF5D2816),
+              color: isFilteringLow
+                  ? AppColors.primary
+                  : const Color(0xFF5D2816),
               width: isFilteringLow ? 1.8 : 1.0,
             ),
             boxShadow: [
@@ -298,25 +316,9 @@ class _StockTabViewState extends State<StockTabView> {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'Needs Reorder',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
-                    const SizedBox(height: 2),
+
                     Text(
                       isFilteringLow
                           ? 'Filtering active — showing low stock items only'
@@ -337,7 +339,9 @@ class _StockTabViewState extends State<StockTabView> {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isFilteringLow ? Icons.filter_alt_off_rounded : Icons.filter_list_rounded,
+                  isFilteringLow
+                      ? Icons.filter_alt_off_rounded
+                      : Icons.filter_list_rounded,
                   size: 16,
                   color: isFilteringLow ? AppColors.primary : Colors.white70,
                 ),
@@ -350,9 +354,16 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// 4 Summary Metric Cards in responsive layout
-  Widget _buildMetricsGrid(BuildContext context, bool isDark, StockViewModel stockVM, bool isTablet) {
+  Widget _buildMetricsGrid(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+    bool isTablet,
+  ) {
     final surfaceColor = isDark ? const Color(0xFF1E1F24) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF282A30) : const Color(0xFFE8EAF0);
+    final borderColor = isDark
+        ? const Color(0xFF282A30)
+        : const Color(0xFFE8EAF0);
 
     final cards = [
       _MetricData(
@@ -373,7 +384,9 @@ class _StockTabViewState extends State<StockTabView> {
         title: 'Out of Stock',
         value: '${stockVM.outOfStockCount}',
         icon: Icons.check_circle_rounded,
-        iconColor: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        iconColor: isDark
+            ? AppColors.darkTextSecondary
+            : AppColors.lightTextSecondary,
         isWarning: false,
       ),
       _MetricData(
@@ -402,17 +415,45 @@ class _StockTabViewState extends State<StockTabView> {
       children: [
         Row(
           children: [
-            Expanded(child: _buildMetricCard(cards[0], surfaceColor, borderColor, isDark)),
+            Expanded(
+              child: _buildMetricCard(
+                cards[0],
+                surfaceColor,
+                borderColor,
+                isDark,
+              ),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: _buildMetricCard(cards[1], surfaceColor, borderColor, isDark)),
+            Expanded(
+              child: _buildMetricCard(
+                cards[1],
+                surfaceColor,
+                borderColor,
+                isDark,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: _buildMetricCard(cards[2], surfaceColor, borderColor, isDark)),
+            Expanded(
+              child: _buildMetricCard(
+                cards[2],
+                surfaceColor,
+                borderColor,
+                isDark,
+              ),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: _buildMetricCard(cards[3], surfaceColor, borderColor, isDark)),
+            Expanded(
+              child: _buildMetricCard(
+                cards[3],
+                surfaceColor,
+                borderColor,
+                isDark,
+              ),
+            ),
           ],
         ),
       ],
@@ -455,7 +496,9 @@ class _StockTabViewState extends State<StockTabView> {
                     letterSpacing: 0.8,
                     color: data.isWarning
                         ? AppColors.primary
-                        : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                        : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -469,7 +512,9 @@ class _StockTabViewState extends State<StockTabView> {
                     letterSpacing: -0.3,
                     color: data.isWarning
                         ? AppColors.primary
-                        : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+                        : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.lightTextPrimary),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -492,9 +537,15 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// Search & Sort Bar
-  Widget _buildSearchBar(BuildContext context, bool isDark, StockViewModel stockVM) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
     final inputBg = isDark ? const Color(0xFF1A1B20) : const Color(0xFFF3F4F6);
-    final borderColor = isDark ? const Color(0xFF292A2F) : const Color(0xFFE5E7EB);
+    final borderColor = isDark
+        ? const Color(0xFF292A2F)
+        : const Color(0xFFE5E7EB);
 
     return Row(
       children: [
@@ -512,12 +563,16 @@ class _StockTabViewState extends State<StockTabView> {
               onChanged: stockVM.setSearchQuery,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.lightTextPrimary,
               ),
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.search_rounded,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
                   size: 20,
                 ),
                 suffixIcon: stockVM.searchQuery.isNotEmpty
@@ -532,7 +587,9 @@ class _StockTabViewState extends State<StockTabView> {
                 hintText: 'Search items, category, supplier or unit...',
                 hintStyle: TextStyle(
                   fontSize: 12,
-                  color: isDark ? const Color(0xFF6B6C75) : const Color(0xFFA0A3AB),
+                  color: isDark
+                      ? const Color(0xFF6B6C75)
+                      : const Color(0xFFA0A3AB),
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -559,7 +616,9 @@ class _StockTabViewState extends State<StockTabView> {
                 Icon(
                   Icons.swap_vert_rounded,
                   size: 18,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.lightTextPrimary,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -568,7 +627,9 @@ class _StockTabViewState extends State<StockTabView> {
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary,
                   ),
                 ),
               ],
@@ -580,7 +641,11 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// Horizontal Category Selector Tabs
-  Widget _buildCategoryPills(BuildContext context, bool isDark, StockViewModel stockVM) {
+  Widget _buildCategoryPills(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
     final categories = [
       {'code': 'all', 'label': 'All Items (${stockVM.totalItemsCount})'},
       {'code': 'food', 'label': 'Stock (Food & Raw)'},
@@ -601,19 +666,27 @@ class _StockTabViewState extends State<StockTabView> {
               label: Text(cat['label']!),
               selected: isSelected,
               selectedColor: AppColors.primary,
-              backgroundColor: isDark ? const Color(0xFF1E1F24) : const Color(0xFFF3F4F6),
+              backgroundColor: isDark
+                  ? const Color(0xFF1E1F24)
+                  : const Color(0xFFF3F4F6),
               labelStyle: TextStyle(
                 fontSize: 11.5,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 color: isSelected
                     ? Colors.black
-                    : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary),
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               side: BorderSide(
                 color: isSelected
                     ? AppColors.primary
-                    : (isDark ? const Color(0xFF2E3038) : const Color(0xFFE5E7EB)),
+                    : (isDark
+                          ? const Color(0xFF2E3038)
+                          : const Color(0xFFE5E7EB)),
               ),
               onSelected: (val) {
                 if (val) {
@@ -629,48 +702,39 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// Filter Status & Low Stock Toggle
-  Widget _buildFilterStatusBar(BuildContext context, bool isDark, StockViewModel stockVM) {
+  Widget _buildFilterStatusBar(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Text(
-              'SHOWING:',
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-              ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: stockVM.isLowStockOnly
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : (isDark ? const Color(0xFF292A2F) : const Color(0xFFE5E7EB)),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            stockVM.isLowStockOnly
+                ? '${stockVM.lowAlertCount} Low Stock Items'
+                : (stockVM.selectedCategoryCode == 'all'
+                      ? 'All Stock Items'
+                      : 'Filtered Category'),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: stockVM.isLowStockOnly
+                  ? AppColors.primary
+                  : (isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary),
             ),
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: stockVM.isLowStockOnly
-                    ? AppColors.primary.withValues(alpha: 0.15)
-                    : (isDark ? const Color(0xFF292A2F) : const Color(0xFFE5E7EB)),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                stockVM.isLowStockOnly
-                    ? '${stockVM.lowAlertCount} Low Stock Items'
-                    : (stockVM.selectedCategoryCode == 'all'
-                        ? 'All Stock Items'
-                        : 'Filtered Category'),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: stockVM.isLowStockOnly
-                      ? AppColors.primary
-                      : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-
         // Show Low Stock Only chip toggle
         InkWell(
           onTap: () {
@@ -679,16 +743,20 @@ class _StockTabViewState extends State<StockTabView> {
           },
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
             decoration: BoxDecoration(
               color: stockVM.isLowStockOnly
                   ? AppColors.primary
-                  : (isDark ? const Color(0xFF1A1B20) : const Color(0xFFF3F4F6)),
+                  : (isDark
+                        ? const Color(0xFF1A1B20)
+                        : const Color(0xFFF3F4F6)),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: stockVM.isLowStockOnly
                     ? AppColors.primary
-                    : (isDark ? const Color(0xFF2E3038) : const Color(0xFFE2E4E9)),
+                    : (isDark
+                          ? const Color(0xFF2E3038)
+                          : const Color(0xFFE2E4E9)),
               ),
             ),
             child: Row(
@@ -697,19 +765,25 @@ class _StockTabViewState extends State<StockTabView> {
                   width: 6,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: stockVM.isLowStockOnly ? Colors.black : AppColors.primary,
+                    color: stockVM.isLowStockOnly
+                        ? Colors.black
+                        : AppColors.primary,
                     shape: BoxShape.circle,
                   ),
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  stockVM.isLowStockOnly ? 'Show All Items' : 'Show Low Stock Only',
+                  stockVM.isLowStockOnly
+                      ? 'Show All Items'
+                      : 'Show Low Stock Only',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.w700,
                     color: stockVM.isLowStockOnly
                         ? Colors.black
-                        : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+                        : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.lightTextPrimary),
                   ),
                 ),
               ],
@@ -721,21 +795,29 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// Empty state display when filter/search returns no matches
-  Widget _buildEmptyState(BuildContext context, bool isDark, StockViewModel stockVM) {
+  Widget _buildEmptyState(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1F24) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF2E3038) : const Color(0xFFE5E7EB)),
+        border: Border.all(
+          color: isDark ? const Color(0xFF2E3038) : const Color(0xFFE5E7EB),
+        ),
       ),
       child: Column(
         children: [
           Icon(
             Icons.inventory_2_outlined,
             size: 48,
-            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -743,7 +825,9 @@ class _StockTabViewState extends State<StockTabView> {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+              color: isDark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.lightTextPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -752,7 +836,9 @@ class _StockTabViewState extends State<StockTabView> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.lightTextSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -771,7 +857,12 @@ class _StockTabViewState extends State<StockTabView> {
   }
 
   /// List of inventory card-tables (responsive 1 col mobile, 2 col tablet)
-  Widget _buildItemsList(BuildContext context, bool isDark, List<StockItemModel> items, bool isTablet) {
+  Widget _buildItemsList(
+    BuildContext context,
+    bool isDark,
+    List<StockItemModel> items,
+    bool isTablet,
+  ) {
     if (isTablet) {
       final leftColumn = <StockItemModel>[];
       final rightColumn = <StockItemModel>[];
@@ -824,41 +915,25 @@ class _StockTabViewState extends State<StockTabView> {
     );
   }
 
-  /// Individual Stock Card matching the Stitch design specification
-  Widget _buildStockItemCard(BuildContext context, bool isDark, StockItemModel item) {
+  /// Individual Stock Card displaying only the requested attributes cleanly without overflow
+  Widget _buildStockItemCard(
+    BuildContext context,
+    bool isDark,
+    StockItemModel item,
+  ) {
     final surfaceColor = isDark ? const Color(0xFF1E1F24) : Colors.white;
-    final metricBg = isDark ? const Color(0xFF18191E) : const Color(0xFFF6F7F9);
-    final borderColor = isDark ? const Color(0xFF282A30) : const Color(0xFFE8EAF0);
+    final borderColor = isDark
+        ? const Color(0xFF282A30)
+        : const Color(0xFFE8EAF0);
+    final secondaryTextColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final primaryTextColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
 
-    // Accent Stripe Color
-    Color stripeColor;
-    if (item.status == StockStatus.critical) {
-      stripeColor = AppColors.error;
-    } else if (item.status == StockStatus.low) {
-      stripeColor = AppColors.primary;
-    } else {
-      stripeColor = AppColors.secondary;
-    }
-
-    // Status Badge Details
-    String badgeText;
-    Color badgeColor;
-    Color badgeBg;
-    if (item.status == StockStatus.critical) {
-      badgeText = 'Critical Low';
-      badgeColor = AppColors.error;
-      badgeBg = AppColors.errorContainer.withValues(alpha: 0.3);
-    } else if (item.status == StockStatus.low) {
-      badgeText = 'Low Stock';
-      badgeColor = AppColors.primary;
-      badgeBg = AppColors.primary.withValues(alpha: 0.15);
-    } else {
-      badgeText = 'Optimal';
-      badgeColor = AppColors.secondary;
-      badgeBg = isDark ? const Color(0xFF292A2F) : const Color(0xFFE5E7EB);
-    }
-
-    final percentRemaining = (item.stockRatio * 100).round();
+    final packetsLabel =
+        '${item.displayPacketsCount} ${item.displayPacketsCount == 1 ? "packet" : "packets"}';
+    final minPacketsLabel =
+        '${item.displayMinPackets} ${item.displayMinPackets == 1 ? "packet" : "packets"}';
 
     return Container(
       decoration: BoxDecoration(
@@ -867,411 +942,211 @@ class _StockTabViewState extends State<StockTabView> {
         border: Border.all(color: borderColor),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x10000000),
-            blurRadius: 10,
-            offset: Offset(0, 3),
+            color: Color(0x0A000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left status color indicator stripe
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 4.5,
-            child: Container(color: stripeColor),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 14, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header: Title & Status Badge
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.name,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Category: ${item.category.displayName} • Unit: ${item.unit}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-
-                    // Badge + % text
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: badgeBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 5,
-                                decoration: BoxDecoration(
-                                  color: badgeColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                badgeText.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 9.5,
-                                  fontWeight: FontWeight.w800,
-                                  color: badgeColor,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          item.isLowStock
-                              ? '$percentRemaining% remaining'
-                              : '$percentRemaining% of min',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: item.status == StockStatus.critical
-                                ? AppColors.error
-                                : (item.status == StockStatus.low
-                                    ? AppColors.primary
-                                    : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+          // 1. First line: Item Name + Low badge if low stock
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  item.name,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: primaryTextColor,
+                    height: 1.3,
+                  ),
                 ),
-
-                const SizedBox(height: 10),
-
-                // 3 Column Rapid Scan Metric Grid
+              ),
+              if (item.isLowStock) ...[
+                const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
-                    color: metricBg,
-                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.errorContainer.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: AppColors.error.withValues(alpha: 0.7),
+                      width: 1,
+                    ),
                   ),
-                  child: Row(
-                    children: [
-                      // In Stock
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'IN STOCK',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${item.currentStock} ${item.unit.split(' ').first}',
-                              style: TextStyle(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.bold,
-                                color: item.status == StockStatus.critical
-                                    ? AppColors.error
-                                    : (item.status == StockStatus.low
-                                        ? AppColors.primary
-                                        : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Cost / Unit
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'COST / UNIT',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              CurrencyFormatter.format(item.costPerUnit),
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Min. Level
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'MIN. LEVEL',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${item.minLevel} ${item.unit.split(' ').first}',
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    'Low',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.error,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // Supplier & Visual Progress Bar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.local_shipping_outlined,
-                            size: 14,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              'Supplier: ${item.supplier}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Progress bar
-                    Container(
-                      width: 80,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF282A30) : const Color(0xFFE5E7EB),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: item.stockRatio.clamp(0.0, 1.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: stripeColor,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                // Action Buttons
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // + Restock CTA
-                        FilledButton.icon(
-                          onPressed: () {
-                            HapticService.selection();
-                            RestockModal.show(context, item);
-                          },
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            minimumSize: const Size(0, 34),
-                          ),
-                          icon: const Icon(Icons.add_shopping_cart_rounded, size: 14),
-                          label: const Text(
-                            '+ Restock',
-                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-
-                        // Usage CTA
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            HapticService.selection();
-                            UsageModal.show(context, item);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: isDark ? const Color(0xFF292A2F) : const Color(0xFFF3F4F6),
-                            foregroundColor: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            side: BorderSide.none,
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            minimumSize: const Size(0, 34),
-                          ),
-                          icon: const Icon(Icons.remove_circle_outline_rounded, size: 14, color: AppColors.secondary),
-                          label: const Text(
-                            'Usage',
-                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // History Button
-                        IconButton(
-                          onPressed: () {
-                            HapticService.selection();
-                            StockHistoryDialog.show(context, item);
-                          },
-                          icon: Icon(
-                            Icons.history_rounded,
-                            size: 18,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                          ),
-                          style: IconButton.styleFrom(
-                            backgroundColor: isDark ? const Color(0xFF292A2F) : const Color(0xFFF3F4F6),
-                            minimumSize: const Size(34, 34),
-                            padding: EdgeInsets.zero,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-
-                        // More Menu
-                        PopupMenuButton<String>(
-                          icon: Icon(
-                            Icons.more_vert_rounded,
-                            size: 18,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                          ),
-                          color: surfaceColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          onSelected: (val) {
-                            if (val == 'restock') {
-                              RestockModal.show(context, item);
-                            } else if (val == 'usage') {
-                              UsageModal.show(context, item);
-                            } else if (val == 'history') {
-                              StockHistoryDialog.show(context, item);
-                            }
-                          },
-                          itemBuilder: (ctx) => [
-                            const PopupMenuItem(
-                              value: 'restock',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.add_shopping_cart_rounded, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Quick Restock'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'usage',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.remove_circle_outline_rounded, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Log Usage'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'history',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.history_rounded, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('View History'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
               ],
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // 2. Category
+          Text(
+            'Category: ${item.category.displayName}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: secondaryTextColor,
+              height: 1.3,
             ),
+          ),
+          const SizedBox(height: 6),
+
+          // 3. In stock: no. of packets, total amount eg: 500 ml, amount per packet eg: 250 ml each
+          Text(
+            'In stock: $packetsLabel, ${item.displayTotalAmount}, ${item.displayAmountPerPacket}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: item.isLowStock ? AppColors.error : primaryTextColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // 4. Cost: needs both per packet cost and per unit cost
+          Text(
+            'Cost: ₹${item.displayCostPerPacket.toStringAsFixed(2)} / packet, ₹${item.costPerUnit.toStringAsFixed(2)} / ${item.unit}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: secondaryTextColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // 5. Min. level: eg: 5 packet
+          Text(
+            'Min. level: $minPacketsLabel',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: secondaryTextColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // 6. Supplier name
+          Text(
+            'Supplier: ${item.supplier}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: secondaryTextColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // 7. Action buttons: Issue Stock & Alert Mgr
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              FilledButton.icon(
+                onPressed: () {
+                  HapticService.selection();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Issue Stock: ${item.name}'),
+                      duration: const Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                ),
+                icon: const Icon(Icons.outbox_rounded, size: 16),
+                label: const Text(
+                  'Issue Stock',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              OutlinedButton.icon(
+                onPressed: () {
+                  HapticService.selection();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Alert Manager for ${item.name}'),
+                      duration: const Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.lightTextPrimary,
+                  side: BorderSide(
+                    color: isDark
+                        ? const Color(0xFF3E4048)
+                        : const Color(0xFFCBD0DC),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.notification_important_outlined,
+                  size: 16,
+                ),
+                label: const Text(
+                  'Alert Mgr',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
+
   /// Weekly Kitchen Stocktake Audit Banner Card
-  Widget _buildAuditBannerCard(BuildContext context, bool isDark, StockViewModel stockVM) {
+  Widget _buildAuditBannerCard(
+    BuildContext context,
+    bool isDark,
+    StockViewModel stockVM,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1306,7 +1181,9 @@ class _StockTabViewState extends State<StockTabView> {
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.lightTextPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -1314,7 +1191,9 @@ class _StockTabViewState extends State<StockTabView> {
                   'Last audited: ${stockVM.lastAuditedBy}',
                   style: TextStyle(
                     fontSize: 11.5,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
                   ),
                 ),
               ],
@@ -1328,7 +1207,9 @@ class _StockTabViewState extends State<StockTabView> {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.tertiary,
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             ),
             child: const Text(

@@ -89,6 +89,10 @@ class StockItemModel {
     required this.minLevel,
     required this.costPerUnit,
     required this.supplier,
+    this.packetsCount,
+    this.amountPerPacket,
+    this.costPerPacket,
+    this.minPackets,
     this.logs = const [],
     this.lastAudited,
   });
@@ -101,6 +105,10 @@ class StockItemModel {
   final double minLevel;
   final double costPerUnit;
   final String supplier;
+  final int? packetsCount;
+  final double? amountPerPacket;
+  final double? costPerPacket;
+  final int? minPackets;
   final List<StockLogEntry> logs;
   final DateTime? lastAudited;
 
@@ -125,6 +133,50 @@ class StockItemModel {
 
   bool get isLowStock => status == StockStatus.low || status == StockStatus.critical;
 
+  /// Display helper for packets count
+  int get displayPacketsCount {
+    if (packetsCount != null) return packetsCount!;
+    if (amountPerPacket != null && amountPerPacket! > 0) {
+      return (currentStock / amountPerPacket!).ceil();
+    }
+    return currentStock > 0 ? currentStock.ceil() : 0;
+  }
+
+  /// Display helper for formatted total amount with unit
+  String get displayTotalAmount {
+    final formattedVal = currentStock % 1 == 0
+        ? currentStock.toInt().toString()
+        : currentStock.toStringAsFixed(1);
+    return '$formattedVal $unit';
+  }
+
+  /// Display helper for amount per packet
+  String get displayAmountPerPacket {
+    if (amountPerPacket != null) {
+      final formatted = amountPerPacket! % 1 == 0
+          ? amountPerPacket!.toInt().toString()
+          : amountPerPacket!.toStringAsFixed(1);
+      return '$formatted $unit each';
+    }
+    return '$unit each';
+  }
+
+  /// Display helper for cost per packet
+  double get displayCostPerPacket {
+    if (costPerPacket != null) return costPerPacket!;
+    if (amountPerPacket != null) return costPerUnit * amountPerPacket!;
+    return costPerUnit;
+  }
+
+  /// Display helper for min packets level
+  int get displayMinPackets {
+    if (minPackets != null) return minPackets!;
+    if (amountPerPacket != null && amountPerPacket! > 0) {
+      return (minLevel / amountPerPacket!).ceil();
+    }
+    return minLevel > 0 ? minLevel.ceil() : 0;
+  }
+
   StockItemModel copyWith({
     String? id,
     String? name,
@@ -134,6 +186,10 @@ class StockItemModel {
     double? minLevel,
     double? costPerUnit,
     String? supplier,
+    int? packetsCount,
+    double? amountPerPacket,
+    double? costPerPacket,
+    int? minPackets,
     List<StockLogEntry>? logs,
     DateTime? lastAudited,
   }) {
@@ -146,6 +202,10 @@ class StockItemModel {
       minLevel: minLevel ?? this.minLevel,
       costPerUnit: costPerUnit ?? this.costPerUnit,
       supplier: supplier ?? this.supplier,
+      packetsCount: packetsCount ?? this.packetsCount,
+      amountPerPacket: amountPerPacket ?? this.amountPerPacket,
+      costPerPacket: costPerPacket ?? this.costPerPacket,
+      minPackets: minPackets ?? this.minPackets,
       logs: logs ?? this.logs,
       lastAudited: lastAudited ?? this.lastAudited,
     );

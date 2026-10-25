@@ -256,15 +256,35 @@ class StockViewModel extends BaseViewModel {
   /// Seeds catalog precisely matching the Stitch "NERAM POS - Stocks & Inventory Management" screen.
   void _initializeSeedCatalog() {
     _items.addAll([
+      // 0. Gloves Nitrile Black Disposable (Matches user example specification)
+      StockItemModel(
+        id: 'stk_00',
+        name: 'Gloves Nitrile Black Disposable',
+        category: StockCategory.consumables,
+        unit: 'ml',
+        currentStock: 500.0,
+        minLevel: 1250.0,
+        costPerUnit: 0.60,
+        packetsCount: 2,
+        amountPerPacket: 250.0,
+        costPerPacket: 150.00,
+        minPackets: 5,
+        supplier: 'Prime Safety Supplies',
+      ),
+
       // 1. Arabica Coffee Beans (Dark Roast) - Priority Low Stock
       StockItemModel(
         id: 'stk_01',
         name: 'Arabica Coffee Beans (Dark Roast)',
         category: StockCategory.foodRaw,
-        unit: '1 kg bag',
+        unit: 'kg',
         currentStock: 3.5,
         minLevel: 10.0,
         costPerUnit: 880.00,
+        packetsCount: 4,
+        amountPerPacket: 1.0,
+        costPerPacket: 880.00,
+        minPackets: 10,
         supplier: 'Nilgiri Roasters',
         logs: [
           StockLogEntry(
@@ -288,6 +308,10 @@ class StockViewModel extends BaseViewModel {
         currentStock: 6.0,
         minLevel: 20.0,
         costPerUnit: 68.00,
+        packetsCount: 6,
+        amountPerPacket: 1.0,
+        costPerPacket: 68.00,
+        minPackets: 20,
         supplier: 'Heritage Dairy Direct',
         logs: [
           StockLogEntry(
@@ -311,6 +335,10 @@ class StockViewModel extends BaseViewModel {
         currentStock: 140.0,
         minLevel: 500.0,
         costPerUnit: 4.20,
+        packetsCount: 3,
+        amountPerPacket: 50.0,
+        costPerPacket: 210.00,
+        minPackets: 10,
         supplier: 'GreenPack Supplies Ltd',
         logs: [
           StockLogEntry(
@@ -334,6 +362,10 @@ class StockViewModel extends BaseViewModel {
         currentStock: 8.0,
         minLevel: 3.0,
         costPerUnit: 540.00,
+        packetsCount: 8,
+        amountPerPacket: 1.0,
+        costPerPacket: 540.00,
+        minPackets: 3,
         supplier: 'Monin Direct India',
       ),
 

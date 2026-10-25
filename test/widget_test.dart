@@ -818,7 +818,7 @@ void main() {
 
       // Verify initial seed catalog
       expect(stockVM.totalItemsCount, greaterThanOrEqualTo(18));
-      expect(stockVM.lowAlertCount, equals(3));
+      expect(stockVM.lowAlertCount, equals(4));
       expect(stockVM.outOfStockCount, equals(0));
       expect(stockVM.totalStockValue, greaterThan(100000));
 
@@ -834,7 +834,7 @@ void main() {
       // Low stock filter
       stockVM.setCategory('all');
       stockVM.setLowStockFilter(true);
-      expect(stockVM.filteredItems.length, equals(3));
+      expect(stockVM.filteredItems.length, equals(4));
 
       // Search query
       stockVM.setLowStockFilter(false);
@@ -916,7 +916,7 @@ void main() {
       expect(find.text('TOTAL VALUE'), findsOneWidget);
 
       // Verify Alert Banner
-      expect(find.text('3 Items Low on Stock'), findsOneWidget);
+      expect(find.text('4 Items Low on Stock'), findsOneWidget);
 
       // Verify Search and Category Pills
       expect(
@@ -927,33 +927,13 @@ void main() {
       expect(find.text('Small Equipment'), findsOneWidget);
 
       // Verify Stock Card Presence
+      expect(find.text('Gloves Nitrile Black Disposable'), findsOneWidget);
       expect(find.text('Arabica Coffee Beans (Dark Roast)'), findsOneWidget);
       expect(find.text('Full Cream Cow Milk'), findsOneWidget);
 
-      // Tap + Restock on first item
-      await tester.tap(find.text('+ Restock').first);
-      await tester.pumpAndSettle();
-      expect(find.text('Restock Item'), findsOneWidget);
-      expect(find.text('CONFIRM INWARD RESTOCK'), findsOneWidget);
-
-      // Close Restock Modal
-      await tester.tap(find.byIcon(Icons.close_rounded));
-      await tester.pumpAndSettle();
-      expect(find.text('CONFIRM INWARD RESTOCK'), findsNothing);
-
-      // Tap Usage on first item
-      await tester.tap(find.text('Usage').first);
-      await tester.pumpAndSettle();
-      expect(find.text('Record Stock Usage'), findsOneWidget);
-      expect(find.text('DEDUCT & RECORD USAGE'), findsOneWidget);
-
-      // Close Usage Modal
-      await tester.tap(find.byIcon(Icons.close_rounded));
-      await tester.pumpAndSettle();
-      expect(find.text('DEDUCT & RECORD USAGE'), findsNothing);
-
-      // Tap New Item button
-      await tester.tap(find.text('New Item'));
+      // Verify Add New Item button on dedicated new line and tap it
+      await tester.ensureVisible(find.text('Add New Item'));
+      await tester.tap(find.text('Add New Item'));
       await tester.pumpAndSettle();
       expect(find.text('Add New Stock Item'), findsOneWidget);
       expect(find.text('ADD TO INVENTORY CATALOG'), findsOneWidget);
@@ -962,6 +942,24 @@ void main() {
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
       expect(find.text('Add New Stock Item'), findsNothing);
+
+      // Verify and tap Issue Stock on first item
+      expect(find.text('Issue Stock'), findsWidgets);
+      await tester.ensureVisible(find.text('Issue Stock').first);
+      await tester.tap(find.text('Issue Stock').first);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Issue Stock:'), findsOneWidget);
+
+      // Dismiss SnackBar before tapping Alert Mgr
+      tester.binding.scheduleFrame();
+      await tester.pump(const Duration(seconds: 2));
+
+      // Verify and tap Alert Mgr on first item
+      expect(find.text('Alert Mgr'), findsWidgets);
+      await tester.ensureVisible(find.text('Alert Mgr').first);
+      await tester.tap(find.text('Alert Mgr').first);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Alert Manager for'), findsOneWidget);
 
       // Scroll down until Weekly Kitchen Stocktake and Start Audit are visible
       await tester.scrollUntilVisible(
