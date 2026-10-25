@@ -91,6 +91,19 @@ class LeaveApplicationModel {
     return '$startStr - $endStr ($days ${days == 1 ? 'Day' : 'Days'})';
   }
 
+  /// Whether this leave type is paid or unpaid.
+  bool get isPaid => type == LeaveType.paidLeave || type == LeaveType.compensatoryOff;
+
+  /// Formatted type with paid/unpaid status indicator.
+  String get typePaidString => '${type.displayName} (${isPaid ? "Paid" : "Unpaid"})';
+
+  /// Period string in "from date to to date" format.
+  String get periodString {
+    final startStr = '${startDate.day} ${_monthName(startDate.month)} ${startDate.year}';
+    final endStr = '${endDate.day} ${_monthName(endDate.month)} ${endDate.year}';
+    return '$startStr to $endStr';
+  }
+
   static String _monthName(int month) {
     const months = [
       'Jan',

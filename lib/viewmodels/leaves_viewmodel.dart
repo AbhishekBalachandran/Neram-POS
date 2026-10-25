@@ -21,6 +21,22 @@ class LeavesViewModel extends ChangeNotifier {
   int _selectedYear = 2024;
   String _selectedMonth = 'October';
 
+  static const List<int> yearsList = [2023, 2024, 2025, 2026, 2027];
+  static const List<String> monthsList = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
   late List<LeaveApplicationModel> _applications;
 
   // Getters
@@ -32,12 +48,24 @@ class LeavesViewModel extends ChangeNotifier {
   String get selectedMonth => _selectedMonth;
   List<LeaveApplicationModel> get applications => _applications;
 
-  // Metrics
+  // Monthly Attendance & Working Days Metrics
+  int get daysInMonth {
+    final mIndex = monthsList.indexOf(_selectedMonth) + 1;
+    final m = mIndex > 0 ? mIndex : 10;
+    return DateTime(_selectedYear, m + 1, 0).day;
+  }
+
+  int get totalMonthDays => daysInMonth;
+  int get absentDays => 1;
+  int get leaveDays => 2;
+  int get totalAbsentLeaveDays => absentDays + leaveDays;
+  int get absentCount => 1;
+  int get leaveCount => 2;
+
+  // Legacy/Additional Metrics
   String get joinedDate => '15 Jan 2024';
-  int get totalMonthDays => 31;
   int get eligibleWorkDays => 26;
   int get presentDays => 21;
-  int get leaveDays => 2;
   int get offDays => 5;
   double get attendanceRate => 91.3;
 

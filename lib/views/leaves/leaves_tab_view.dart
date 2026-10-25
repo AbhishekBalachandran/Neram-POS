@@ -3,7 +3,6 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
-import 'package:neram_pos/data/models/leave_model.dart';
 import 'package:neram_pos/viewmodels/leaves_viewmodel.dart';
 import 'package:neram_pos/views/leaves/widgets/apply_leave_modal.dart';
 import 'package:provider/provider.dart';
@@ -471,7 +470,7 @@ class LeavesTabView extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // 2. SHIFT & DUTY ROSTER / MONTHLY ATTENDANCE
+  // 2. MONTHLY ATTENDANCE & WORKING DAYS
   // ---------------------------------------------------------------------------
   Widget _buildRosterCard(
     BuildContext context,
@@ -479,15 +478,22 @@ class LeavesTabView extends StatelessWidget {
     LeavesViewModel leavesViewModel,
     bool isTablet,
   ) {
+    final secondaryTextColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final primaryTextColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final cardBg =
+        isDark ? AppColors.darkSurfaceContainerLow : AppColors.lightSurfaceSubtle;
+    final borderColor =
+        isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
     return Container(
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.darkSurfaceContainer
             : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
+        border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
@@ -502,231 +508,178 @@ class LeavesTabView extends StatelessWidget {
         children: [
           // Header Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_month_rounded,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        'Shift & Duty Roster',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.headlineFont(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.lightTextPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const Icon(
+                Icons.calendar_month_rounded,
+                size: 20,
+                color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.darkSurfaceContainerHigh
-                          : AppColors.lightSurfaceSubtle,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
-                      ),
-                    ),
-                    child: Text(
-                      '${leavesViewModel.selectedYear}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary,
-                      ),
-                    ),
+              Expanded(
+                child: Text(
+                  'Monthly attendance & working days',
+                  style: AppTypography.headlineFont(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: primaryTextColor,
                   ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.35),
-                      ),
-                    ),
-                    child: Text(
-                      leavesViewModel.selectedMonth,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // Attendance Percentage Gauge Bar
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.sm + 2),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkSurfaceContainerLow
-                  : AppColors.lightSurfaceSubtle,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Dropdown selectors for Year and Month
+          Row(
+            children: [
+              // Year Selector
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Text(
-                        'MONTHLY ATTENDANCE RATE',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.6,
-                          color: isDark
-                              ? AppColors.darkTextMuted
-                              : AppColors.lightTextMuted,
-                        ),
+                    Text(
+                      'Year',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: secondaryTextColor,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${leavesViewModel.attendanceRate}%',
-                      style: AppTypography.headlineFont(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: leavesViewModel.selectedYear,
+                          isExpanded: true,
+                          dropdownColor: isDark
+                              ? AppColors.darkSurfaceContainer
+                              : AppColors.lightSurface,
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.bold,
+                            color: primaryTextColor,
+                          ),
+                          items: LeavesViewModel.yearsList.map((y) {
+                            return DropdownMenuItem<int>(
+                              value: y,
+                              child: Text('$y'),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) leavesViewModel.setYear(val);
+                          },
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+              ),
+              const SizedBox(width: 10),
 
-                // Multi-Segment Gauge
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: SizedBox(
-                    height: 10,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 81,
-                          child: Container(color: AppColors.primary),
-                        ),
-                        Expanded(
-                          flex: 8,
-                          child: Container(color: const Color(0xFFF59E0B)),
-                        ),
-                        Expanded(
-                          flex: 4,
-                          child: Container(color: const Color(0xFFEF4444)),
-                        ),
-                        Expanded(
-                          flex: 7,
-                          child: Container(
-                            color: isDark
-                                ? const Color(0xFF38393E)
-                                : const Color(0xFFCBD5E1),
-                          ),
-                        ),
-                      ],
+              // Month Selector
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Month',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: secondaryTextColor,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: leavesViewModel.selectedMonth,
+                          isExpanded: true,
+                          dropdownColor: isDark
+                              ? AppColors.darkSurfaceContainer
+                              : AppColors.lightSurface,
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.bold,
+                            color: primaryTextColor,
+                          ),
+                          items: LeavesViewModel.monthsList.map((m) {
+                            return DropdownMenuItem<String>(
+                              value: m,
+                              child: Text(
+                                m,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) leavesViewModel.setMonth(val);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-
-                // Legend
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      _buildLegendDot(
-                        AppColors.primary,
-                        '${leavesViewModel.presentDays} Present',
-                        isDark,
-                      ),
-                      const SizedBox(width: 14),
-                      _buildLegendDot(
-                        const Color(0xFFF59E0B),
-                        '${leavesViewModel.leaveDays} Leaves',
-                        isDark,
-                      ),
-                      const SizedBox(width: 14),
-                      _buildLegendDot(
-                        const Color(0xFF64748B),
-                        '${leavesViewModel.offDays} Off-Days',
-                        isDark,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // 4 Key Metrics (Responsive 2x2 or 4 in a row)
+          // 4 Required Counts:
+          // 1. Days in month count
+          // 2. Absent / leave count as number of days
+          // 3. Count of absent
+          // 4. Count of leave
           if (isTablet)
             Row(
               children: [
                 Expanded(
                   child: _buildMetricTile(
-                    title: 'Joined Date',
-                    value: leavesViewModel.joinedDate,
-                    icon: Icons.badge_outlined,
+                    title: 'Days in Month',
+                    value: '${leavesViewModel.daysInMonth} Days',
+                    icon: Icons.calendar_today_rounded,
                     isDark: isDark,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _buildMetricTile(
-                    title: 'Total Month Days',
-                    value: '${leavesViewModel.totalMonthDays} Days',
-                    icon: Icons.today_outlined,
-                    isDark: isDark,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildMetricTile(
-                    title: 'Eligible Work Days',
-                    value: '${leavesViewModel.eligibleWorkDays} Working',
-                    icon: Icons.work_history_outlined,
-                    isDark: isDark,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildMetricTile(
-                    title: 'Leaves Taken',
-                    value: '${leavesViewModel.leaveDays} Days (1P, 1C)',
-                    icon: Icons.beach_access_outlined,
+                    title: 'Absent / Leave Days',
+                    value: '${leavesViewModel.totalAbsentLeaveDays} Days',
+                    icon: Icons.event_busy_rounded,
                     accentColor: const Color(0xFFF59E0B),
+                    isDark: isDark,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildMetricTile(
+                    title: 'Count of Absent',
+                    value: '${leavesViewModel.absentCount}',
+                    icon: Icons.person_off_rounded,
+                    accentColor: const Color(0xFFEF4444),
+                    isDark: isDark,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildMetricTile(
+                    title: 'Count of Leave',
+                    value: '${leavesViewModel.leaveCount}',
+                    icon: Icons.beach_access_rounded,
+                    accentColor: const Color(0xFF3B82F6),
                     isDark: isDark,
                   ),
                 ),
@@ -737,18 +690,19 @@ class LeavesTabView extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildMetricTile(
-                    title: 'Joined Date',
-                    value: leavesViewModel.joinedDate,
-                    icon: Icons.badge_outlined,
+                    title: 'Days in Month',
+                    value: '${leavesViewModel.daysInMonth} Days',
+                    icon: Icons.calendar_today_rounded,
                     isDark: isDark,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _buildMetricTile(
-                    title: 'Total Month Days',
-                    value: '${leavesViewModel.totalMonthDays} Days',
-                    icon: Icons.today_outlined,
+                    title: 'Absent / Leave Days',
+                    value: '${leavesViewModel.totalAbsentLeaveDays} Days',
+                    icon: Icons.event_busy_rounded,
+                    accentColor: const Color(0xFFF59E0B),
                     isDark: isDark,
                   ),
                 ),
@@ -759,19 +713,20 @@ class LeavesTabView extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildMetricTile(
-                    title: 'Eligible Work Days',
-                    value: '${leavesViewModel.eligibleWorkDays} Working',
-                    icon: Icons.work_history_outlined,
+                    title: 'Count of Absent',
+                    value: '${leavesViewModel.absentCount}',
+                    icon: Icons.person_off_rounded,
+                    accentColor: const Color(0xFFEF4444),
                     isDark: isDark,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _buildMetricTile(
-                    title: 'Leaves Taken',
-                    value: '${leavesViewModel.leaveDays} Days (1P, 1C)',
-                    icon: Icons.beach_access_outlined,
-                    accentColor: const Color(0xFFF59E0B),
+                    title: 'Count of Leave',
+                    value: '${leavesViewModel.leaveCount}',
+                    icon: Icons.beach_access_rounded,
+                    accentColor: const Color(0xFF3B82F6),
                     isDark: isDark,
                   ),
                 ),
@@ -780,30 +735,6 @@ class LeavesTabView extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-
-  Widget _buildLegendDot(Color color, String label, bool isDark) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: isDark
-                ? AppColors.darkTextSecondary
-                : AppColors.lightTextSecondary,
-          ),
-        ),
-      ],
     );
   }
 
@@ -867,7 +798,7 @@ class LeavesTabView extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. LEAVE AUDIT & TEAM LOG SECTION
+  // 3. LEAVE APPLICATIONS & AUDIT SECTION
   // ---------------------------------------------------------------------------
   Widget _buildLeaveAuditSection(
     BuildContext context,
@@ -894,7 +825,7 @@ class LeavesTabView extends StatelessWidget {
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      'Leave Audit & Team Log',
+                      'Leave applications & audit',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.headlineFont(
@@ -932,6 +863,7 @@ class LeavesTabView extends StatelessWidget {
         const SizedBox(height: 10),
 
         // Applications List Cards
+        // Only datas shown: Name, Period (from date to to date), type paid or not, reason, status, reviewed by
         ...applications.map((app) {
           return Container(
             margin: const EdgeInsets.only(bottom: 10),
@@ -955,67 +887,24 @@ class LeavesTabView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top Applicant Header
+                // Top Row: Name and Status Badge
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              app.initials,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  app.applicantName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppTypography.headlineFont(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: isDark
-                                        ? AppColors.darkTextPrimary
-                                        : AppColors.lightTextPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  '${app.applicantRole} • ${app.staffId}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.lightTextSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        app.applicantName,
+                        style: AppTypography.headlineFont(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.lightTextPrimary,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
-
-                    // Status Badge
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -1046,7 +935,7 @@ class LeavesTabView extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Details Card Box
+                // Key-value Details Section
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -1057,96 +946,15 @@ class LeavesTabView extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      _buildDetailRow(
-                        'Period:',
-                        app.formattedPeriod,
-                        isDark,
-                        isBold: true,
-                      ),
-                      const SizedBox(height: 5),
-                      _buildDetailRow(
-                        'Type:',
-                        app.type.displayName,
-                        isDark,
-                        badgeColor: AppColors.primary,
-                      ),
-                      const SizedBox(height: 5),
-                      _buildDetailRow(
-                        'Reason:',
-                        app.reason,
-                        isDark,
-                      ),
+                      _buildLeaveDetailRow('Period', app.periodString, isDark, isBold: true),
+                      const SizedBox(height: 6),
+                      _buildLeaveDetailRow('Type', app.typePaidString, isDark),
+                      const SizedBox(height: 6),
+                      _buildLeaveDetailRow('Reason', app.reason, isDark),
+                      const SizedBox(height: 6),
+                      _buildLeaveDetailRow('Reviewed by', app.reviewedBy, isDark),
                     ],
                   ),
-                ),
-                const SizedBox(height: 8),
-
-                // Reviewer Footer & Quick Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Reviewed by: ${app.reviewedBy}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (app.status == LeaveStatus.pending)
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () {
-                            leavesViewModel.cancelLeave(app.id);
-                            _showToast(
-                              context,
-                              title: 'Leave Application Recalled',
-                              subtitle:
-                                  'Removed request for ${app.applicantName}',
-                              isSuccess: false,
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0x1AEF4444),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.cancel_outlined,
-                                  size: 13,
-                                  color: Color(0xFFEF4444),
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Recall',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFFEF4444),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
                 ),
               ],
             ),
@@ -1156,64 +964,39 @@ class LeavesTabView extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(
+  Widget _buildLeaveDetailRow(
     String label,
     String value,
     bool isDark, {
     bool isBold = false,
-    Color? badgeColor,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        SizedBox(
-          width: 55,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w500,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
           ),
         ),
+        const SizedBox(width: 12),
         Expanded(
-          child: badgeColor != null
-              ? Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 1.5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: badgeColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: badgeColor,
-                      ),
-                    ),
-                  ),
-                )
-              : Text(
-                  value,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.lightTextPrimary,
-                  ),
-                ),
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+              color: isDark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.lightTextPrimary,
+            ),
+          ),
         ),
       ],
     );

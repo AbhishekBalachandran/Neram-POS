@@ -623,11 +623,12 @@ void main() {
       // Verify LeavesTabView is active
       expect(find.byType(LeavesTabView), findsOneWidget);
       expect(find.text('SHIFT TIMER'), findsOneWidget);
-      expect(find.text('Shift & Duty Roster'), findsOneWidget);
-      expect(find.text('MONTHLY ATTENDANCE RATE'), findsOneWidget);
-      expect(find.text('ELIGIBLE WORK DAYS'), findsOneWidget);
-      expect(find.text('LEAVES TAKEN'), findsOneWidget);
-      expect(find.text('Leave Audit & Team Log'), findsOneWidget);
+      expect(find.text('Monthly attendance & working days'), findsOneWidget);
+      expect(find.text('DAYS IN MONTH'), findsOneWidget);
+      expect(find.text('ABSENT / LEAVE DAYS'), findsOneWidget);
+      expect(find.text('COUNT OF ABSENT'), findsOneWidget);
+      expect(find.text('COUNT OF LEAVE'), findsOneWidget);
+      expect(find.text('Leave applications & audit'), findsOneWidget);
 
       // Verify Check In / Check Out action button
       expect(find.text('Check In'), findsOneWidget);
