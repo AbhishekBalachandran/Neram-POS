@@ -396,9 +396,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
     final accentColor = isOutdoor ? AppColors.secondary : AppColors.primary;
     final icon = isOutdoor ? Icons.deck_rounded : Icons.shopping_bag_rounded;
     final title = isOutdoor ? 'Outdoor Order' : 'Takeaway Order';
-    final desc = isOutdoor
-        ? 'No outdoor tables. This order is identified & served by Customer Name.'
-        : 'Takeaway order. Packed & announced by Customer Name.';
+    const desc = 'Please enter the customer name.';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

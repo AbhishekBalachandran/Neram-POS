@@ -244,7 +244,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                   ),
                 ),
 
-                // Trailing Clear or Filter Button
+                // Trailing Clear Button
                 if (_hasText)
                   IconButton(
                     icon: const Icon(Icons.close_rounded, size: 20),
@@ -257,40 +257,6 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                         ? AppColors.darkTextSecondary
                         : AppColors.lightTextSecondary,
                     onPressed: _clearSearch,
-                  )
-                else
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () {
-                        HapticService.selection();
-                        widget.onFilterTap?.call();
-                      },
-                      child: Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.darkSurfaceContainerHigh
-                              : AppColors.lightSurfaceSubtle,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isDark
-                                ? AppColors.darkBorder.withValues(alpha: 0.5)
-                                : AppColors.lightBorder,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.tune_rounded,
-                          size: 15,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                    ),
                   ),
               ],
             ),

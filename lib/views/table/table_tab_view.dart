@@ -44,7 +44,7 @@ class _TableTabViewState extends State<TableTabView> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    if (_scrollController.offset <= 10) {
+    if (_scrollController.offset <= 5) {
       if (!_isHeaderVisible) {
         setState(() {
           _isHeaderVisible = true;
@@ -65,11 +65,11 @@ class _TableTabViewState extends State<TableTabView> {
     return Column(
       children: [
         // FIXED TOP SECTION (Action Strip + Search & Categories)
-        // Fixed at top, but smoothly hides when scrolled up and shows when scrolled down
+        // Fixed at top, hides instantly when scrolled up and shows instantly when scrolled down
         ClipRect(
           child: AnimatedSize(
-            duration: const Duration(milliseconds: 260),
-            curve: Curves.fastOutSlowIn,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeOutQuad,
             alignment: Alignment.topCenter,
             child: _isHeaderVisible
                 ? Column(
@@ -87,31 +87,48 @@ class _TableTabViewState extends State<TableTabView> {
           ),
         ),
 
-        // DISHES CATALOG LIST
+        // DISHES CATALOG GRIDVIEW
         // Scrolls independently beneath the fixed top section
         Expanded(
-          child: NotificationListener<UserScrollNotification>(
+          child: NotificationListener<ScrollNotification>(
             onNotification: (notification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                // User scrolled up (content moving up, browsing down the list)
-                if (_isHeaderVisible &&
-                    _scrollController.hasClients &&
-                    _scrollController.offset > 20) {
+              if (notification is UserScrollNotification) {
+                if (notification.direction == ScrollDirection.reverse) {
+                  // User scrolled up (browsing downwards) -> hide top part instantly
+                  if (_isHeaderVisible) {
+                    setState(() {
+                      _isHeaderVisible = false;
+                    });
+                  }
+                } else if (notification.direction == ScrollDirection.forward) {
+                  // User scrolled down (returning upwards) -> show top part instantly
+                  if (!_isHeaderVisible) {
+                    setState(() {
+                      _isHeaderVisible = true;
+                    });
+                  }
+                }
+              } else if (notification is ScrollUpdateNotification) {
+                final delta = notification.scrollDelta ?? 0.0;
+                if (delta > 1.0 && _isHeaderVisible) {
                   setState(() {
                     _isHeaderVisible = false;
                   });
-                }
-              } else if (notification.direction == ScrollDirection.forward) {
-                // User scrolled down (content moving down, returning towards top)
-                if (!_isHeaderVisible) {
+                } else if (delta < -1.0 && !_isHeaderVisible) {
                   setState(() {
                     _isHeaderVisible = true;
                   });
                 }
+              } else if (notification is OverscrollNotification &&
+                  notification.overscroll < 0 &&
+                  !_isHeaderVisible) {
+                setState(() {
+                  _isHeaderVisible = true;
+                });
               }
               return false;
             },
-            child: ListView.builder(
+            child: GridView.builder(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
@@ -122,15 +139,16 @@ class _TableTabViewState extends State<TableTabView> {
                 AppSpacing.md,
                 bottomPadding,
               ),
-              itemCount: dishes.length + 1,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount:
+                    MediaQuery.of(context).size.width >= 600 ? 3 : 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.55,
+              ),
+              itemCount: dishes.length,
               itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: _buildSectionHeader(isDark, dishes.length),
-                  );
-                }
-                final dish = dishes[index - 1];
+                final dish = dishes[index];
                 return _buildDishCard(
                   context,
                   isDark,
@@ -162,11 +180,9 @@ class _TableTabViewState extends State<TableTabView> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.md,
-        AppSpacing.sm,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 6,
       ),
       decoration: BoxDecoration(
         color: isDark
@@ -182,91 +198,11 @@ class _TableTabViewState extends State<TableTabView> {
       ),
       child: Column(
         children: [
-          // Row 1: Active Orders Alert Pill & All Tables Trigger (Fully Responsive)
+          // Row 1: All Tables Trigger (Left) & Active Alert Pill (Right) - Sides Shifted
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Active Orders Pill
-              Flexible(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
-                    onTap: () => ActiveOrdersDialog.show(context),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.40),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Animated Beacon
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(
-                            Icons.bolt_rounded,
-                            size: 16,
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              'ACTIVE\nORDERS',
-                              maxLines: 2,
-                              softWrap: true,
-                              style: AppTypography.headlineFont(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3,
-                                color: AppColors.primary,
-                                height: 1.15,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              '$activeOrdersCount',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                height: 1.0,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-
-              // All Tables Trigger Button
+              // All Tables Trigger Button (Left)
               Flexible(
                 child: Material(
                   color: Colors.transparent,
@@ -276,7 +212,7 @@ class _TableTabViewState extends State<TableTabView> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 8,
+                        vertical: 7,
                       ),
                       decoration: BoxDecoration(
                         color: isDark
@@ -329,9 +265,79 @@ class _TableTabViewState extends State<TableTabView> {
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
+
+              // Active Orders Pill (Right) - Single Icon & "ACTIVE" Label
+              Flexible(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(999),
+                    onTap: () => ActiveOrdersDialog.show(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.40),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.bolt_rounded,
+                            size: 15,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'ACTIVE',
+                                style: AppTypography.headlineFont(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.4,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              '$activeOrdersCount',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.onPrimary,
+                                height: 1.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // Row 2: Service / Dining Mode Switcher
           Row(
@@ -361,16 +367,16 @@ class _TableTabViewState extends State<TableTabView> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
           // Row 3: Contextual View - Indoor Tables List OR Customer Name Order Bar
           if (tableViewModel.diningMode == DiningMode.dineIn)
             SizedBox(
-              height: 52,
+              height: 44,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: tableViewModel.tables.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final table = tableViewModel.tables[index];
                   final isSelected = table.id == tableViewModel.selectedTableId;
@@ -469,12 +475,10 @@ class _TableTabViewState extends State<TableTabView> {
     final accentColor = isOutdoor ? AppColors.secondary : AppColors.primary;
     final icon = isOutdoor ? Icons.deck_rounded : Icons.shopping_bag_rounded;
     final modeLabel = isOutdoor ? 'Outdoor Order' : 'Takeaway Order';
-    final helpText = isOutdoor
-        ? 'No outdoor tables • Served by Customer Name'
-        : 'Takeaway pickup • Called by Customer Name';
+    const helpText = 'Please enter the customer name.';
 
     return Container(
-      height: 52,
+      height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: accentColor.withValues(alpha: 0.12),
@@ -633,14 +637,14 @@ class _TableTabViewState extends State<TableTabView> {
           borderRadius: BorderRadius.circular(14),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x40F59E0B),
-                  blurRadius: 8,
+                  blurRadius: 6,
                   offset: Offset(0, 2),
                 ),
               ],
@@ -718,7 +722,7 @@ class _TableTabViewState extends State<TableTabView> {
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
             color: isDark
                 ? AppColors.darkSurfaceContainer
@@ -807,9 +811,9 @@ class _TableTabViewState extends State<TableTabView> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.xs + 2,
+        2,
         AppSpacing.md,
-        AppSpacing.xs + 2,
+        4,
       ),
       child: Column(
         children: [
@@ -818,11 +822,11 @@ class _TableTabViewState extends State<TableTabView> {
             onChanged: tableViewModel.setSearchQuery,
             onFilterTap: () => AllTablesBottomSheet.show(context),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // Categories Horizontal Scroll
           SizedBox(
-            height: 40,
+            height: 32,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: TableViewModel.categories.length,
@@ -836,8 +840,8 @@ class _TableTabViewState extends State<TableTabView> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: 14,
+                      vertical: 4,
                     ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -858,12 +862,12 @@ class _TableTabViewState extends State<TableTabView> {
                     child: Text(
                       category,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w500,
                         color: isSelected
-                            ? Colors.white
+                            ? AppColors.onPrimary
                             : isDark
                             ? AppColors.darkTextSecondary
                             : AppColors.lightTextSecondary,
@@ -880,43 +884,8 @@ class _TableTabViewState extends State<TableTabView> {
   }
 
   // ---------------------------------------------------------------------------
-  // SECTION HEADER & DISH CARD (FOR SLIVER LIST)
+  // DISH CARD (FOR GRID VIEW)
   // ---------------------------------------------------------------------------
-  Widget _buildSectionHeader(bool isDark, int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Text(
-              'POPULAR & RECOMMENDED DISHES',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.headlineFont(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '$count Items Available',
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildDishCard(
     BuildContext context,
     bool isDark,
@@ -926,160 +895,177 @@ class _TableTabViewState extends State<TableTabView> {
     final countInCart = tableViewModel.currentTableCart[dish.id] ?? 0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.darkSurfaceContainerLow
             : AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.03),
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Veg / Egg / NonVeg Badge
-          _buildFoodTypeBadge(dish.foodType),
-          const SizedBox(width: AppSpacing.md),
-
-          // Dish Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          // Top: Food Type Badge + Dish Name (Subtitle removed for clean layout)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: _buildFoodTypeBadge(dish.foodType),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
                   dish.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTypography.headlineFont(
-                    fontSize: 15,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: isDark
                         ? AppColors.darkTextPrimary
                         : AppColors.lightTextPrimary,
+                    height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  dish.subtitle,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  dish.formattedPrice,
-                  style: AppTypography.headlineFont(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
 
-          // Add or Quantity Counter Button
-          if (countInCart == 0)
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () => tableViewModel.addDish(dish),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8.5,
+          // Bottom: Price + Compact Reduced Add/Counter Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    dish.formattedPrice,
+                    style: AppTypography.headlineFont(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
                   ),
+                ),
+              ),
+              const SizedBox(width: 4),
+
+              // Reduced Add / Counter Button
+              if (countInCart == 0)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(9),
+                    onTap: () => tableViewModel.addDish(dish),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(9),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x33F59E0B),
+                            blurRadius: 4,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.add_rounded,
+                            size: 13,
+                            color: AppColors.onPrimary,
+                          ),
+                          SizedBox(width: 3),
+                          Text(
+                            'Add',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  height: 26,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x33F59E0B),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(9),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.add_rounded,
-                        size: 16,
-                        color: AppColors.onPrimary,
+                      InkWell(
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(9),
+                        ),
+                        onTap: () => tableViewModel.removeDish(dish),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
+                          child: Icon(
+                            Icons.remove_rounded,
+                            size: 13,
+                            color: AppColors.onPrimary,
+                          ),
+                        ),
                       ),
-                      SizedBox(width: 4),
                       Text(
-                        'Add',
-                        style: TextStyle(
-                          fontSize: 13,
+                        '$countInCart',
+                        style: const TextStyle(
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.onPrimary,
+                        ),
+                      ),
+                      InkWell(
+                        borderRadius: const BorderRadius.horizontal(
+                          right: Radius.circular(9),
+                        ),
+                        onTap: () => tableViewModel.addDish(dish),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
+                          child: Icon(
+                            Icons.add_rounded,
+                            size: 13,
+                            color: AppColors.onPrimary,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            )
-          else
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                    icon: const Icon(
-                      Icons.remove_rounded,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => tableViewModel.removeDish(dish),
-                  ),
-                  Text(
-                    '$countInCart',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                    icon: const Icon(
-                      Icons.add_rounded,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => tableViewModel.addDish(dish),
-                  ),
-                ],
-              ),
-            ),
+            ],
+          ),
         ],
       ),
     );

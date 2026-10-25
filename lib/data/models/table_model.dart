@@ -74,7 +74,7 @@ class TableModel {
   final int itemCount;
 
   String get formattedTotal => '₹${total.toStringAsFixed(2)}';
-  String get subtitle => '$seats Seats • Indoor';
+  String get subtitle => '$seats Seats';
 
   TableModel copyWith({
     String? id,

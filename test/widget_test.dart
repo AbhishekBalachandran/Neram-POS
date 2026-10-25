@@ -327,9 +327,8 @@ void main() {
 
       // TableTabView in Tab 0
       expect(find.byType(TableTabView), findsOneWidget);
-      expect(find.text('ACTIVE\nORDERS'), findsOneWidget);
+      expect(find.text('ACTIVE'), findsOneWidget);
       expect(find.text('ALL TABLES (12)'), findsOneWidget);
-      expect(find.text('POPULAR & RECOMMENDED DISHES'), findsOneWidget);
       expect(find.text('Crispy Corn Pepper Fry'), findsOneWidget);
 
       // Bottom Navigation Bar
@@ -389,7 +388,7 @@ void main() {
     expect(find.text('Indoor Dining Tables'), findsNothing);
 
     // Tap Active Orders button
-    await tester.tap(find.text('ACTIVE\nORDERS'));
+    await tester.tap(find.text('ACTIVE'));
     await tester.pumpAndSettle();
 
     // Verify dialog appears
