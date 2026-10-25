@@ -7,7 +7,6 @@ import 'package:neram_pos/core/widgets/app_bottom_sheet.dart';
 import 'package:neram_pos/data/models/dish_model.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
-import 'package:neram_pos/views/table/widgets/all_tables_bottom_sheet.dart';
 import 'package:neram_pos/views/table/widgets/table_transfer_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -670,23 +669,31 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                                       : AppColors.lightTextPrimary,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '(${table.seats} Seats)',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.lightTextSecondary,
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  '(${table.seats} Seats)',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.lightTextSecondary,
+                                  ),
                                 ),
                               ),
                               const Spacer(),
-                              Text(
-                                table.status.displayName,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: table.status.color,
+                              Flexible(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    table.status.displayName,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: table.status.color,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -702,88 +709,33 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
-              // Transfer Table Button
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () {
-                    TableTransferDialog.show(
-                      context,
-                      fromTableId: tableViewModel.selectedTableId,
-                    );
-                  },
-                  child: Container(
-                    height: 42,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.35),
-                      ),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(
-                          Icons.swap_horiz_rounded,
-                          size: 15,
-                          color: AppColors.primary,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Transfer',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
+              const SizedBox(width: 8),
+              // Transfer Table Text Button
+              TextButton.icon(
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(
+                  Icons.swap_horiz_rounded,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                label: const Text(
+                  'Transfer',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              // Open Full Grid Button
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    AllTablesBottomSheet.show(context);
-                  },
-                  child: Container(
-                    height: 42,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.darkSurfaceContainerHigh
-                          : AppColors.lightSurface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
-                      ),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.grid_view_rounded, size: 15),
-                        SizedBox(width: 4),
-                        Text(
-                          'Grid',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                onPressed: () {
+                  TableTransferDialog.show(
+                    context,
+                    fromTableId: tableViewModel.selectedTableId,
+                  );
+                },
               ),
             ],
           ),
@@ -1243,16 +1195,20 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
 
                         // Line Total
                         SizedBox(
-                          width: 48,
-                          child: Text(
-                            '₹${lineTotal.toStringAsFixed(2)}',
-                            textAlign: TextAlign.right,
-                            style: AppTypography.headlineFont(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w700,
-                              color: isDark
-                                  ? AppColors.darkTextPrimary
-                                  : AppColors.lightTextPrimary,
+                          width: 52,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              '₹${lineTotal.toStringAsFixed(2)}',
+                              textAlign: TextAlign.right,
+                              style: AppTypography.headlineFont(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.lightTextPrimary,
+                              ),
                             ),
                           ),
                         ),

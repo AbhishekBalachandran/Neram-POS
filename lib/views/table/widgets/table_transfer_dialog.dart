@@ -486,13 +486,18 @@ class _TableTransferDialogState extends State<TableTransferDialog> {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        '(${sourceTable.seats} Seats)',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.lightTextSecondary,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '(${sourceTable.seats} Seats)',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.lightTextSecondary,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -578,7 +583,7 @@ class _TableTransferDialogState extends State<TableTransferDialog> {
         crossAxisCount: 3,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
-        childAspectRatio: 1.35,
+        childAspectRatio: 1.15,
       ),
       itemCount: tables.length,
       itemBuilder: (context, index) {
@@ -656,21 +661,26 @@ class _TableTransferDialogState extends State<TableTransferDialog> {
                               : AppColors.lightTextMuted,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: table.status.backgroundColor,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          isVacant ? 'Vacant' : table.status.displayName,
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            color: table.status.color,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: table.status.backgroundColor,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              isVacant ? 'Vacant' : table.status.displayName,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: table.status.color,
+                              ),
+                            ),
                           ),
                         ),
                       ),

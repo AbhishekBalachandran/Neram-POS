@@ -492,10 +492,13 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                               ),
                               const SizedBox(height: AppSpacing.sm),
 
-                              // Bottom Row: Total and Action Buttons
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              // Bottom Row: Total and Action Buttons (Wraps to new line on narrow widths)
+                              Wrap(
+                                alignment: WrapAlignment.spaceBetween,
+                                runAlignment: WrapAlignment.center,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 10,
+                                runSpacing: 8,
                                 children: [
                                   Text(
                                     order.formattedTotal,
@@ -505,60 +508,54 @@ class _ActiveOrdersDialogState extends State<ActiveOrdersDialog> {
                                       color: AppColors.primary,
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
+                                    crossAxisAlignment: WrapCrossAlignment.center,
                                     children: [
                                       // Table Transfer Button (Only for Dine-In Tables with tableId)
                                       if (order.zone == TableZone.indoor &&
-                                          order.tableId.isNotEmpty) ...[
-                                        InkWell(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          onTap: () {
+                                          order.tableId.isNotEmpty)
+                                        TextButton.icon(
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            minimumSize: Size.zero,
+                                            tapTargetSize:
+                                                MaterialTapTargetSize.shrinkWrap,
+                                            foregroundColor: AppColors.primary,
+                                            backgroundColor: AppColors.primary
+                                                .withValues(alpha: 0.12),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              side: BorderSide(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.35),
+                                              ),
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.swap_horiz_rounded,
+                                            size: 13,
+                                          ),
+                                          label: const Text(
+                                            'Transfer',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          onPressed: () {
                                             TableTransferDialog.show(
                                               context,
                                               fromTableId: order.tableId,
                                               order: order,
                                             );
                                           },
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.primary
-                                                  .withValues(alpha: 0.12),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: AppColors.primary
-                                                    .withValues(alpha: 0.35),
-                                              ),
-                                            ),
-                                            child: const Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.swap_horiz_rounded,
-                                                  size: 13,
-                                                  color: AppColors.primary,
-                                                ),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  'Transfer',
-                                                  style: TextStyle(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppColors.primary,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
                                         ),
-                                        const SizedBox(width: 8),
-                                      ],
                                       InkWell(
                                         borderRadius: BorderRadius.circular(8),
                                         onTap: () {
