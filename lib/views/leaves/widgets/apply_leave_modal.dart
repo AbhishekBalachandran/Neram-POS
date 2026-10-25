@@ -55,13 +55,13 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
             colorScheme: isDark
                 ? const ColorScheme.dark(
                     primary: AppColors.primary,
-                    onPrimary: Colors.white,
+                    onPrimary: AppColors.onPrimary,
                     surface: AppColors.darkSurfaceContainer,
                     onSurface: AppColors.darkTextPrimary,
                   )
                 : const ColorScheme.light(
                     primary: AppColors.primary,
-                    onPrimary: Colors.white,
+                    onPrimary: AppColors.onPrimary,
                     surface: AppColors.lightSurface,
                     onSurface: AppColors.lightTextPrimary,
                   ),
@@ -524,7 +524,7 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                                           Icon(
                                             Icons.send_rounded,
                                             size: 17,
-                                            color: Colors.white,
+                                            color: AppColors.onPrimary,
                                           ),
                                           SizedBox(width: 6),
                                           Text(
@@ -532,7 +532,7 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                                             style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w700,
-                                              color: Colors.white,
+                                              color: AppColors.onPrimary,
                                             ),
                                           ),
                                         ],

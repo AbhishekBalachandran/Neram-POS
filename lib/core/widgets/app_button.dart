@@ -70,7 +70,7 @@ class AppButton extends StatelessWidget {
     switch (variant) {
       case AppButtonVariant.primary:
         backgroundColor = AppColors.primary;
-        foregroundColor = Colors.white;
+        foregroundColor = AppColors.onPrimary;
         gradient = _isEnabled ? AppColors.primaryGradient : null;
       case AppButtonVariant.secondary:
         backgroundColor = isDark

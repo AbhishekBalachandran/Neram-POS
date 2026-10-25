@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   // Brand Primary & Radiant Amber (Primary: #F59E0B)
   static const Color primary = Color(0xFFF59E0B);
+  static const Color onPrimary = Color(0xFF000000);
   static const Color primaryLight = Color(0xFFFCD34D);
   static const Color primaryDark = Color(0xFFD97706);
   static const Color primaryContainer = Color(0xFFF59E0B);

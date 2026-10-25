@@ -396,7 +396,7 @@ class LeavesTabView extends StatelessWidget {
                           Icon(
                             Icons.event_available_rounded,
                             size: 18,
-                            color: Colors.white,
+                            color: AppColors.onPrimary,
                           ),
                           SizedBox(height: 2),
                           Text(
@@ -404,7 +404,7 @@ class LeavesTabView extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.onPrimary,
                             ),
                           ),
                         ],

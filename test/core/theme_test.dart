@@ -14,6 +14,7 @@ void main() {
 
       expect(lightTheme.brightness, Brightness.light);
       expect(lightTheme.colorScheme.primary, AppColors.primary);
+      expect(lightTheme.colorScheme.onPrimary, AppColors.onPrimary);
       expect(
         lightTheme.colorScheme.primary.toARGB32(),
         AppColors.primary.toARGB32(),
@@ -28,6 +29,7 @@ void main() {
 
       expect(darkTheme.brightness, Brightness.dark);
       expect(darkTheme.colorScheme.primary, AppColors.primary);
+      expect(darkTheme.colorScheme.onPrimary, AppColors.onPrimary);
       expect(
         darkTheme.colorScheme.primary.toARGB32(),
         AppColors.primary.toARGB32(),

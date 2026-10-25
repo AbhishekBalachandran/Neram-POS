@@ -488,7 +488,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   Icon(
                     icon,
                     size: 15,
-                    color: isSelected ? Colors.white : AppColors.primary,
+                    color: isSelected ? AppColors.onPrimary : AppColors.primary,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -496,7 +496,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: isSelected ? Colors.white : null,
+                      color: isSelected ? AppColors.onPrimary : null,
                     ),
                   ),
                 ],
@@ -508,7 +508,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   fontSize: 9,
                   fontWeight: FontWeight.w500,
                   color: isSelected
-                      ? Colors.white.withValues(alpha: 0.85)
+                      ? AppColors.onPrimary.withValues(alpha: 0.8)
                       : const Color(0xFF94A3B8),
                 ),
               ),
@@ -627,7 +627,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                                       ? FontWeight.w700
                                       : FontWeight.w600,
                                   color: isSelected
-                                      ? Colors.white
+                                      ? AppColors.onPrimary
                                       : isDark
                                       ? AppColors.darkTextPrimary
                                       : AppColors.lightTextPrimary,
@@ -1402,7 +1402,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                       Icon(
                         Icons.soup_kitchen_rounded,
                         size: 20,
-                        color: Colors.white,
+                        color: AppColors.onPrimary,
                       ),
                       SizedBox(width: 8),
                       Text(
@@ -1410,7 +1410,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: AppColors.onPrimary,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -1418,7 +1418,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                       Icon(
                         Icons.arrow_forward_rounded,
                         size: 16,
-                        color: Colors.white,
+                        color: AppColors.onPrimary,
                       ),
                     ],
                   ),

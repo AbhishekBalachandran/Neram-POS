@@ -657,7 +657,7 @@ class _TableTabViewState extends State<TableTabView> {
                       style: AppTypography.headlineFont(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.onPrimary,
                       ),
                     ),
                     Text(
@@ -665,7 +665,7 @@ class _TableTabViewState extends State<TableTabView> {
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.onPrimary,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -1018,7 +1018,7 @@ class _TableTabViewState extends State<TableTabView> {
                       Icon(
                         Icons.add_rounded,
                         size: 16,
-                        color: Colors.white,
+                        color: AppColors.onPrimary,
                       ),
                       SizedBox(width: 4),
                       Text(
@@ -1026,7 +1026,7 @@ class _TableTabViewState extends State<TableTabView> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: AppColors.onPrimary,
                         ),
                       ),
                     ],
@@ -1282,7 +1282,7 @@ class _TableTabViewState extends State<TableTabView> {
                         Icon(
                           Icons.receipt_long_rounded,
                           size: 16,
-                          color: Colors.white,
+                          color: AppColors.onPrimary,
                         ),
                         SizedBox(width: 5),
                         Text(
@@ -1290,14 +1290,14 @@ class _TableTabViewState extends State<TableTabView> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.onPrimary,
                           ),
                         ),
                         SizedBox(width: 3),
                         Icon(
                           Icons.arrow_forward_rounded,
                           size: 13,
-                          color: Colors.white,
+                          color: AppColors.onPrimary,
                         ),
                       ],
                     ),

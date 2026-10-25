@@ -12,7 +12,7 @@ abstract final class AppTheme {
   static ThemeData get lightTheme {
     final colorScheme = const ColorScheme.light(
       primary: AppColors.primary,
-      onPrimary: Colors.white,
+      onPrimary: AppColors.onPrimary,
       primaryContainer: AppColors.primaryContainerLight,
       onPrimaryContainer: AppColors.amber900,
       secondary: AppColors.secondary,
@@ -77,7 +77,7 @@ abstract final class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onPrimary,
           disabledBackgroundColor: AppColors.lightSurfaceSubtle,
           disabledForegroundColor: AppColors.lightTextMuted,
           elevation: 0,
@@ -87,7 +87,7 @@ abstract final class AppTheme {
           ),
           shape: RoundedRectangleBorder(borderRadius: AppSpacing.roundedMd),
           textStyle: textTheme.labelLarge?.copyWith(
-            color: Colors.white,
+            color: AppColors.onPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -97,7 +97,7 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: AppSpacing.roundedMd),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
@@ -344,7 +344,7 @@ abstract final class AppTheme {
       // Floating Action Button Theme
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.onPrimary,
         elevation: 3,
         focusElevation: 4,
         hoverElevation: 4,
@@ -407,7 +407,7 @@ abstract final class AppTheme {
   static ThemeData get darkTheme {
     final colorScheme = const ColorScheme.dark(
       primary: AppColors.primary,
-      onPrimary: Colors.white,
+      onPrimary: AppColors.onPrimary,
       primaryContainer: AppColors.primaryContainerDark,
       onPrimaryContainer: AppColors.amber200,
       secondary: AppColors.secondaryLight,
@@ -472,7 +472,7 @@ abstract final class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onPrimary,
           disabledBackgroundColor: AppColors.darkSurfaceSubtle,
           disabledForegroundColor: AppColors.darkTextMuted,
           elevation: 0,
@@ -482,7 +482,7 @@ abstract final class AppTheme {
           ),
           shape: RoundedRectangleBorder(borderRadius: AppSpacing.roundedMd),
           textStyle: textTheme.labelLarge?.copyWith(
-            color: Colors.white,
+            color: AppColors.onPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -492,7 +492,7 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: AppSpacing.roundedMd),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
@@ -741,7 +741,7 @@ abstract final class AppTheme {
       // Floating Action Button Theme
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.onPrimary,
         elevation: 3,
         focusElevation: 4,
         hoverElevation: 4,

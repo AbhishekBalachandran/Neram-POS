@@ -806,7 +806,7 @@ class _ProfileViewState extends State<ProfileView>
                             style: AppTypography.headlineFont(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.onPrimary,
                             ),
                           ),
                         ),
