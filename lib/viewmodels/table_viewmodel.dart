@@ -40,11 +40,8 @@ class TableViewModel extends ChangeNotifier {
   final Map<String, int> _currentTableCart = {};
   DiningMode _diningMode = DiningMode.dineIn;
   String _customerName = '';
-  final Map<String, String> _itemNotes = {
-    'dish_1': 'Extra crunchy, less oil',
-    'dish_2': 'Medium spice',
-    'dish_3': 'Served with hot croutons',
-  };
+  String _orderNote = '';
+  final Map<String, String> _itemNotes = {};
 
   // Getters
   List<TableModel> get tables => _tables;
@@ -56,6 +53,7 @@ class TableViewModel extends ChangeNotifier {
   Map<String, int> get currentTableCart => _currentTableCart;
   DiningMode get diningMode => _diningMode;
   String get customerName => _customerName;
+  String get orderNote => _orderNote;
   Map<String, String> get itemNotes => _itemNotes;
 
   TableModel get selectedTable => _tables.firstWhere(
@@ -166,6 +164,13 @@ class TableViewModel extends ChangeNotifier {
     }
   }
 
+  void deleteDish(DishModel dish) {
+    HapticService.selection();
+    _currentTableCart.remove(dish.id);
+    _itemNotes.remove(dish.id);
+    notifyListeners();
+  }
+
   void setDiningMode(DiningMode mode) {
     if (_diningMode != mode) {
       HapticService.selection();
@@ -176,6 +181,11 @@ class TableViewModel extends ChangeNotifier {
 
   void setCustomerName(String name) {
     _customerName = name;
+    notifyListeners();
+  }
+
+  void setOrderNote(String note) {
+    _orderNote = note;
     notifyListeners();
   }
 
@@ -214,12 +224,16 @@ class TableViewModel extends ChangeNotifier {
     );
     _activeOrders.insert(0, newOrder);
     _currentTableCart.clear();
+    _itemNotes.clear();
+    _orderNote = '';
     notifyListeners();
   }
 
   void clearCart() {
     HapticService.mediumImpact();
     _currentTableCart.clear();
+    _itemNotes.clear();
+    _orderNote = '';
     notifyListeners();
   }
 

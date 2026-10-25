@@ -5,6 +5,7 @@ import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/widgets/app_bottom_sheet.dart';
 import 'package:neram_pos/data/models/dish_model.dart';
+import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/table/widgets/all_tables_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -28,24 +29,48 @@ class CartDetailsModal extends StatefulWidget {
 
 class _CartDetailsModalState extends State<CartDetailsModal> {
   late final TextEditingController _guestController;
+  late final TextEditingController _orderNoteController;
+  final Map<String, TextEditingController> _dishNoteControllers = {};
 
   @override
   void initState() {
     super.initState();
     final tableViewModel = context.read<TableViewModel>();
     _guestController = TextEditingController(text: tableViewModel.customerName);
+    _orderNoteController = TextEditingController(text: tableViewModel.orderNote);
   }
 
   @override
   void dispose() {
     _guestController.dispose();
+    _orderNoteController.dispose();
+    for (final controller in _dishNoteControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
+  }
+
+  TextEditingController _getDishNoteController(String dishId, String initialText) {
+    return _dishNoteControllers.putIfAbsent(
+      dishId,
+      () => TextEditingController(text: initialText),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final tableViewModel = context.watch<TableViewModel>();
+    String staffName = 'Abhishek';
+    try {
+      final authViewModel = context.watch<AuthViewModel>();
+      if (authViewModel.currentUser?.name != null &&
+          authViewModel.currentUser!.name.isNotEmpty) {
+        staffName = authViewModel.currentUser!.name;
+      }
+    } catch (_) {
+      // In isolated tests where AuthViewModel is not injected
+    }
     final cartItems = tableViewModel.currentTableCart;
     final dishes = tableViewModel.dishes;
 
@@ -120,15 +145,58 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Current Order',
-                              style: AppTypography.headlineFont(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: isDark
-                                    ? AppColors.darkTextPrimary
-                                    : AppColors.lightTextPrimary,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Current Order',
+                                  style: AppTypography.headlineFont(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.lightTextPrimary,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 1.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.darkSurfaceContainerHigh
+                                        : AppColors.lightSurfaceSubtle,
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? AppColors.darkBorder
+                                          : AppColors.lightBorder,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.person_rounded,
+                                        size: 10,
+                                        color: AppColors.primary,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        staffName,
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark
+                                              ? AppColors.darkTextPrimary
+                                              : AppColors.lightTextPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 3),
                             Row(
@@ -256,7 +324,11 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   _buildCustomerNameInput(isDark, tableViewModel),
                   const SizedBox(height: AppSpacing.sm + 4),
 
-                  // 4. Ordered Dishes List with Steppers & Notes
+                  // 4. Order Note (Optional)
+                  _buildOrderNoteInput(isDark, tableViewModel),
+                  const SizedBox(height: AppSpacing.sm + 4),
+
+                  // 5. Ordered Dishes List with Steppers & Notes
                   _buildOrderedDishesList(
                     context,
                     isDark,
@@ -266,7 +338,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   ),
                   const SizedBox(height: AppSpacing.sm + 4),
 
-                  // 5. Dynamic Pricing & Bill Breakdown
+                  // 6. Dynamic Pricing & Bill Breakdown
                   _buildPricingBreakdown(isDark, tableViewModel),
                 ],
               ),
@@ -525,9 +597,6 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
     bool isDark,
     TableViewModel tableViewModel,
   ) {
-    // Only Indoor tables (T-01 to T-12)
-    final quickTables = tableViewModel.tables.map((t) => t.id).toList();
-
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -548,13 +617,13 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
               Row(
                 children: [
                   const Icon(
-                    Icons.chair_rounded,
+                    Icons.table_restaurant_rounded,
                     size: 15,
                     color: AppColors.primary,
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'INDOOR TABLE',
+                    'TABLE',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -580,66 +649,92 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
           ),
           const SizedBox(height: AppSpacing.sm),
 
-          // Quick Table Selection Pills with Grid browse button
+          // Table Dropdown Section with Grid browse button
           Row(
             children: [
               Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: quickTables.map((tid) {
-                      final isSelected = tableViewModel.selectedTableId == tid;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            onTap: () => tableViewModel.selectTable(tid),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : isDark
-                                    ? AppColors.darkSurfaceContainerLowest
-                                    : AppColors.lightSurface,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.primary
-                                      : isDark
-                                      ? AppColors.darkBorder
-                                      : AppColors.lightBorder,
+                child: Container(
+                  height: 42,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkSurfaceContainerLowest
+                        : AppColors.lightSurface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: tableViewModel.selectedTableId,
+                      isExpanded: true,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                      dropdownColor: isDark
+                          ? AppColors.darkSurfaceContainer
+                          : AppColors.lightSurface,
+                      borderRadius: BorderRadius.circular(12),
+                      items: tableViewModel.tables.map((table) {
+                        return DropdownMenuItem<String>(
+                          value: table.id,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: table.status.color,
+                                  shape: BoxShape.circle,
                                 ),
                               ),
-                              child: Text(
-                                tid,
+                              const SizedBox(width: 8),
+                              Text(
+                                table.id,
                                 style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w600,
-                                  color: isSelected
-                                      ? AppColors.onPrimary
-                                      : isDark
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark
                                       ? AppColors.darkTextPrimary
                                       : AppColors.lightTextPrimary,
                                 ),
                               ),
-                            ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '(${table.seats} Seats)',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                table.status.displayName,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: table.status.color,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                      onChanged: (newTableId) {
+                        if (newTableId != null) {
+                          tableViewModel.selectTable(newTableId);
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               // Open Full Grid Button
               Material(
                 color: Colors.transparent,
@@ -650,10 +745,8 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                     AllTablesBottomSheet.show(context);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
+                    height: 42,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: isDark
                           ? AppColors.darkSurfaceContainerHigh
@@ -667,7 +760,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.grid_view_rounded, size: 14),
+                        Icon(Icons.grid_view_rounded, size: 15),
                         SizedBox(width: 4),
                         Text(
                           'Grid',
@@ -813,7 +906,103 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. ORDERED DISHES LIST WITH STEPPERS & NOTES
+  // 4. ORDER NOTE (OPTIONAL)
+  // ---------------------------------------------------------------------------
+  Widget _buildOrderNoteInput(bool isDark, TableViewModel tableViewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSurfaceContainer
+            : AppColors.lightSurfaceSubtle,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.description_outlined,
+                size: 15,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'ORDER NOTE (OPTIONAL)',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            height: 38,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkSurfaceContainerLowest
+                  : AppColors.lightSurface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.sticky_note_2_rounded,
+                  size: 16,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: _orderNoteController,
+                    onChanged: tableViewModel.setOrderNote,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.lightTextPrimary,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: 'e.g. Serve appetizers first, allergic to nuts...',
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
+                      filled: false,
+                      fillColor: Colors.transparent,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5. ORDERED DISHES LIST WITH STEPPERS & NOTES
   // ---------------------------------------------------------------------------
   Widget _buildOrderedDishesList(
     BuildContext context,
@@ -897,7 +1086,10 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
               );
               final qty = entry.value;
               final lineTotal = dish.price * qty;
-              final note = tableViewModel.itemNotes[dish.id];
+              final noteController = _getDishNoteController(
+                dish.id,
+                tableViewModel.itemNotes[dish.id] ?? '',
+              );
 
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -917,8 +1109,8 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                       children: [
                         // Food Type Indicator
                         Container(
-                          width: 14,
-                          height: 14,
+                          width: 13,
+                          height: 13,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(3),
                             border: Border.all(
@@ -932,8 +1124,8 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                           ),
                           alignment: Alignment.center,
                           child: Container(
-                            width: 6,
-                            height: 6,
+                            width: 5.5,
+                            height: 5.5,
                             decoration: BoxDecoration(
                               color: dish.foodType == FoodType.veg
                                   ? const Color(0xFF10B981)
@@ -974,13 +1166,14 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                           ),
                         ),
 
-                        // Stepper [-] [qty] [+]
+                        // Compact Stepper [-] [qty] [+]
                         Container(
+                          height: 26,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? AppColors.darkSurfaceContainerLowest
                                 : AppColors.lightSurface,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: isDark
                                   ? AppColors.darkBorder
@@ -990,48 +1183,61 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                  minWidth: 26,
-                                  minHeight: 26,
-                                ),
-                                icon: const Icon(
-                                  Icons.remove_rounded,
-                                  size: 14,
-                                ),
-                                onPressed: () =>
-                                    tableViewModel.removeDish(dish),
-                              ),
-                              Text(
-                                '$qty',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: const BorderRadius.horizontal(
+                                    left: Radius.circular(8),
+                                  ),
+                                  onTap: () => tableViewModel.removeDish(dish),
+                                  child: const SizedBox(
+                                    width: 24,
+                                    height: 26,
+                                    child: Center(
+                                      child: Icon(Icons.remove_rounded, size: 13),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                  minWidth: 26,
-                                  minHeight: 26,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: Text(
+                                  '$qty',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                                icon: const Icon(Icons.add_rounded, size: 14),
-                                onPressed: () => tableViewModel.addDish(dish),
+                              ),
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: const BorderRadius.horizontal(
+                                    right: Radius.circular(8),
+                                  ),
+                                  onTap: () => tableViewModel.addDish(dish),
+                                  child: const SizedBox(
+                                    width: 24,
+                                    height: 26,
+                                    child: Center(
+                                      child: Icon(Icons.add_rounded, size: 13),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 8),
 
                         // Line Total
                         SizedBox(
-                          width: 52,
+                          width: 48,
                           child: Text(
                             '₹${lineTotal.toStringAsFixed(2)}',
                             textAlign: TextAlign.right,
                             style: AppTypography.headlineFont(
-                              fontSize: 13,
+                              fontSize: 12.5,
                               fontWeight: FontWeight.w700,
                               color: isDark
                                   ? AppColors.darkTextPrimary
@@ -1039,53 +1245,105 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                        const SizedBox(width: 4),
 
-                    // Special Notes Pill if available
-                    if (note != null) ...[
-                      const SizedBox(height: 4),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 22),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.darkSurfaceContainerLowest
-                                : AppColors.lightSurface,
+                        // Delete Dish Button
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: isDark
-                                  ? AppColors.darkBorder
-                                  : AppColors.lightBorder,
+                            onTap: () {
+                              _dishNoteControllers.remove(dish.id)?.dispose();
+                              tableViewModel.deleteDish(dish);
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(4.0),
+                              child: Icon(
+                                Icons.delete_outline_rounded,
+                                size: 17,
+                                color: AppColors.error,
+                              ),
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.edit_note_rounded,
-                                size: 12,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                note,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.lightTextSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Dish Note Inline Input
+                    Container(
+                      height: 28,
+                      margin: const EdgeInsets.only(left: 21),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkSurfaceContainerLowest
+                            : AppColors.lightSurface,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: isDark
+                              ? AppColors.darkBorder.withValues(alpha: 0.7)
+                              : AppColors.lightBorder,
                         ),
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit_note_rounded,
+                            size: 14,
+                            color: isDark
+                                ? AppColors.darkTextMuted
+                                : AppColors.lightTextMuted,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: TextField(
+                              controller: noteController,
+                              onChanged: (val) =>
+                                  tableViewModel.setItemNote(dish.id, val),
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.lightTextPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                hintText:
+                                    'Add note (e.g. less spicy, no onion)...',
+                                hintStyle: TextStyle(
+                                  fontSize: 10.5,
+                                  color: isDark
+                                      ? AppColors.darkTextMuted
+                                      : AppColors.lightTextMuted,
+                                ),
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                focusedErrorBorder: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ),
+                          if (noteController.text.isNotEmpty)
+                            GestureDetector(
+                              onTap: () {
+                                noteController.clear();
+                                tableViewModel.setItemNote(dish.id, '');
+                              },
+                              child: Icon(
+                                Icons.clear_rounded,
+                                size: 12,
+                                color: isDark
+                                    ? AppColors.darkTextMuted
+                                    : AppColors.lightTextMuted,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               );

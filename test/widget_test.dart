@@ -410,11 +410,23 @@ void main() {
 
     // Verify Animated Order Sheet components
     expect(find.text('Current Order'), findsOneWidget);
+    expect(find.text('Abhishek'), findsWidgets);
     expect(find.text('DINING MODE'), findsOneWidget);
-    expect(find.text('INDOOR TABLE'), findsOneWidget);
+    expect(find.text('TABLE'), findsOneWidget);
+    expect(find.text('INDOOR TABLE'), findsNothing);
     expect(find.text('CUSTOMER / GUEST NAME (OPTIONAL)'), findsOneWidget);
+    expect(find.text('ORDER NOTE (OPTIONAL)'), findsOneWidget);
     expect(find.text('ORDERED DISHES'), findsOneWidget);
+    expect(find.byIcon(Icons.delete_outline_rounded), findsWidgets);
+    expect(find.text('Add note (e.g. less spicy, no onion)...'), findsWidgets);
     expect(find.text('Send to Kitchen (KOT)'), findsOneWidget);
+
+    // Enter order note
+    await tester.enterText(
+      find.widgetWithText(TextField, 'e.g. Serve appetizers first, allergic to nuts...'),
+      'Serve soup hot',
+    );
+    await tester.pumpAndSettle();
 
     // Confirm & Fire to Kitchen
     await tester.tap(find.text('Send to Kitchen (KOT)'));
