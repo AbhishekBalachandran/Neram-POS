@@ -10,7 +10,7 @@ enum StockCategory {
   String get displayName {
     switch (this) {
       case StockCategory.foodRaw:
-        return 'Stock (Food & Raw)';
+        return 'Stock';
       case StockCategory.consumables:
         return 'Consumables';
       case StockCategory.smallEquipment:
@@ -117,8 +117,10 @@ class StockItemModel {
 
   /// Calculated stock percentage capped for display.
   double get percentageRemaining =>
-      ((minLevel > 0 ? (currentStock / minLevel) * 100 : 100).clamp(0.0, 999.0))
-          .toDouble();
+      ((minLevel > 0 ? (currentStock / minLevel) * 100 : 100).clamp(
+        0.0,
+        999.0,
+      )).toDouble();
 
   /// Total valuation of current on-hand stock.
   double get totalValue => currentStock * costPerUnit;
@@ -131,7 +133,8 @@ class StockItemModel {
     return StockStatus.optimal;
   }
 
-  bool get isLowStock => status == StockStatus.low || status == StockStatus.critical;
+  bool get isLowStock =>
+      status == StockStatus.low || status == StockStatus.critical;
 
   /// Display helper for packets count
   int get displayPacketsCount {

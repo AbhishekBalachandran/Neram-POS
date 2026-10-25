@@ -1011,9 +1011,32 @@ class _StockTabViewState extends State<StockTabView> {
           ),
           _buildKeyValueRow(
             label: 'In Stock',
-            value: '$packetsLabel, ${item.displayTotalAmount}, ${item.displayAmountPerPacket}',
             labelColor: secondaryTextColor,
-            valueColor: item.isLowStock ? AppColors.error : primaryTextColor,
+            valueWidget: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$packetsLabel ',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: item.isLowStock
+                          ? AppColors.error
+                          : primaryTextColor,
+                    ),
+                  ),
+                  TextSpan(
+                    text: '${item.displayTotalAmount} total . ${item.displayAmountPerPacket}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: secondaryTextColor,
+                    ),
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.right,
+            ),
           ),
           _buildKeyValueRow(
             label: 'Cost',
@@ -1121,9 +1144,10 @@ class _StockTabViewState extends State<StockTabView> {
   /// Reusable Key-Value item row with spaceBetween alignment and no truncation
   Widget _buildKeyValueRow({
     required String label,
-    required String value,
+    String? value,
+    Widget? valueWidget,
     required Color labelColor,
-    required Color valueColor,
+    Color? valueColor,
     FontWeight valueWeight = FontWeight.w600,
   }) {
     return Padding(
@@ -1143,16 +1167,17 @@ class _StockTabViewState extends State<StockTabView> {
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: valueWeight,
-                color: valueColor,
-                height: 1.35,
-              ),
-            ),
+            child: valueWidget ??
+                Text(
+                  value ?? '',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: valueWeight,
+                    color: valueColor,
+                    height: 1.35,
+                  ),
+                ),
           ),
         ],
       ),
