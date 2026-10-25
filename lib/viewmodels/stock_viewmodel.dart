@@ -304,7 +304,7 @@ class StockViewModel extends BaseViewModel {
         id: 'stk_02',
         name: 'Full Cream Cow Milk',
         category: StockCategory.foodRaw,
-        unit: 'Litre',
+        unit: 'l',
         currentStock: 6.0,
         minLevel: 20.0,
         costPerUnit: 68.00,

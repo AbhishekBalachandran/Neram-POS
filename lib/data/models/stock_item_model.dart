@@ -136,6 +136,67 @@ class StockItemModel {
   bool get isLowStock =>
       status == StockStatus.low || status == StockStatus.critical;
 
+  /// Returns a clean, abbreviated short form of the unit (e.g. 'l', 'ml', 'g', 'kg', etc.)
+  String get shortUnit {
+    final clean = unit.trim().toLowerCase();
+    if (clean == 'litre' ||
+        clean == 'litres' ||
+        clean == 'liter' ||
+        clean == 'liters' ||
+        clean == 'l') {
+      return 'l';
+    }
+    if (clean == 'millilitre' ||
+        clean == 'millilitres' ||
+        clean == 'milliliter' ||
+        clean == 'milliliters' ||
+        clean == 'ml') {
+      return 'ml';
+    }
+    if (clean == 'gram' || clean == 'grams' || clean == 'g' || clean == 'gm') {
+      return 'g';
+    }
+    if (clean == 'kilogram' ||
+        clean == 'kilograms' ||
+        clean == 'kg' ||
+        clean == 'kgs') {
+      return 'kg';
+    }
+    if (clean.contains('1 kg') || clean.contains('kg')) {
+      return 'kg';
+    }
+    if (clean.contains('500g') ||
+        clean.contains('800g') ||
+        clean.contains('gram')) {
+      return 'g';
+    }
+    if (clean.contains('pieces') ||
+        clean.contains('pcs') ||
+        clean.contains('pc') ||
+        clean.contains('piece')) {
+      return 'pcs';
+    }
+    if (clean.contains('bottle')) {
+      return 'btl';
+    }
+    if (clean.contains('carton')) {
+      return 'ctn';
+    }
+    if (clean.contains('pack')) {
+      return 'pk';
+    }
+    if (clean.contains('box')) {
+      return 'box';
+    }
+    if (clean.contains('set')) {
+      return 'set';
+    }
+    if (clean.contains('pair')) {
+      return 'pr';
+    }
+    return unit.toLowerCase();
+  }
+
   /// Display helper for packets count
   int get displayPacketsCount {
     if (packetsCount != null) return packetsCount!;
@@ -145,23 +206,23 @@ class StockItemModel {
     return currentStock > 0 ? currentStock.ceil() : 0;
   }
 
-  /// Display helper for formatted total amount with unit
+  /// Display helper for formatted total amount with short unit
   String get displayTotalAmount {
     final formattedVal = currentStock % 1 == 0
         ? currentStock.toInt().toString()
         : currentStock.toStringAsFixed(1);
-    return '$formattedVal $unit';
+    return '$formattedVal $shortUnit';
   }
 
-  /// Display helper for amount per packet
+  /// Display helper for amount per packet with short unit
   String get displayAmountPerPacket {
     if (amountPerPacket != null) {
       final formatted = amountPerPacket! % 1 == 0
           ? amountPerPacket!.toInt().toString()
           : amountPerPacket!.toStringAsFixed(1);
-      return '$formatted $unit each';
+      return '$formatted $shortUnit each';
     }
-    return '$unit each';
+    return '$shortUnit each';
   }
 
   /// Display helper for cost per packet

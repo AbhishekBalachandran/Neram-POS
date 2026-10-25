@@ -1040,7 +1040,7 @@ class _StockTabViewState extends State<StockTabView> {
           ),
           _buildKeyValueRow(
             label: 'Cost',
-            value: '₹${item.displayCostPerPacket.toStringAsFixed(2)} / packet, ₹${item.costPerUnit.toStringAsFixed(2)} / ${item.unit}',
+            value: '₹${item.displayCostPerPacket.toStringAsFixed(2)} / packet, ₹${item.costPerUnit.toStringAsFixed(2)} / ${item.shortUnit}',
             labelColor: secondaryTextColor,
             valueColor: primaryTextColor,
           ),
