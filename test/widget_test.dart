@@ -89,7 +89,9 @@ void main() {
           create: (_) => AuthViewModel(authRepository: authRepository),
         ),
         ChangeNotifierProvider<TableViewModel>(create: (_) => TableViewModel()),
-        ChangeNotifierProvider<LeavesViewModel>(create: (_) => LeavesViewModel()),
+        ChangeNotifierProvider<LeavesViewModel>(
+          create: (_) => LeavesViewModel(),
+        ),
         ChangeNotifierProvider<StockViewModel>(create: (_) => StockViewModel()),
       ],
       child: const NeramPosApp(),
@@ -448,7 +450,10 @@ void main() {
 
     // Enter order note
     await tester.enterText(
-      find.widgetWithText(TextField, 'e.g. Serve appetizers first, allergic to nuts...'),
+      find.widgetWithText(
+        TextField,
+        'e.g. Serve appetizers first, allergic to nuts...',
+      ),
       'Serve soup hot',
     );
     await tester.pumpAndSettle();
@@ -460,38 +465,39 @@ void main() {
     expect(find.text('Current Order'), findsNothing);
   });
 
-  testWidgets('TableTabView hides top section on drag up and shows on drag down', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<TableViewModel>(
-            create: (_) => TableViewModel(),
-          ),
-          ChangeNotifierProvider<LeavesViewModel>(
-            create: (_) => LeavesViewModel(),
-          ),
-          ChangeNotifierProvider<StockViewModel>(
-            create: (_) => StockViewModel(),
-          ),
-        ],
-        child: const MaterialApp(home: Scaffold(body: TableTabView())),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('ALL TABLES (12)'), findsOneWidget);
+  testWidgets(
+    'TableTabView hides top section on drag up and shows on drag down',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<TableViewModel>(
+              create: (_) => TableViewModel(),
+            ),
+            ChangeNotifierProvider<LeavesViewModel>(
+              create: (_) => LeavesViewModel(),
+            ),
+            ChangeNotifierProvider<StockViewModel>(
+              create: (_) => StockViewModel(),
+            ),
+          ],
+          child: const MaterialApp(home: Scaffold(body: TableTabView())),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('ALL TABLES (12)'), findsOneWidget);
 
-    // Drag UP (scroll down into dishes) -> top section should hide
-    await tester.drag(find.byType(GridView), const Offset(0, -150));
-    await tester.pumpAndSettle();
-    expect(find.text('ALL TABLES (12)'), findsNothing);
+      // Drag UP (scroll down into dishes) -> top section should hide
+      await tester.drag(find.byType(GridView), const Offset(0, -150));
+      await tester.pumpAndSettle();
+      expect(find.text('ALL TABLES (12)'), findsNothing);
 
-    // Drag DOWN (scroll up towards top) -> top section should show
-    await tester.drag(find.byType(GridView), const Offset(0, 150));
-    await tester.pumpAndSettle();
-    expect(find.text('ALL TABLES (12)'), findsOneWidget);
-  });
+      // Drag DOWN (scroll up towards top) -> top section should show
+      await tester.drag(find.byType(GridView), const Offset(0, 150));
+      await tester.pumpAndSettle();
+      expect(find.text('ALL TABLES (12)'), findsOneWidget);
+    },
+  );
 
   testWidgets('HomeView opens Stitch App Drawer and Change Password Dialog', (
     WidgetTester tester,
@@ -580,85 +586,86 @@ void main() {
     expect(find.byType(ProfileView), findsNothing);
   });
 
-  testWidgets('LeavesTabView renders shift punch station, metrics gauge, and applies leave', (
-    WidgetTester tester,
-  ) async {
-    final prefs = await SharedPreferences.getInstance();
-    final authRepo = FakeAuthRepository();
-    final authViewModel = AuthViewModel(authRepository: authRepo);
-    await authViewModel.login(username: 'abhishek', password: '123456');
+  testWidgets(
+    'LeavesTabView renders shift punch station, metrics gauge, and applies leave',
+    (WidgetTester tester) async {
+      final prefs = await SharedPreferences.getInstance();
+      final authRepo = FakeAuthRepository();
+      final authViewModel = AuthViewModel(authRepository: authRepo);
+      await authViewModel.login(username: 'abhishek', password: '123456');
 
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<ThemeProvider>(
-            create: (_) => ThemeProvider(prefs: prefs),
-          ),
-          ChangeNotifierProvider<AuthViewModel>.value(value: authViewModel),
-          ChangeNotifierProvider<TableViewModel>(
-            create: (_) => TableViewModel(),
-          ),
-          ChangeNotifierProvider<LeavesViewModel>(
-            create: (_) => LeavesViewModel(),
-          ),
-          ChangeNotifierProvider<StockViewModel>(
-            create: (_) => StockViewModel(),
-          ),
-        ],
-        child: const MaterialApp(home: HomeView()),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(prefs: prefs),
+            ),
+            ChangeNotifierProvider<AuthViewModel>.value(value: authViewModel),
+            ChangeNotifierProvider<TableViewModel>(
+              create: (_) => TableViewModel(),
+            ),
+            ChangeNotifierProvider<LeavesViewModel>(
+              create: (_) => LeavesViewModel(),
+            ),
+            ChangeNotifierProvider<StockViewModel>(
+              create: (_) => StockViewModel(),
+            ),
+          ],
+          child: const MaterialApp(home: HomeView()),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    // Tap Leaves tab in Bottom Navigation Bar (Tab 2)
-    await tester.tap(find.text('LEAVES'));
-    await tester.pumpAndSettle();
+      // Tap Leaves tab in Bottom Navigation Bar (Tab 2)
+      await tester.tap(find.text('LEAVES'));
+      await tester.pumpAndSettle();
 
-    // Verify LeavesTabView is active
-    expect(find.byType(LeavesTabView), findsOneWidget);
-    expect(find.text('SHIFT TIMER'), findsOneWidget);
-    expect(find.text('Shift & Duty Roster'), findsOneWidget);
-    expect(find.text('MONTHLY ATTENDANCE RATE'), findsOneWidget);
-    expect(find.text('ELIGIBLE WORK DAYS'), findsOneWidget);
-    expect(find.text('LEAVES TAKEN'), findsOneWidget);
-    expect(find.text('Leave Audit & Team Log'), findsOneWidget);
+      // Verify LeavesTabView is active
+      expect(find.byType(LeavesTabView), findsOneWidget);
+      expect(find.text('SHIFT TIMER'), findsOneWidget);
+      expect(find.text('Shift & Duty Roster'), findsOneWidget);
+      expect(find.text('MONTHLY ATTENDANCE RATE'), findsOneWidget);
+      expect(find.text('ELIGIBLE WORK DAYS'), findsOneWidget);
+      expect(find.text('LEAVES TAKEN'), findsOneWidget);
+      expect(find.text('Leave Audit & Team Log'), findsOneWidget);
 
-    // Verify Check In / Check Out action button
-    expect(find.text('Check In'), findsOneWidget);
-    await tester.tap(find.text('Check In'));
-    await tester.pumpAndSettle();
+      // Verify Check In / Check Out action button
+      expect(find.text('Check In'), findsOneWidget);
+      await tester.tap(find.text('Check In'));
+      await tester.pumpAndSettle();
 
-    // Tap Apply Leave button
-    await tester.tap(find.text('Apply Leave'));
-    await tester.pumpAndSettle();
+      // Tap Apply Leave button
+      await tester.tap(find.text('Apply Leave'));
+      await tester.pumpAndSettle();
 
-    // Verify ApplyLeaveModal opens
-    expect(find.byType(ApplyLeaveModal), findsOneWidget);
-    expect(find.text('Apply for Leave'), findsOneWidget);
-    expect(find.text('Submit Request'), findsOneWidget);
+      // Verify ApplyLeaveModal opens
+      expect(find.byType(ApplyLeaveModal), findsOneWidget);
+      expect(find.text('Apply for Leave'), findsOneWidget);
+      expect(find.text('Submit Request'), findsOneWidget);
 
-    // Enter absence reason
-    final reasonField = find.byType(TextField);
-    await tester.enterText(reasonField, 'Family vacation planned');
-    await tester.pump();
+      // Enter absence reason
+      final reasonField = find.byType(TextField);
+      await tester.enterText(reasonField, 'Family vacation planned');
+      await tester.pump();
 
-    // Submit Request
-    await tester.tap(find.text('Submit Request'));
-    await tester.pumpAndSettle();
+      // Submit Request
+      await tester.tap(find.text('Submit Request'));
+      await tester.pumpAndSettle();
 
-    // Modal should close and the new leave application should appear
-    expect(find.byType(ApplyLeaveModal), findsNothing);
-    expect(find.text('Family vacation planned'), findsOneWidget);
-  });
+      // Modal should close and the new leave application should appear
+      expect(find.byType(ApplyLeaveModal), findsNothing);
+      expect(find.text('Family vacation planned'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'TableTabView and LeavesTabView render with zero overflow on narrow mobile and tablet screens',
     (WidgetTester tester) async {
       final prefs = await SharedPreferences.getInstance();
       final screenSizes = [
-        const Size(320, 568),  // Smallest compact phone (iPhone SE 1st gen)
-        const Size(360, 640),  // Standard small budget Android
-        const Size(393, 852),  // Modern phone (iPhone 16)
+        const Size(320, 568), // Smallest compact phone (iPhone SE 1st gen)
+        const Size(360, 640), // Standard small budget Android
+        const Size(393, 852), // Modern phone (iPhone 16)
         const Size(768, 1024), // Portrait Tablet (iPad)
         const Size(1024, 768), // Landscape Tablet
       ];
@@ -685,11 +692,7 @@ void main() {
                 create: (_) => LeavesViewModel(),
               ),
             ],
-            child: const MaterialApp(
-              home: Scaffold(
-                body: TableTabView(),
-              ),
-            ),
+            child: const MaterialApp(home: Scaffold(body: TableTabView())),
           ),
         );
         await tester.pumpAndSettle();
@@ -709,11 +712,7 @@ void main() {
                 create: (_) => LeavesViewModel(),
               ),
             ],
-            child: const MaterialApp(
-              home: Scaffold(
-                body: LeavesTabView(),
-              ),
-            ),
+            child: const MaterialApp(home: Scaffold(body: LeavesTabView())),
           ),
         );
         await tester.pumpAndSettle();
@@ -765,9 +764,7 @@ void main() {
               create: (_) => StockViewModel(),
             ),
           ],
-          child: const MaterialApp(
-            home: ProfileView(),
-          ),
+          child: const MaterialApp(home: ProfileView()),
         ),
       );
       await tester.pumpAndSettle();
@@ -800,10 +797,16 @@ void main() {
       expect(find.text('Update Quick PIN'), findsNothing);
 
       // Scroll down and verify remaining sections
-      await tester.scrollUntilVisible(find.text('Personal & Employment Details'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Personal & Employment Details'),
+        200,
+      );
       expect(find.text('Personal & Employment Details'), findsOneWidget);
 
-      await tester.scrollUntilVisible(find.text('Bank Account & Payout Details'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Bank Account & Payout Details'),
+        200,
+      );
       expect(find.text('Bank Account & Payout Details'), findsOneWidget);
 
       await tester.scrollUntilVisible(find.text('Log Out of Terminal'), 200);
@@ -960,12 +963,23 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Quantity to Issue *'), findsNothing);
 
-      // Verify and tap Alert Mgr on first item
+      // Verify and tap Alert Mgr on first item to open AlertManagerModal
       expect(find.text('Alert Mgr'), findsWidgets);
       await tester.ensureVisible(find.text('Alert Mgr').first);
       await tester.tap(find.text('Alert Mgr').first);
       await tester.pumpAndSettle();
-      expect(find.textContaining('Alert Manager for'), findsOneWidget);
+
+      // Verify AlertManagerModal content
+      expect(find.text('Notify the manager'), findsOneWidget);
+      expect(find.text('Current quantity'), findsOneWidget);
+      expect(find.text('Minimum quantity'), findsOneWidget);
+      expect(find.text('Optional message to the manager'), findsOneWidget);
+      expect(find.text('Send alert'), findsOneWidget);
+
+      // Close AlertManagerModal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('Notify the manager'), findsNothing);
 
       // Scroll down until Weekly Kitchen Stocktake and Start Audit are visible
       await tester.scrollUntilVisible(
@@ -988,32 +1002,35 @@ void main() {
     },
   );
 
-  test('TableViewModel transferTable successfully shifts active order and updates table statuses', () {
-    final vm = TableViewModel();
-    // T-01 is occupied/preparing with active order #ORD-101
-    final table1Before = vm.tables.firstWhere((t) => t.id == 'T-01');
-    final table3Before = vm.tables.firstWhere((t) => t.id == 'T-03');
-    expect(table1Before.status, isNot(TableStatus.vacant));
-    expect(table3Before.status, TableStatus.vacant);
+  test(
+    'TableViewModel transferTable successfully shifts active order and updates table statuses',
+    () {
+      final vm = TableViewModel();
+      // T-01 is occupied/preparing with active order #ORD-101
+      final table1Before = vm.tables.firstWhere((t) => t.id == 'T-01');
+      final table3Before = vm.tables.firstWhere((t) => t.id == 'T-03');
+      expect(table1Before.status, isNot(TableStatus.vacant));
+      expect(table3Before.status, TableStatus.vacant);
 
-    // Transfer from T-01 to T-03
-    vm.transferTable(
-      fromTableId: 'T-01',
-      toTableId: 'T-03',
-      reason: 'Guest requested window seat',
-    );
+      // Transfer from T-01 to T-03
+      vm.transferTable(
+        fromTableId: 'T-01',
+        toTableId: 'T-03',
+        reason: 'Guest requested window seat',
+      );
 
-    final table1After = vm.tables.firstWhere((t) => t.id == 'T-01');
-    final table3After = vm.tables.firstWhere((t) => t.id == 'T-03');
+      final table1After = vm.tables.firstWhere((t) => t.id == 'T-01');
+      final table3After = vm.tables.firstWhere((t) => t.id == 'T-03');
 
-    expect(table1After.status, TableStatus.vacant);
-    expect(table1After.total, 0.0);
-    expect(table3After.status, table1Before.status);
-    expect(table3After.total, table1Before.total);
+      expect(table1After.status, TableStatus.vacant);
+      expect(table1After.total, 0.0);
+      expect(table3After.status, table1Before.status);
+      expect(table3After.total, table1Before.total);
 
-    // Order #ORD-2849 should now be attached to T-03
-    final order = vm.activeOrders.firstWhere((o) => o.id == '#ORD-2849');
-    expect(order.tableId, 'T-03');
-    expect(order.tableName, table3After.name);
-  });
+      // Order #ORD-2849 should now be attached to T-03
+      final order = vm.activeOrders.firstWhere((o) => o.id == '#ORD-2849');
+      expect(order.tableId, 'T-03');
+      expect(order.tableName, table3After.name);
+    },
+  );
 }
