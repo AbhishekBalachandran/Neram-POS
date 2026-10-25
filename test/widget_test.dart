@@ -943,16 +943,22 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Add New Stock Item'), findsNothing);
 
-      // Verify and tap Issue Stock on first item
+      // Verify and tap Issue Stock on first item to open IssueStockModal
       expect(find.text('Issue Stock'), findsWidgets);
       await tester.ensureVisible(find.text('Issue Stock').first);
       await tester.tap(find.text('Issue Stock').first);
       await tester.pumpAndSettle();
-      expect(find.textContaining('Issue Stock:'), findsOneWidget);
 
-      // Dismiss SnackBar before tapping Alert Mgr
-      tester.binding.scheduleFrame();
-      await tester.pump(const Duration(seconds: 2));
+      // Verify IssueStockModal content
+      expect(find.text('Quantity to Issue *'), findsOneWidget);
+      expect(find.text('Why'), findsOneWidget);
+      expect(find.text('Reason / notes'), findsOneWidget);
+      expect(find.text('Usage (kitchen / counter)'), findsOneWidget);
+
+      // Close IssueStockModal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('Quantity to Issue *'), findsNothing);
 
       // Verify and tap Alert Mgr on first item
       expect(find.text('Alert Mgr'), findsWidgets);

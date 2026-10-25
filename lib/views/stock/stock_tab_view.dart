@@ -5,6 +5,7 @@ import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/utils/currency_formatter.dart';
 import 'package:neram_pos/data/models/stock_item_model.dart';
 import 'package:neram_pos/viewmodels/stock_viewmodel.dart';
+import 'package:neram_pos/views/stock/widgets/issue_stock_modal.dart';
 import 'package:neram_pos/views/stock/widgets/new_stock_item_modal.dart';
 import 'package:neram_pos/views/stock/widgets/stock_audit_modal.dart';
 import 'package:provider/provider.dart';
@@ -1066,13 +1067,7 @@ class _StockTabViewState extends State<StockTabView> {
               FilledButton.icon(
                 onPressed: () {
                   HapticService.selection();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Issue Stock: ${item.name}'),
-                      duration: const Duration(seconds: 1),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
+                  IssueStockModal.show(context, item);
                 },
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
