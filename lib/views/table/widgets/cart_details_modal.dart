@@ -240,20 +240,6 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 6),
-                                Flexible(
-                                  child: Text(
-                                    'Review & dispatch to kitchen',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      color: isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.lightTextSecondary,
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ],
@@ -424,7 +410,6 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   mode: DiningMode.dineIn,
                   icon: Icons.table_restaurant_rounded,
                   label: 'Table',
-                  sub: 'Indoor Table',
                   isSelected: tableViewModel.diningMode == DiningMode.dineIn,
                   onTap: () => tableViewModel.setDiningMode(DiningMode.dineIn),
                 ),
@@ -435,7 +420,6 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   mode: DiningMode.outdoor,
                   icon: Icons.deck_rounded,
                   label: 'Outdoor',
-                  sub: 'By Name',
                   isSelected: tableViewModel.diningMode == DiningMode.outdoor,
                   onTap: () => tableViewModel.setDiningMode(DiningMode.outdoor),
                 ),
@@ -446,7 +430,6 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   mode: DiningMode.takeaway,
                   icon: Icons.shopping_bag_rounded,
                   label: 'Takeaway',
-                  sub: 'By Name',
                   isSelected: tableViewModel.diningMode == DiningMode.takeaway,
                   onTap: () =>
                       tableViewModel.setDiningMode(DiningMode.takeaway),
@@ -525,7 +508,6 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
     required DiningMode mode,
     required IconData icon,
     required String label,
-    required String sub,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
@@ -536,7 +518,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
@@ -550,36 +532,21 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                   ]
                 : null,
           ),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    icon,
-                    size: 15,
-                    color: isSelected ? AppColors.onPrimary : AppColors.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: isSelected ? AppColors.onPrimary : null,
-                    ),
-                  ),
-                ],
+              Icon(
+                icon,
+                size: 15,
+                color: isSelected ? AppColors.onPrimary : AppColors.primary,
               ),
-              const SizedBox(height: 1),
+              const SizedBox(width: 5),
               Text(
-                sub,
+                label,
                 style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected
-                      ? AppColors.onPrimary.withValues(alpha: 0.8)
-                      : const Color(0xFF94A3B8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: isSelected ? AppColors.onPrimary : null,
                 ),
               ),
             ],
