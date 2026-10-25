@@ -607,7 +607,7 @@ class NeramDrawer extends StatelessWidget {
                                     height: 22,
                                     decoration: BoxDecoration(
                                       color: isDark
-                                          ? const Color(0xFF5F1900)
+                                          ? AppColors.primaryContainerDark
                                           : Colors.white,
                                       shape: BoxShape.circle,
                                       boxShadow: const [

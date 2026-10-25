@@ -639,7 +639,7 @@ class _TableTabViewState extends State<TableTabView> {
               borderRadius: BorderRadius.circular(14),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x40FF6B35),
+                  color: Color(0x40F59E0B),
                   blurRadius: 8,
                   offset: Offset(0, 2),
                 ),
@@ -1006,7 +1006,7 @@ class _TableTabViewState extends State<TableTabView> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x33FF6B35),
+                        color: Color(0x33F59E0B),
                         blurRadius: 6,
                         offset: Offset(0, 2),
                       ),
@@ -1270,7 +1270,7 @@ class _TableTabViewState extends State<TableTabView> {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: const [
                         BoxShadow(
-                          color: Color(0x4DFF6B35),
+                          color: Color(0x4DF59E0B),
                           blurRadius: 8,
                           offset: Offset(0, 2),
                         ),

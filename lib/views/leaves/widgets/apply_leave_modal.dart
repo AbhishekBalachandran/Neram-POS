@@ -501,7 +501,7 @@ class _ApplyLeaveModalState extends State<ApplyLeaveModal> {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: const [
                                 BoxShadow(
-                                  color: Color(0x4DFF6B35),
+                                  color: Color(0x4DF59E0B),
                                   blurRadius: 12,
                                   offset: Offset(0, 3),
                                 ),

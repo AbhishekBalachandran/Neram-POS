@@ -16,7 +16,7 @@ import 'package:neram_pos/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
 /// Staff authentication screen updated to match the Stitch "Amber Hearth POS" design system.
-/// Implements radiant flame amber (#FF6B35), obsidian card surfaces (#1E1F24 / #0D0E13),
+/// Implements radiant amber (#F59E0B), obsidian card surfaces (#1E1F24 / #0D0E13),
 /// Space Grotesk / Plus Jakarta Sans typography, and floating toast notifications.
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -152,10 +152,10 @@ class _LoginViewState extends State<LoginView>
                       radius: 0.95,
                       colors: isDark
                           ? const [
-                              Color(0x24FF6B35), // Subtle flame amber aura
+                              Color(0x24F59E0B), // Subtle amber aura
                               Colors.transparent,
                             ]
-                          : const [Color(0x15FF6B35), Colors.transparent],
+                          : const [Color(0x15F59E0B), Colors.transparent],
                     ),
                   ),
                 ),

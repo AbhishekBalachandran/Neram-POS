@@ -384,7 +384,7 @@ class LeavesTabView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: const [
                           BoxShadow(
-                            color: Color(0x40FF6B35),
+                            color: Color(0x40F59E0B),
                             blurRadius: 10,
                             offset: Offset(0, 3),
                           ),

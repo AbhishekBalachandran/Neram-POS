@@ -86,7 +86,7 @@ class _ProfileViewState extends State<ProfileView>
         duration: const Duration(seconds: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0x33FF6B35)),
+          side: const BorderSide(color: Color(0x33F59E0B)),
         ),
       ),
     );
@@ -788,13 +788,13 @@ class _ProfileViewState extends State<ProfileView>
                             color: AppColors.secondaryContainer,
                             borderRadius: BorderRadius.circular(18),
                             gradient: const LinearGradient(
-                              colors: [Color(0xFFE85D04), Color(0xFFFF6B35)],
+                              colors: [Color(0xFFD97706), Color(0xFFF59E0B)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             boxShadow: const [
                               BoxShadow(
-                                color: Color(0x33FF6B35),
+                                color: Color(0x33F59E0B),
                                 blurRadius: 10,
                                 offset: Offset(0, 3),
                               ),

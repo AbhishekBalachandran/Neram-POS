@@ -19,7 +19,7 @@ abstract final class AppDecorations {
 
   // Amber glow for active/selected items
   static const List<BoxShadow> primaryGlow = [
-    BoxShadow(color: Color(0x4DFF6B35), blurRadius: 20, offset: Offset(0, 6)),
+    BoxShadow(color: Color(0x4DF59E0B), blurRadius: 20, offset: Offset(0, 6)),
   ];
 
   /// Standard card decoration based on brightness.

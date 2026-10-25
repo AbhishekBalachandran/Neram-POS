@@ -4,7 +4,7 @@ import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 
 /// Reusable branding title widget matching the Stitch "Amber Hearth POS" identity.
-/// Top: NERAM in high-contrast text and POS highlighted in radiant primary amber (#FF6B35).
+/// Top: NERAM in high-contrast text and POS highlighted in radiant primary amber (#F59E0B).
 /// Bottom: RESTAURANT & CAFE MANAGEMENT in uppercase with wide letter-spacing.
 class NeramBrandTitle extends StatelessWidget {
   const NeramBrandTitle({

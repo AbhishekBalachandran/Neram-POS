@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 /// Comprehensive color tokens for NERAM POS.
-/// Built on the "Amber Hearth POS" Stitch design system with radiant flame amber (#FF6B35),
+/// Built on the "Amber Hearth POS" Stitch design system with radiant amber (#F59E0B),
 /// deep obsidian canvas (#121318), and tiered slate containers.
 abstract final class AppColors {
-  // Brand Primary & Radiant Flame Amber (from Stitch design system)
-  static const Color primary = Color(0xFFFF6B35);
-  static const Color primaryLight = Color(0xFFFFB59D);
-  static const Color primaryDark = Color(0xFFE85D04);
-  static const Color primaryContainer = Color(0xFFFF6B35);
-  static const Color onPrimaryContainer = Color(0xFF5F1900);
-  static const Color primaryContainerLight = Color(0xFFFFE0D6);
-  static const Color primaryContainerDark = Color(0xFF5F1900);
+  // Brand Primary & Radiant Amber (Primary: #F59E0B)
+  static const Color primary = Color(0xFFF59E0B);
+  static const Color primaryLight = Color(0xFFFCD34D);
+  static const Color primaryDark = Color(0xFFD97706);
+  static const Color primaryContainer = Color(0xFFF59E0B);
+  static const Color onPrimaryContainer = Color(0xFF78350F);
+  static const Color primaryContainerLight = Color(0xFFFEF3C7);
+  static const Color primaryContainerDark = Color(0xFF78350F);
 
   // Amber Reference Tones
   static const Color amber50 = Color(0xFFFFFBEB);
@@ -51,7 +51,7 @@ abstract final class AppColors {
 
   // Table State Colors
   static const Color tableAvailable = Color(0xFF10B981);
-  static const Color tableOccupied = Color(0xFFFF6B35);
+  static const Color tableOccupied = Color(0xFFF59E0B);
   static const Color tableBilled = Color(0xFF6366F1);
   static const Color tableReserved = Color(0xFF0EA5E9);
 
@@ -93,13 +93,13 @@ abstract final class AppColors {
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFFF6B35), Color(0xFFE85D04)],
+    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
   );
 
   static const LinearGradient primaryWarmGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFFFB59D), Color(0xFFFF6B35)],
+    colors: [Color(0xFFFCD34D), Color(0xFFF59E0B)],
   );
 
   static const LinearGradient darkCardGradient = LinearGradient(

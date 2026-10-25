@@ -111,7 +111,7 @@ class AppButton extends StatelessWidget {
     if (_isEnabled && variant == AppButtonVariant.primary) {
       shadows = const [
         BoxShadow(
-          color: Color(0x4DFF6B35),
+          color: Color(0x4DF59E0B),
           blurRadius: 20,
           offset: Offset(0, 6),
         ),

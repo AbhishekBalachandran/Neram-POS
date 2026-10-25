@@ -473,7 +473,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
             boxShadow: isSelected
                 ? const [
                     BoxShadow(
-                      color: Color(0x40FF6B35),
+                      color: Color(0x40F59E0B),
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     ),
@@ -1390,7 +1390,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x4DFF6B35),
+                        color: Color(0x4DF59E0B),
                         blurRadius: 14,
                         offset: Offset(0, 4),
                       ),
