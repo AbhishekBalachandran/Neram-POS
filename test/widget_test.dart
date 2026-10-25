@@ -923,8 +923,8 @@ void main() {
         find.text('Search items, category, supplier or unit...'),
         findsOneWidget,
       );
-      expect(find.text('Consumables'), findsOneWidget);
-      expect(find.text('Small Equipment'), findsOneWidget);
+      expect(find.text('Consumables'), findsWidgets);
+      expect(find.text('Small Equipment'), findsWidgets);
 
       // Verify Stock Card Presence
       expect(find.text('Gloves Nitrile Black Disposable'), findsOneWidget);

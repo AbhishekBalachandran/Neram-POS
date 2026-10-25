@@ -995,65 +995,43 @@ class _StockTabViewState extends State<StockTabView> {
               ],
             ],
           ),
+          const SizedBox(height: 10),
+          Divider(
+            height: 1,
+            color: borderColor.withValues(alpha: 0.8),
+          ),
           const SizedBox(height: 8),
 
-          // 2. Category
-          Text(
-            'Category: ${item.category.displayName}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: secondaryTextColor,
-              height: 1.3,
-            ),
+          // Key-Value Details Section (Row with spaceBetween)
+          _buildKeyValueRow(
+            label: 'Category',
+            value: item.category.displayName,
+            labelColor: secondaryTextColor,
+            valueColor: primaryTextColor,
           ),
-          const SizedBox(height: 6),
-
-          // 3. In stock: no. of packets, total amount eg: 500 ml, amount per packet eg: 250 ml each
-          Text(
-            'In stock: $packetsLabel, ${item.displayTotalAmount}, ${item.displayAmountPerPacket}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: item.isLowStock ? AppColors.error : primaryTextColor,
-              height: 1.3,
-            ),
+          _buildKeyValueRow(
+            label: 'In Stock',
+            value: '$packetsLabel, ${item.displayTotalAmount}, ${item.displayAmountPerPacket}',
+            labelColor: secondaryTextColor,
+            valueColor: item.isLowStock ? AppColors.error : primaryTextColor,
           ),
-          const SizedBox(height: 6),
-
-          // 4. Cost: needs both per packet cost and per unit cost
-          Text(
-            'Cost: ₹${item.displayCostPerPacket.toStringAsFixed(2)} / packet, ₹${item.costPerUnit.toStringAsFixed(2)} / ${item.unit}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: secondaryTextColor,
-              height: 1.3,
-            ),
+          _buildKeyValueRow(
+            label: 'Cost',
+            value: '₹${item.displayCostPerPacket.toStringAsFixed(2)} / packet, ₹${item.costPerUnit.toStringAsFixed(2)} / ${item.unit}',
+            labelColor: secondaryTextColor,
+            valueColor: primaryTextColor,
           ),
-          const SizedBox(height: 6),
-
-          // 5. Min. level: eg: 5 packet
-          Text(
-            'Min. level: $minPacketsLabel',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: secondaryTextColor,
-              height: 1.3,
-            ),
+          _buildKeyValueRow(
+            label: 'Min. Level',
+            value: minPacketsLabel,
+            labelColor: secondaryTextColor,
+            valueColor: primaryTextColor,
           ),
-          const SizedBox(height: 6),
-
-          // 6. Supplier name
-          Text(
-            'Supplier: ${item.supplier}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: secondaryTextColor,
-              height: 1.3,
-            ),
+          _buildKeyValueRow(
+            label: 'Supplier',
+            value: item.supplier,
+            labelColor: secondaryTextColor,
+            valueColor: primaryTextColor,
           ),
           const SizedBox(height: 14),
 
@@ -1140,6 +1118,46 @@ class _StockTabViewState extends State<StockTabView> {
     );
   }
 
+  /// Reusable Key-Value item row with spaceBetween alignment and no truncation
+  Widget _buildKeyValueRow({
+    required String label,
+    required String value,
+    required Color labelColor,
+    required Color valueColor,
+    FontWeight valueWeight = FontWeight.w600,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3.5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: labelColor,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: valueWeight,
+                color: valueColor,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   /// Weekly Kitchen Stocktake Audit Banner Card
   Widget _buildAuditBannerCard(
