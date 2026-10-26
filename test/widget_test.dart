@@ -734,7 +734,7 @@ void main() {
   );
 
   testWidgets(
-    'ProfileView renders Stitch specifications and handles PIN & HR modals',
+    'ProfileView renders staff identity, badges, account, employment, and bank sections',
     (WidgetTester tester) async {
       final prefs = await SharedPreferences.getInstance();
       final authRepository = FakeAuthRepository();
@@ -770,47 +770,67 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Verify key profile headers & metadata from Stitch
+      // Verify AppBar
       expect(find.text('Staff Profile'), findsOneWidget);
-      expect(find.text('CREDENTIAL & TERMINAL IDENTITY'), findsOneWidget);
-      expect(find.text('VIEW-ONLY PROFILE'), findsOneWidget);
-      expect(find.text('Account & System Access'), findsOneWidget);
 
-      // Verify Contact Admin / HR modal while at top
-      await tester.tap(find.text('Contact Admin / HR'));
+      // Verify Identity card: Staff name and badges
+      expect(find.text('Abhishek'), findsWidgets);
+      expect(find.text('Employee'), findsWidgets);
+      expect(find.text('Active'), findsOneWidget);
+      expect(find.text('Waiter'), findsWidgets);
+
+      // Verify Active / Inactive badge toggle
+      await tester.tap(find.text('Active'));
       await tester.pumpAndSettle();
-      expect(find.text('Contact Store Administration'), findsOneWidget);
+      expect(find.text('Inactive'), findsOneWidget);
 
-      // Close Contact Admin modal
-      await tester.tap(find.text('Close'));
+      await tester.tap(find.text('Inactive'));
       await tester.pumpAndSettle();
-      expect(find.text('Contact Store Administration'), findsNothing);
+      expect(find.text('Active'), findsOneWidget);
 
-      // Verify Update PIN modal
-      await tester.tap(find.text('Update PIN'));
-      await tester.pumpAndSettle();
-      expect(find.text('Update Quick PIN'), findsOneWidget);
-      expect(find.text('NEW 4-DIGIT SPEED PIN'), findsOneWidget);
+      // Verify Account Section
+      expect(find.text('Account'), findsOneWidget);
+      expect(find.text('Username'), findsOneWidget);
+      expect(find.text('Role'), findsOneWidget);
+      expect(find.text('Table orders & POS'), findsOneWidget);
+      expect(find.text('Inventory'), findsOneWidget);
+      expect(find.text('Print bill'), findsOneWidget);
+      expect(find.text('Allowed'), findsNWidgets(2));
+      expect(find.text('Restricted'), findsOneWidget);
 
-      // Cancel Update PIN modal
-      await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
-      expect(find.text('Update Quick PIN'), findsNothing);
+      // Verify Employment Section
+      expect(find.text('Employment'), findsOneWidget);
+      expect(find.text('Full name'), findsOneWidget);
+      expect(find.text('Abhishek B Ambady'), findsOneWidget);
+      expect(find.text('Designation'), findsOneWidget);
+      expect(find.text('Phone'), findsOneWidget);
+      expect(find.text('9876543210'), findsOneWidget);
+      expect(find.text('Email'), findsOneWidget);
+      expect(find.text('abc@gmail.com'), findsOneWidget);
+      expect(find.text('Department'), findsOneWidget);
+      expect(find.text('Joined'), findsOneWidget);
+      expect(find.text('15 Jan 2023'), findsOneWidget);
+      expect(find.text('Basic salary'), findsOneWidget);
+      expect(find.text('20000'), findsOneWidget);
+      expect(find.text('Leave quota'), findsOneWidget);
+      expect(find.text('12 paid / 12 casual days per year'), findsOneWidget);
+      expect(find.text('Address'), findsOneWidget);
 
-      // Scroll down and verify remaining sections
-      await tester.scrollUntilVisible(
-        find.text('Personal & Employment Details'),
-        200,
-      );
-      expect(find.text('Personal & Employment Details'), findsOneWidget);
+      // Verify Bank & Payout Section
+      expect(find.text('Bank & Payout'), findsOneWidget);
+      expect(find.text('Account holder'), findsOneWidget);
+      expect(find.text('Bank'), findsOneWidget);
+      expect(find.text('Federal Bank'), findsOneWidget);
+      expect(find.text('Account number'), findsOneWidget);
+      expect(find.text('982374982739'), findsOneWidget);
+      expect(find.text('IFSC'), findsOneWidget);
+      expect(find.text('AL432892'), findsOneWidget);
+      expect(find.text('Branch'), findsOneWidget);
+      expect(find.text('Kochi'), findsOneWidget);
+      expect(find.text('UPI ID'), findsOneWidget);
+      expect(find.text('4894938@icici'), findsOneWidget);
 
-      await tester.scrollUntilVisible(
-        find.text('Bank Account & Payout Details'),
-        200,
-      );
-      expect(find.text('Bank Account & Payout Details'), findsOneWidget);
-
-      await tester.scrollUntilVisible(find.text('Log Out of Terminal'), 200);
+      // Verify Logout Button
       expect(find.text('Log Out of Terminal'), findsOneWidget);
     },
   );

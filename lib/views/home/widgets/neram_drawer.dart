@@ -566,7 +566,8 @@ class NeramDrawer extends StatelessWidget {
                                               fontSize: 11,
                                               color: isDark
                                                   ? AppColors.darkTextSecondary
-                                                  : AppColors.lightTextSecondary,
+                                                  : AppColors
+                                                        .lightTextSecondary,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -595,8 +596,9 @@ class NeramDrawer extends StatelessWidget {
                                     color: isDark
                                         ? AppColors.primary
                                         : (isDark
-                                            ? AppColors.darkSurfaceContainerHighest
-                                            : AppColors.lightBorder),
+                                              ? AppColors
+                                                    .darkSurfaceContainerHighest
+                                              : AppColors.lightBorder),
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   alignment: isDark
@@ -722,29 +724,16 @@ class NeramDrawer extends StatelessWidget {
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                'Hospitality Edition',
+                                'v2.4.1 (Build 8290)',
                                 style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 10,
                                   color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.lightTextSecondary,
+                                      ? AppColors.darkTextMuted
+                                      : AppColors.lightTextMuted,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'v2.4.1 (Build 8290) • Amber Hearth',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: isDark
-                                ? AppColors.darkTextMuted
-                                : AppColors.lightTextMuted,
-                          ),
                         ),
                       ],
                     ),
