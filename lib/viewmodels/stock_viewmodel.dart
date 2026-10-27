@@ -1,4 +1,5 @@
 import 'package:neram_pos/data/models/stock_item_model.dart';
+import 'package:neram_pos/data/repositories/stock_repository.dart';
 import 'package:neram_pos/viewmodels/base_viewmodel.dart';
 
 enum StockSortOption {
@@ -25,8 +26,23 @@ enum StockSortOption {
 /// Matches the official Stitch specification with live search, category filtering,
 /// priority restock toggling, restocking adjustments, usage logs, and weekly audits.
 class StockViewModel extends BaseViewModel {
-  StockViewModel() {
+  StockViewModel({this.repository}) {
     _initializeSeedCatalog();
+    _fetchFromApi();
+  }
+
+  final StockRepository? repository;
+
+  Future<void> _fetchFromApi() async {
+    if (repository == null) return;
+    try {
+      final remoteItems = await repository!.getInventoryItems();
+      if (remoteItems.isNotEmpty) {
+        _items.clear();
+        _items.addAll(remoteItems);
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   final List<StockItemModel> _items = [];
@@ -170,6 +186,15 @@ class StockViewModel extends BaseViewModel {
     );
 
     notifyListeners();
+
+    // Async server sync
+    repository?.restockItem(
+      itemId: itemId,
+      addedQuantity: addedQuantity,
+      invoiceNumber: invoiceNumber,
+      supplierName: supplierName,
+      staffName: staffName,
+    );
     return true;
   }
 
@@ -201,6 +226,14 @@ class StockViewModel extends BaseViewModel {
     );
 
     notifyListeners();
+
+    // Async server sync
+    repository?.recordUsage(
+      itemId: itemId,
+      usedQuantity: usedQuantity,
+      reason: reason,
+      staffName: staffName,
+    );
     return true;
   }
 
@@ -240,6 +273,9 @@ class StockViewModel extends BaseViewModel {
 
     _items.insert(0, newItem);
     notifyListeners();
+
+    // Async server sync
+    repository?.createStockItem(newItem);
     return true;
   }
 
@@ -251,6 +287,22 @@ class StockViewModel extends BaseViewModel {
     _lastKitchenAudit = DateTime.now();
     _lastAuditedBy = staffName;
     notifyListeners();
+
+    // Async server sync
+    repository?.submitAudit(staffName: staffName, notes: notes);
+  }
+
+  /// Send manager alert or update alert threshold
+  Future<void> sendManagerAlert({
+    required String itemId,
+    double minLevel = 0.0,
+    int? minPackets,
+  }) async {
+    await repository?.updateAlertThreshold(
+      itemId: itemId,
+      minLevel: minLevel,
+      minPackets: minPackets,
+    );
   }
 
   /// Seeds catalog precisely matching the Stitch "NERAM POS - Stocks & Inventory Management" screen.

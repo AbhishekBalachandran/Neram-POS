@@ -355,6 +355,7 @@ class _ProfileViewState extends State<ProfileView>
                   setState(() {
                     _isActive = !_isActive;
                   });
+                  context.read<AuthViewModel>().updateStatus(isActive: _isActive);
                 },
                 child: _buildBadge(
                   label: _isActive ? 'Active' : 'Inactive',

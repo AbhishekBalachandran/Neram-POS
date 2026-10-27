@@ -52,4 +52,26 @@ class AuthViewModel extends BaseViewModel {
       notifyListeners();
     });
   }
+
+  /// Changes the staff account password via API.
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final success = await runBusyFuture<bool>(() async {
+      return await authRepository.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+    });
+    return success ?? false;
+  }
+
+  /// Updates staff active/inactive status via API.
+  Future<bool> updateStatus({required bool isActive}) async {
+    final success = await runBusyFuture<bool>(() async {
+      return await authRepository.updateStatus(isActive: isActive);
+    });
+    return success ?? false;
+  }
 }

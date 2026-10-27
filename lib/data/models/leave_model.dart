@@ -153,5 +153,56 @@ class LeaveApplicationModel {
       appliedAt: appliedAt ?? this.appliedAt,
     );
   }
+
+  factory LeaveApplicationModel.fromJson(Map<String, dynamic> json) {
+    LeaveType type = LeaveType.paidLeave;
+    final typeStr = (json['type'] as String?)?.toLowerCase();
+    if (typeStr == 'casualleave' || typeStr == 'casual') type = LeaveType.casualLeave;
+    if (typeStr == 'compensatoryoff' || typeStr == 'compoff') type = LeaveType.compensatoryOff;
+    if (typeStr == 'sickleave' || typeStr == 'sick') type = LeaveType.sickLeave;
+
+    LeaveStatus status = LeaveStatus.pending;
+    final statusStr = (json['status'] as String?)?.toLowerCase();
+    if (statusStr == 'approved') status = LeaveStatus.approved;
+    if (statusStr == 'rejected') status = LeaveStatus.rejected;
+
+    return LeaveApplicationModel(
+      id: json['id'] as String? ?? '',
+      applicantName: json['applicantName'] as String? ?? '',
+      applicantRole: json['applicantRole'] as String? ?? '',
+      staffId: json['staffId'] as String? ?? '',
+      initials: json['initials'] as String? ?? '',
+      startDate: json['startDate'] != null
+          ? DateTime.tryParse(json['startDate'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      endDate: json['endDate'] != null
+          ? DateTime.tryParse(json['endDate'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      days: (json['days'] as num?)?.toInt() ?? 1,
+      type: type,
+      reason: json['reason'] as String? ?? '',
+      status: status,
+      reviewedBy: json['reviewedBy'] as String? ?? 'Awaiting Manager Dispatch',
+      appliedAt: json['appliedAt'] != null
+          ? DateTime.tryParse(json['appliedAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'applicantName': applicantName,
+    'applicantRole': applicantRole,
+    'staffId': staffId,
+    'initials': initials,
+    'startDate': startDate.toIso8601String(),
+    'endDate': endDate.toIso8601String(),
+    'days': days,
+    'type': type.name,
+    'reason': reason,
+    'status': status.name,
+    'reviewedBy': reviewedBy,
+    'appliedAt': appliedAt.toIso8601String(),
+  };
 }
 

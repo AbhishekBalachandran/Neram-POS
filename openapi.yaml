@@ -1,0 +1,415 @@
+openapi: 3.0.3
+info:
+  title: NERAM POS API Specification
+  description: Official RESTful API specification for NERAM POS client and backend synchronization.
+  version: 1.0.0
+servers:
+  - url: https://api.nerampos.com/v1
+    description: Production Server
+  - url: https://dev-api.nerampos.com/v1
+    description: Development Server
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate Staff
+      description: Logs in staff using username and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: abhishek
+                password:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Authentication successful
+        '401':
+          description: Invalid credentials
+
+  /auth/refresh:
+    post:
+      summary: Refresh Access Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+        '401':
+          description: Expired or invalid token
+
+  /auth/logout:
+    post:
+      summary: Logout Staff
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out
+
+  /auth/change-password:
+    post:
+      summary: Change Staff Password
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid current password or weak new password
+
+  /auth/profile:
+    get:
+      summary: Get Staff Profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Staff profile returned
+
+  /staff/profile/status:
+    patch:
+      summary: Update Staff Active/Inactive Status
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isActive]
+              properties:
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Status updated
+
+  /orders/sync:
+    post:
+      summary: Idempotent Order & Hybrid Print Sync
+      description: Syncs client-drafted orders and hybrid LAN printer jobs with server queue fallback.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Outlet-Id
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderId, localNo, payload, jobs, rev]
+              properties:
+                orderId:
+                  type: string
+                  format: uuid
+                localNo:
+                  type: string
+                  example: "#ORD-2849"
+                payload:
+                  type: object
+                jobs:
+                  type: array
+                  items:
+                    type: object
+                    required: [jobId, printerId, status]
+                    properties:
+                      jobId:
+                        type: string
+                        format: uuid
+                      printerId:
+                        type: string
+                      type:
+                        type: string
+                        example: kot
+                      status:
+                        type: string
+                        enum: [pending, printing, printed, failed, fallbackRequested, serverPrinted]
+                      attempts:
+                        type: integer
+                      lastError:
+                        type: string
+                        nullable: true
+                rev:
+                  type: integer
+                createdAt:
+                  type: string
+                  format: date-time
+                deviceId:
+                  type: string
+      responses:
+        '200':
+          description: Order upserted and merged jobs returned
+
+  /printers:
+    get:
+      summary: List Network Printers
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of thermal printers configured for outlet
+
+  /tables:
+    get:
+      summary: List Dining Tables
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of tables and current statuses
+
+  /tables/transfer:
+    post:
+      summary: Transfer Table
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fromTableId, toTableId]
+              properties:
+                fromTableId:
+                  type: string
+                toTableId:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Table transferred
+
+  /menu/categories:
+    get:
+      summary: List Dish Categories
+      responses:
+        '200':
+          description: Array of category names
+
+  /menu/items:
+    get:
+      summary: List Menu Dishes
+      responses:
+        '200':
+          description: Array of menu dish items
+
+  /orders/active:
+    get:
+      summary: List Active Kitchen Orders
+      responses:
+        '200':
+          description: Active orders returned
+
+  /orders/{id}/bill:
+    post:
+      summary: Generate Bill for Order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order marked as billed
+
+  /orders/{id}/settle:
+    post:
+      summary: Settle Order Payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentMethod]
+              properties:
+                paymentMethod:
+                  type: string
+      responses:
+        '200':
+          description: Order settled and closed
+
+  /orders/{id}:
+    delete:
+      summary: Cancel Order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order cancelled
+
+  /inventory/items:
+    get:
+      summary: List Stock Items
+      responses:
+        '200':
+          description: Inventory items returned
+    post:
+      summary: Create New Inventory Item
+      responses:
+        '201':
+          description: Item created
+
+  /inventory/items/{id}/restock:
+    post:
+      summary: Inward Restock Item Batch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restock recorded
+
+  /inventory/items/{id}/issue:
+    post:
+      summary: Record Kitchen/Bar Stock Consumption
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usage recorded
+
+  /inventory/items/{id}/alert-manager:
+    post:
+      summary: Update Safety Threshold / Alert Manager
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Alert updated
+
+  /inventory/audit:
+    post:
+      summary: Submit Stock Audit
+      responses:
+        '200':
+          description: Audit recorded
+
+  /attendance/monthly-summary:
+    get:
+      summary: Get Monthly Attendance Metrics
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Summary returned
+
+  /attendance/check-in:
+    post:
+      summary: Punch In Shift
+      responses:
+        '200':
+          description: Checked in
+
+  /attendance/check-out:
+    post:
+      summary: Punch Out Shift
+      responses:
+        '200':
+          description: Checked out
+
+  /leaves:
+    get:
+      summary: List Leave Applications
+      responses:
+        '200':
+          description: List of leave applications
+    post:
+      summary: Apply for Leave
+      responses:
+        '201':
+          description: Leave application submitted
+
+  /leaves/{id}:
+    delete:
+      summary: Cancel Leave Application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Leave cancelled
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+

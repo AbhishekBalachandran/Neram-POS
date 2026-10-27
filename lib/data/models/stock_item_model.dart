@@ -75,6 +75,30 @@ class StockLogEntry {
   final double balanceAfter;
   final String staffName;
   final String? notes;
+
+  factory StockLogEntry.fromJson(Map<String, dynamic> json) {
+    return StockLogEntry(
+      id: json['id'] as String? ?? '',
+      timestamp: json['timestamp'] != null
+          ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      action: json['action'] as String? ?? '',
+      quantityChange: (json['quantityChange'] as num?)?.toDouble() ?? 0.0,
+      balanceAfter: (json['balanceAfter'] as num?)?.toDouble() ?? 0.0,
+      staffName: json['staffName'] as String? ?? '',
+      notes: json['notes'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'timestamp': timestamp.toIso8601String(),
+    'action': action,
+    'quantityChange': quantityChange,
+    'balanceAfter': balanceAfter,
+    'staffName': staffName,
+    'notes': notes,
+  };
 }
 
 /// Rich domain model representing a stock item in NERAM POS.
@@ -274,4 +298,58 @@ class StockItemModel {
       lastAudited: lastAudited ?? this.lastAudited,
     );
   }
+
+  factory StockItemModel.fromJson(Map<String, dynamic> json) {
+    StockCategory category = StockCategory.foodRaw;
+    final catStr = (json['category'] as String?)?.toLowerCase();
+    if (catStr == 'consumables') category = StockCategory.consumables;
+    if (catStr == 'small_equip' || catStr == 'smallequipment') category = StockCategory.smallEquipment;
+    if (catStr == 'fixed' || catStr == 'fixedassets') category = StockCategory.fixedAssets;
+
+    final logsRaw = json['logs'];
+    final logsList = <StockLogEntry>[];
+    if (logsRaw is List) {
+      for (final logItem in logsRaw) {
+        if (logItem is Map<String, dynamic>) {
+          logsList.add(StockLogEntry.fromJson(logItem));
+        }
+      }
+    }
+
+    return StockItemModel(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      category: category,
+      unit: json['unit'] as String? ?? '',
+      currentStock: (json['currentStock'] as num?)?.toDouble() ?? 0.0,
+      minLevel: (json['minLevel'] as num?)?.toDouble() ?? 0.0,
+      costPerUnit: (json['costPerUnit'] as num?)?.toDouble() ?? 0.0,
+      supplier: json['supplier'] as String? ?? '',
+      packetsCount: (json['packetsCount'] as num?)?.toInt(),
+      amountPerPacket: (json['amountPerPacket'] as num?)?.toDouble(),
+      costPerPacket: (json['costPerPacket'] as num?)?.toDouble(),
+      minPackets: (json['minPackets'] as num?)?.toInt(),
+      logs: logsList,
+      lastAudited: json['lastAudited'] != null
+          ? DateTime.tryParse(json['lastAudited'].toString())
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'category': category.code,
+    'unit': unit,
+    'currentStock': currentStock,
+    'minLevel': minLevel,
+    'costPerUnit': costPerUnit,
+    'supplier': supplier,
+    'packetsCount': ?packetsCount,
+    'amountPerPacket': ?amountPerPacket,
+    'costPerPacket': ?costPerPacket,
+    'minPackets': ?minPackets,
+    'logs': logs.map((l) => l.toJson()).toList(),
+    'lastAudited': ?lastAudited?.toIso8601String(),
+  };
 }

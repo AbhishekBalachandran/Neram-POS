@@ -49,4 +49,55 @@ class OrderModel {
       zone: zone ?? this.zone,
     );
   }
+
+  factory OrderModel.fromJson(Map<String, dynamic> json) {
+    TableZone zone = TableZone.indoor;
+    final zoneStr = (json['zone'] as String?)?.toLowerCase();
+    if (zoneStr == 'outdoor') zone = TableZone.outdoor;
+    if (zoneStr == 'takeaway') zone = TableZone.takeaway;
+
+    TableStatus status = TableStatus.preparing;
+    final statusStr = (json['status'] as String?)?.toLowerCase();
+    if (statusStr == 'vacant') status = TableStatus.vacant;
+    if (statusStr == 'occupied' || statusStr == 'dining') status = TableStatus.occupied;
+    if (statusStr == 'billed') status = TableStatus.billed;
+
+    final rawItems = json['items'];
+    final itemsList = <String>[];
+    if (rawItems is List) {
+      for (final item in rawItems) {
+        if (item is String) {
+          itemsList.add(item);
+        } else if (item is Map) {
+          final qty = item['quantity'] ?? item['qty'] ?? 1;
+          final name = item['name'] ?? item['dishName'] ?? '';
+          itemsList.add('${qty}x $name');
+        }
+      }
+    }
+
+    return OrderModel(
+      id: json['id'] as String? ?? '',
+      tableId: json['tableId'] as String? ?? '',
+      tableName: json['tableName'] as String? ?? '',
+      customerName: json['customerName'] as String? ?? '',
+      items: itemsList,
+      total: (json['total'] as num?)?.toDouble() ?? 0.0,
+      status: status,
+      timeElapsed: json['timeElapsed'] as String? ?? 'Just now',
+      zone: zone,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'tableId': tableId,
+    'tableName': tableName,
+    'customerName': customerName,
+    'items': items,
+    'total': total,
+    'status': status.name,
+    'timeElapsed': timeElapsed,
+    'zone': zone.name,
+  };
 }

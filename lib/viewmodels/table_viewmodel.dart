@@ -3,6 +3,7 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/data/models/dish_model.dart';
 import 'package:neram_pos/data/models/order_model.dart';
 import 'package:neram_pos/data/models/table_model.dart';
+import 'package:neram_pos/data/repositories/table_repository.dart';
 
 /// Dining mode selection: Indoor Tables, Outdoor (by customer name), Takeaway (by customer name).
 enum DiningMode {
@@ -25,8 +26,32 @@ enum DiningMode {
 
 /// State management for Table & Menu Workspace.
 class TableViewModel extends ChangeNotifier {
-  TableViewModel() {
+  TableViewModel({this.repository}) {
     _initializeData();
+    _fetchFromApi();
+  }
+
+  final TableRepository? repository;
+
+  Future<void> _fetchFromApi() async {
+    if (repository == null) return;
+    try {
+      final remoteTables = await repository!.getTables();
+      if (remoteTables.isNotEmpty) {
+        _tables = remoteTables;
+        notifyListeners();
+      }
+      final remoteDishes = await repository!.getMenuItems();
+      if (remoteDishes.isNotEmpty) {
+        _dishes = remoteDishes;
+        notifyListeners();
+      }
+      final remoteOrders = await repository!.getActiveOrders();
+      if (remoteOrders.isNotEmpty) {
+        _activeOrders = remoteOrders;
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   // State
@@ -227,6 +252,9 @@ class TableViewModel extends ChangeNotifier {
     _itemNotes.clear();
     _orderNote = '';
     notifyListeners();
+
+    // Async server sync
+    repository?.createOrder(newOrder.toJson());
   }
 
   void clearCart() {
@@ -287,6 +315,37 @@ class TableViewModel extends ChangeNotifier {
     }
 
     notifyListeners();
+
+    // Async server sync
+    repository?.transferTable(
+      fromTableId: fromTableId,
+      toTableId: toTableId,
+      reason: reason,
+    );
+  }
+
+  /// Mark an active order as billed via API
+  Future<void> billOrder(String orderId) async {
+    final index = _activeOrders.indexWhere((o) => o.id == orderId);
+    if (index != -1) {
+      _activeOrders[index] = _activeOrders[index].copyWith(status: TableStatus.billed);
+      notifyListeners();
+    }
+    await repository?.generateBill(orderId);
+  }
+
+  /// Settle and close an order via API
+  Future<void> settleOrder(String orderId, {String paymentMethod = 'Cash'}) async {
+    _activeOrders.removeWhere((o) => o.id == orderId);
+    notifyListeners();
+    await repository?.settleOrder(orderId, paymentMethod: paymentMethod);
+  }
+
+  /// Cancel an order via API
+  Future<void> cancelOrder(String orderId, {String? reason}) async {
+    _activeOrders.removeWhere((o) => o.id == orderId);
+    notifyListeners();
+    await repository?.cancelOrder(orderId, reason: reason);
   }
 
   void _initializeData() {

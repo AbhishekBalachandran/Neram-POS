@@ -6,6 +6,7 @@ import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/widgets/neram_logo_badge.dart';
+import 'package:neram_pos/features/printing/widgets/pending_sync_indicator.dart';
 
 /// Top App Bar matching the Google Stitch "NERAM POS - Main Dashboard" design specification.
 /// Features frosted glass blur, dual-tone brand title, uppercase tracked subtitle,
@@ -119,6 +120,9 @@ class NeramAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ],
                   ),
                 ),
+
+                // Pending Sync & Print Issues Indicator
+                const PendingSyncIndicator(),
 
                 // Trailing actions if any
                 ...?actions,

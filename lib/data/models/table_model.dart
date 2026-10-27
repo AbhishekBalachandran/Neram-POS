@@ -99,4 +99,41 @@ class TableModel {
       itemCount: itemCount ?? this.itemCount,
     );
   }
+
+  factory TableModel.fromJson(Map<String, dynamic> json) {
+    TableZone zone = TableZone.indoor;
+    final zoneStr = (json['zone'] as String?)?.toLowerCase();
+    if (zoneStr == 'outdoor') zone = TableZone.outdoor;
+    if (zoneStr == 'takeaway') zone = TableZone.takeaway;
+
+    TableStatus status = TableStatus.vacant;
+    final statusStr = (json['status'] as String?)?.toLowerCase();
+    if (statusStr == 'preparing' || statusStr == 'prep') status = TableStatus.preparing;
+    if (statusStr == 'occupied' || statusStr == 'dining') status = TableStatus.occupied;
+    if (statusStr == 'billed') status = TableStatus.billed;
+
+    return TableModel(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      zone: zone,
+      seats: (json['seats'] as num?)?.toInt() ?? 4,
+      status: status,
+      total: (json['total'] as num?)?.toDouble() ?? 0.0,
+      customerName: json['customerName'] as String?,
+      timeElapsed: json['timeElapsed'] as String? ?? 'Ready',
+      itemCount: (json['itemCount'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'zone': zone.name,
+    'seats': seats,
+    'status': status.name,
+    'total': total,
+    'customerName': customerName,
+    'timeElapsed': timeElapsed,
+    'itemCount': itemCount,
+  };
 }

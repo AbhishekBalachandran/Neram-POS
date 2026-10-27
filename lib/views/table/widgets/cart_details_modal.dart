@@ -5,6 +5,8 @@ import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
 import 'package:neram_pos/core/widgets/app_bottom_sheet.dart';
 import 'package:neram_pos/data/models/dish_model.dart';
+import 'package:neram_pos/features/printing/services/hybrid_print_manager.dart';
+import 'package:neram_pos/features/printing/utils/uuid_generator.dart';
 import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
 import 'package:neram_pos/viewmodels/table_viewmodel.dart';
 import 'package:neram_pos/views/table/widgets/table_transfer_dialog.dart';
@@ -28,6 +30,7 @@ class CartDetailsModal extends StatefulWidget {
 }
 
 class _CartDetailsModalState extends State<CartDetailsModal> {
+  late final String _draftOrderId;
   late final TextEditingController _guestController;
   late final TextEditingController _orderNoteController;
   final Map<String, TextEditingController> _dishNoteControllers = {};
@@ -35,6 +38,7 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
   @override
   void initState() {
     super.initState();
+    _draftOrderId = UuidGenerator.v4();
     final tableViewModel = context.read<TableViewModel>();
     _guestController = TextEditingController(text: tableViewModel.customerName);
     _orderNoteController = TextEditingController(text: tableViewModel.orderNote);
@@ -1581,6 +1585,40 @@ class _CartDetailsModalState extends State<CartDetailsModal> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () {
+                  final printManager = Provider.of<HybridPrintManager?>(context, listen: false);
+                  if (printManager != null && printManager.isSendInProgress) {
+                    return; // Ignore tap if a send is already in progress
+                  }
+
+                  // Build items payload for hybrid LAN printing and server synchronization
+                  final cartItems = tableViewModel.currentTableCart.entries.map((e) {
+                    final dish = tableViewModel.dishes.firstWhere(
+                      (d) => d.id == e.key,
+                      orElse: () => tableViewModel.dishes.first,
+                    );
+                    return {
+                      'dishId': dish.id,
+                      'name': dish.name,
+                      'quantity': e.value,
+                      'price': dish.price,
+                      'category': dish.category,
+                      'note': tableViewModel.itemNotes[dish.id],
+                    };
+                  }).toList();
+
+                  printManager?.sendToKitchen(
+                    orderId: _draftOrderId,
+                    localNo: '#ORD-${DateTime.now().millisecondsSinceEpoch % 10000}',
+                    tableId: tableViewModel.selectedTableId,
+                    tableName: tableViewModel.orderDestinationTitle,
+                    diningMode: tableViewModel.diningMode.name,
+                    customerName: tableViewModel.customerName,
+                    orderNote: tableViewModel.orderNote,
+                    items: cartItems,
+                    total: tableViewModel.cartTotalPayable,
+                    tax: tableViewModel.cartTax,
+                  );
+
                   tableViewModel.sendOrderToKitchen();
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(

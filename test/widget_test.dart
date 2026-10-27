@@ -63,6 +63,15 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<bool> isAuthenticated() async => false;
+
+  @override
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async => true;
+
+  @override
+  Future<bool> updateStatus({required bool isActive}) async => true;
 }
 
 void main() {

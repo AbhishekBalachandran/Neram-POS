@@ -2,13 +2,17 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/data/models/leave_model.dart';
+import 'package:neram_pos/data/repositories/leaves_repository.dart';
 
 /// State management for the Leaves & Attendance Workspace from Stitch.
 class LeavesViewModel extends ChangeNotifier {
-  LeavesViewModel() {
+  LeavesViewModel({this.repository}) {
     _initializeData();
     _startLiveClock();
+    _fetchFromApi();
   }
+
+  final LeavesRepository? repository;
 
   Timer? _ticker;
   DateTime _currentTime = DateTime.now();
@@ -20,6 +24,28 @@ class LeavesViewModel extends ChangeNotifier {
 
   int _selectedYear = 2024;
   String _selectedMonth = 'October';
+  int _absentDays = 1;
+  int _leaveDays = 2;
+
+  Future<void> _fetchFromApi() async {
+    if (repository == null) return;
+    try {
+      final remoteLeaves = await repository!.getLeaveApplications();
+      if (remoteLeaves.isNotEmpty) {
+        _applications = remoteLeaves;
+        notifyListeners();
+      }
+      final summary = await repository!.getMonthlySummary(
+        year: _selectedYear,
+        month: _selectedMonth,
+      );
+      if (summary != null) {
+        if (summary['absentDays'] is num) _absentDays = (summary['absentDays'] as num).toInt();
+        if (summary['leaveDays'] is num) _leaveDays = (summary['leaveDays'] as num).toInt();
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
 
   static const List<int> yearsList = [2023, 2024, 2025, 2026, 2027];
   static const List<String> monthsList = [
@@ -56,11 +82,11 @@ class LeavesViewModel extends ChangeNotifier {
   }
 
   int get totalMonthDays => daysInMonth;
-  int get absentDays => 1;
-  int get leaveDays => 2;
-  int get totalAbsentLeaveDays => absentDays + leaveDays;
-  int get absentCount => 1;
-  int get leaveCount => 2;
+  int get absentDays => _absentDays;
+  int get leaveDays => _leaveDays;
+  int get totalAbsentLeaveDays => _absentDays + _leaveDays;
+  int get absentCount => _absentDays;
+  int get leaveCount => _leaveDays;
 
   // Legacy/Additional Metrics
   String get joinedDate => '15 Jan 2024';
@@ -92,9 +118,11 @@ class LeavesViewModel extends ChangeNotifier {
   void checkIn() {
     HapticService.success();
     _isCheckedIn = true;
-    _checkInTime = DateTime.now();
+    final now = DateTime.now();
+    _checkInTime = now;
     _stationName = 'Active';
     notifyListeners();
+    repository?.checkIn(timestamp: now, station: _stationName);
   }
 
   void checkOut() {
@@ -103,6 +131,7 @@ class LeavesViewModel extends ChangeNotifier {
     _checkInTime = null;
     _stationName = 'Inactive';
     notifyListeners();
+    repository?.checkOut(timestamp: DateTime.now());
   }
 
   void applyLeave({
@@ -144,12 +173,14 @@ class LeavesViewModel extends ChangeNotifier {
 
     _applications.insert(0, newApplication);
     notifyListeners();
+    repository?.applyLeave(newApplication);
   }
 
   void cancelLeave(String id) {
     HapticService.selection();
     _applications.removeWhere((app) => app.id == id);
     notifyListeners();
+    repository?.cancelLeave(id);
   }
 
   void setMonth(String month) {
@@ -157,6 +188,7 @@ class LeavesViewModel extends ChangeNotifier {
       HapticService.selection();
       _selectedMonth = month;
       notifyListeners();
+      _fetchSummaryOnly();
     }
   }
 
@@ -165,7 +197,23 @@ class LeavesViewModel extends ChangeNotifier {
       HapticService.selection();
       _selectedYear = year;
       notifyListeners();
+      _fetchSummaryOnly();
     }
+  }
+
+  Future<void> _fetchSummaryOnly() async {
+    if (repository == null) return;
+    try {
+      final summary = await repository!.getMonthlySummary(
+        year: _selectedYear,
+        month: _selectedMonth,
+      );
+      if (summary != null) {
+        if (summary['absentDays'] is num) _absentDays = (summary['absentDays'] as num).toInt();
+        if (summary['leaveDays'] is num) _leaveDays = (summary['leaveDays'] as num).toInt();
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   void _initializeData() {

@@ -3,6 +3,8 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/data/models/stock_item_model.dart';
+import 'package:neram_pos/viewmodels/stock_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 /// Bottom sheet modal for notifying the manager about stock issues matching the user's specification.
 class AlertManagerModal extends StatefulWidget {
@@ -43,6 +45,9 @@ class _AlertManagerModalState extends State<AlertManagerModal> {
 
   void _onSendAlert() {
     HapticService.mediumImpact();
+    context.read<StockViewModel?>()?.sendManagerAlert(
+      itemId: widget.item.id,
+    );
     Navigator.of(context).pop();
 
     ScaffoldMessenger.of(context).showSnackBar(

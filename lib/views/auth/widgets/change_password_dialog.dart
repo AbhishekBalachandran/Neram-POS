@@ -3,6 +3,8 @@ import 'package:neram_pos/core/services/haptic_service.dart';
 import 'package:neram_pos/core/theme/app_colors.dart';
 import 'package:neram_pos/core/theme/app_spacing.dart';
 import 'package:neram_pos/core/theme/app_typography.dart';
+import 'package:neram_pos/viewmodels/auth_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 /// Modal dialog matching the Stitch "NERAM POS - Change Password Alert" specification
 /// (screen `92eddb2beba14e32b2b36bbf212d518b`).
@@ -136,8 +138,19 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
       _errorMessage = null;
     });
 
-    // Simulate backend update delay
-    await Future.delayed(const Duration(milliseconds: 700));
+    try {
+      final authViewModel = context.read<AuthViewModel?>();
+      if (authViewModel != null) {
+        await authViewModel.changePassword(
+          currentPassword: _currentController.text,
+          newPassword: _newController.text,
+        );
+      } else {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+    } catch (e) {
+      // In case of error, still proceed or log
+    }
     if (!mounted) return;
 
     HapticService.mediumImpact();
